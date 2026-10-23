@@ -5,7 +5,7 @@ A local ComfyUI pipeline for photoreal image-to-video on a single 16 GB consumer
 **Krea 2 Turbo still → MiniMax H3 image-to-video (with sound) → RIFE ×2 / lanczos ×2 upscale → 1536×1920 @ 48 fps.**
 
 Ready-to-drop ComfyUI workflows, the Python tooling used to generate and benchmark them, and the measured
-results of the first experiment series.
+measured results.
 
 - **Learning page (Russian, with videos and comparison sheets):** https://olexiy.github.io/comfy-h3-studio/
 - **Workflows:** [`workflows/`](workflows/) · **Tools:** [`tools/`](tools/) · **Shot-list prompts:** [`prompts/`](prompts/)
@@ -18,14 +18,10 @@ results of the first experiment series.
 
 ## Tested hardware
 
-| | |
-|---|---|
-| GPU | RTX 5070 Ti 16 GB (Blackwell) |
-| RAM | 62 GB — **the real limit**: H3's 32 B text encoder keeps system RAM at 54–60 GB |
-| ComfyUI | Desktop app, core v0.42.4, torch 2.12.1+cu130, Python 3.13 |
-| Custom nodes | [KJNodes](https://github.com/kijai/ComfyUI-KJNodes), [UltimateSDUpscale](https://github.com/ssitu/ComfyUI_UltimateSDUpscale), [Impact Pack](https://github.com/ltdrdata/ComfyUI-Impact-Pack) + [Subpack](https://github.com/ltdrdata/ComfyUI-Impact-Subpack), [Frame-Interpolation](https://github.com/Fannovel16/ComfyUI-Frame-Interpolation) (RIFE), [VideoHelperSuite](https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite) |
+Tested on **16 GB VRAM / 62 GB RAM** (RTX 5070 Ti, ComfyUI core 0.42). System RAM is the real limit: H3's 32 B
+text encoder keeps it at 54–60 GB.
 
-No Triton / SageAttention needed.
+Custom nodes: [KJNodes](https://github.com/kijai/ComfyUI-KJNodes), [UltimateSDUpscale](https://github.com/ssitu/ComfyUI_UltimateSDUpscale), [Impact Pack](https://github.com/ltdrdata/ComfyUI-Impact-Pack) + [Subpack](https://github.com/ltdrdata/ComfyUI-Impact-Subpack), [Frame-Interpolation](https://github.com/Fannovel16/ComfyUI-Frame-Interpolation) (RIFE), [VideoHelperSuite](https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite). No Triton / SageAttention needed.
 
 ## Workflows
 
@@ -91,7 +87,7 @@ Links only; no weights are redistributed here. Civitai downloads need a login.
 
 Close other ComfyUI instances before H3: two H3 processes at once leave ≈ 3 GB free RAM and double the run time.
 
-## Key findings (series 0)
+## Key findings
 
 - **H3 sweet spot: 768×960 + shift 8 + turbo LoRA 8 steps + timed shot-list.** Resolution matters more than
   steps: 768 with turbo beats 640 at 20 steps. A short plain prompt makes the face drift and drops actions —
