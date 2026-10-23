@@ -5,7 +5,7 @@ A local ComfyUI pipeline for photoreal image-to-video on a single 16 GB consumer
 **Krea 2 Turbo still → MiniMax H3 image-to-video (with sound) → RIFE ×2 / lanczos ×2 upscale → 1536×1920 @ 48 fps.**
 
 Ready-to-drop ComfyUI workflows, the Python tooling used to generate and benchmark them, and the measured
-measured results.
+results.
 
 - **Learning page (Russian, with videos and comparison sheets):** https://olexiy.github.io/comfy-h3-studio/
 - **Workflows:** [`workflows/`](workflows/) · **Tools:** [`tools/`](tools/) · **Shot-list prompts:** [`prompts/`](prompts/)
