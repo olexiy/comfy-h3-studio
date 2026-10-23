@@ -1,0 +1,10 @@
+{
+ "01": "RTX 5070 Ti 16 GB, ComfyUI 0.42.4 · 1000×1600 → 2856×4560: **88–106 s** · 896×1120 → 2552×3192: **54–57 s** · peak VRAM 15.6–15.9 GB, RAM ≈ 45 GB",
+ "01b": "RTX 5070 Ti 16 GB, ComfyUI 0.42.4 · 1000×1600, 8 steps: **13–14 s** warm (32 s incl. first model load) · peak VRAM 15.2 GB",
+ "02": "RTX 5070 Ti 16 GB, ComfyUI 0.42.4 · 1024×1280 → hi-res 1536×1920 → USDU ×1.9: **56–81 s** (8-step DMD) · peak VRAM 15.7 GB, RAM ≈ 50 GB",
+ "03": "RTX 5070 Ti 16 GB, ComfyUI 0.42.4 · **768×960 · 124 f (5 s) · 8 steps · shift 8: 160–184 s** · 640×800 · 73 f: 65–72 s · peak VRAM 15.5–15.9 GB · system RAM 58–60 GB (32B text encoder!)",
+ "04": "RTX 5070 Ti 16 GB · 124 f 768×960 → 1536×1920: **RIFE ×2 / 48 fps 27 s** (RAM 53 GB) · RIFE ×3 / 72 fps 39 s (RAM 61 GB) · OmniSR variant ≈ 2.4× slower than lanczos, no visible gain",
+ "03b": "RTX 5070 Ti 16 GB, ComfyUI 0.42.4 · 768×960 · 8 steps · shift 8: **6 s/141 f 219 s · 9 s/226 f 434 s · 12 s/294 f 694 s** (all beats, mid-clip sharpness ≈ 810–870) · 15 s/362 f 956 s (end goes soft, background drifts) · peak VRAM 15.5–15.6 GB, system RAM 54–59 GB. **Practical local max ≈ 12 s; 9 s = best quality/time; longer → chain with 03c.**",
+ "03c": "RTX 5070 Ti 16 GB, ComfyUI 0.42.4 · 5 s clip (V13, 124 f) + 22 anchor frames → +5 s continuation at 768×960, 8 steps, shift 8: **233 s** (5 s + 5 s = 9.4 s total in 164 + 233 = 397 s vs 434 s single 9 s clip) · peak VRAM 15.5 GB, RAM 55 GB · seam invisible (frame diff 6.8 vs median 4.6), identity/background/audio carry over, mid sharpness 892 vs 724 single.",
+ "05": "768×960 · 124 f (5 s) · 8 steps: **158–171 s**, peak VRAM 15.5–15.7 GB, system RAM 59 GB — same as official 03. SFW clothed test (series 0): Eros Max is ≈ 30 % softer than official H3 (Laplacian 56/44/50 vs 79/64/75 start/mid/end); **shift 8 recovers part (61/52/57)**, identity drift slightly higher (13 vs 7). Hands fine, all beats play. For clothed scenes 03 is sharper."
+}

@@ -1,0 +1,11 @@
+# local caches written by tools/comfytool.py
+object_info.json
+results.json
+# never commit weights, renders or secrets
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+.env
+__pycache__/
+*.bak

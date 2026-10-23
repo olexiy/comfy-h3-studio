@@ -1,0 +1,1818 @@
+{
+ "id": "a69f5cc1-1060-50c4-b819-cebf7ba57f87",
+ "revision": 0,
+ "last_node_id": 33,
+ "last_link_id": 39,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "MarkdownNote",
+   "pos": [
+    30,
+    76
+   ],
+   "size": [
+    480,
+    558
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "# 02 · MOSS-Image SFT — A/B vs Krea 2\nSame subject/prompt as 01. LoRA stack mirrors Civitai image **146220084**\n(MOSS SFT + nicegirls 0.4 + lenovo 0.5 + DMD 8-step turbo 1.0 + hi8 \"2000s Analog Core\" 0.4).\n\n⚠ **Needs ComfyUI ≥ v0.42.0** (core MOSS support, PR #17095 by Kijai, merged 2026-10-16).\nThe installed core **0.37.4 cannot load MOSS** (no `moss_image` CLIP type, no model detection) — update ComfyUI Desktop first.\n\n**Settings sources:** comfyui-wiki news 2026-10-16; Neural Dreamer video (YouTube 9GGOv7sxSoY):\nSFT is built for **50 steps, cfg 3, shift 5**, scheduler **simple** (beta is noisier); 1–2 MP best, ≤4 MP stable, >6 MP breaks\ncomposition. With a turbo/DMD LoRA: **8–10 steps, cfg 1**. Put `nsfw` in the negative when running non-turbo.\n\n**Timings:** RTX 5070 Ti 16 GB, ComfyUI 0.42.4 · 1024×1280 → hi-res 1536×1920 → USDU ×1.9: **56–81 s** (8-step DMD) · peak VRAM 15.7 GB, RAM ≈ 50 GB"
+   ]
+  },
+  {
+   "id": 2,
+   "type": "MarkdownNote",
+   "pos": [
+    650,
+    76
+   ],
+   "size": [
+    420,
+    470
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "### 1 · Models\n- **DiT** `moss_image_sft_bf16` (10.2 GB; `…_int8_convrot` 5.4 GB is the low-VRAM option)\n- **Text encoder** `qwen3.5_9b_int8_convrot`, CLIPLoader type **moss_image**\n- **VAE** `flux2-vae` (MOSS works in the FLUX.2 latent space)\n- **ModelSamplingAuraFlow shift 5** (= model default). Do NOT use ModelSamplingSD3: it sets multiplier 1000, MOSS needs 1.0 → pure noise.\n\n### LoRA chain (model-only)\nnicegirls 0.4 → lenovo 0.5 (trigger **l3n0v0**, already in the prompt) → **DMD 8-step 1.0** → hi8 0.4.\n\n### No-turbo variant\nBypass the **DMD** LoRA (Ctrl+B), set the sampler to **50 steps, cfg 3**, and un-bypass\n**Skip layer 22 (negative only)** — negative-branch layer skip at 22 (24/26 also work)."
+   ]
+  },
+  {
+   "id": 3,
+   "type": "UNETLoader",
+   "pos": [
+    1110,
+    76
+   ],
+   "size": [
+    400,
+    82
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      1
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "moss_image_sft_bf16.safetensors",
+    "default"
+   ]
+  },
+  {
+   "id": 4,
+   "type": "CLIPLoader",
+   "pos": [
+    1110,
+    218
+   ],
+   "size": [
+    400,
+    106
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "CLIPLoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      7,
+      8,
+      27
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "qwen3.5_9b_int8_convrot.safetensors",
+    "moss_image",
+    "default"
+   ]
+  },
+  {
+   "id": 5,
+   "type": "VAELoader",
+   "pos": [
+    1110,
+    384
+   ],
+   "size": [
+    400,
+    58
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      14,
+      22,
+      28,
+      36
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "flux2-vae.safetensors"
+   ]
+  },
+  {
+   "id": 6,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    1550,
+    76
+   ],
+   "size": [
+    380,
+    82
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "title": "LoRA · nicegirls v2 @0.4",
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      2
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "nicegirls_v2_moss.safetensors",
+    0.4
+   ]
+  },
+  {
+   "id": 7,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    1550,
+    218
+   ],
+   "size": [
+    380,
+    82
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "title": "LoRA · lenovo @0.5 (trigger l3n0v0)",
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      3
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "lenovo_moss.safetensors",
+    0.5
+   ]
+  },
+  {
+   "id": 8,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    1550,
+    360
+   ],
+   "size": [
+    380,
+    82
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "title": "LoRA · DMD 8-step turbo @1.0",
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 3
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      4
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "MOSS_Image_SFT_8_steps_dmd_v0.1.safetensors",
+    1.0
+   ]
+  },
+  {
+   "id": 9,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    1550,
+    502
+   ],
+   "size": [
+    380,
+    82
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "title": "LoRA · hi8 v2 \"2000s Analog Core\" @0.4",
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 4
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "hi8_v2_moss.safetensors",
+    0.4
+   ]
+  },
+  {
+   "id": 10,
+   "type": "ModelSamplingAuraFlow",
+   "pos": [
+    1970,
+    76
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "ModelSamplingAuraFlow"
+   },
+   "title": "ModelSampling (AuraFlow) · shift 5",
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 5
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    5.0,
+    "flow"
+   ]
+  },
+  {
+   "id": 11,
+   "type": "SkipLayerGuidanceDiTSimple",
+   "pos": [
+    1970,
+    218
+   ],
+   "size": [
+    340,
+    130
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 4,
+   "properties": {
+    "Node name for S&R": "SkipLayerGuidanceDiTSimple"
+   },
+   "title": "Skip layer 22 (negative only) · no-turbo",
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 6
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      9,
+      17,
+      26,
+      33
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "",
+    "22",
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "id": 12,
+   "type": "MarkdownNote",
+   "pos": [
+    2450,
+    76
+   ],
+   "size": [
+    420,
+    184
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "### 2 · Prompt\nSame scene text as 01, prefixed with the lenovo trigger `l3n0v0`.\nMOSS uses stock Qwen3.5-9B — long natural-language prompts work well.\nNegative (only active at cfg > 1): `nsfw, worst quality, bad anatomy, watermark, jpeg artifact`."
+   ]
+  },
+  {
+   "id": 13,
+   "type": "CLIPTextEncode",
+   "pos": [
+    2450,
+    320
+   ],
+   "size": [
+    420,
+    440
+   ],
+   "flags": {},
+   "order": 12,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "title": "Positive prompt",
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      10,
+      18,
+      29,
+      34
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "l3n0v0, Amateur digicam photo of a fictional 28-year-old woman with a mature adult face, defined cheekbones and jawline, long wavy copper-red hair with a side part, fair skin with natural freckles across her nose and cheeks, light everyday makeup, soft closed-lip smile, green-hazel eyes looking at the camera. She sits on a black perforated metal mesh bench inside a glass bus shelter, knees together, hands resting in her lap. She wears an untucked white linen blouse with rolled-up sleeves, dark-blue high-waisted jeans, a small silver pendant on a thin chain and small silver hoop earrings. A black leather shoulder bag lies on the bench beside her. Behind the shelter glass: a red brick shop front with a red-and-white striped awning, a yellow painted curb along the street, parked bicycles, ordinary city daylight with soft overcast sun and faint reflections on the glass. Shot on a cheap compact digital camera from about three meters at eye level, slightly off-center framing, mild wide-angle distortion, slight sensor noise, JPEG compression, auto white balance a little cool, natural unretouched skin texture with visible pores and fine flyaway hairs, everyday candid snapshot, casual adult everyday outfit."
+   ]
+  },
+  {
+   "id": 14,
+   "type": "CLIPTextEncode",
+   "pos": [
+    2450,
+    820
+   ],
+   "size": [
+    420,
+    200
+   ],
+   "flags": {},
+   "order": 13,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "title": "Negative prompt (cfg > 1 only)",
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      11,
+      19,
+      30,
+      35
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "nsfw, worst quality, bad anatomy, watermark, jpeg artifact"
+   ]
+  },
+  {
+   "id": 15,
+   "type": "MarkdownNote",
+   "pos": [
+    3010,
+    76
+   ],
+   "size": [
+    380,
+    162
+   ],
+   "flags": {},
+   "order": 14,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "### 3 · Pass 1\n**1024×1280** (1.3 MP, 4:5, multiples of 16) — Flux2 empty latent.\nTurbo (DMD): **8 steps, cfg 1, euler / simple**. Try `lcm` if DMD looks soft.\nNo-turbo: 50 steps, cfg 3."
+   ]
+  },
+  {
+   "id": 16,
+   "type": "EmptyFlux2LatentImage",
+   "pos": [
+    3430,
+    76
+   ],
+   "size": [
+    340,
+    106
+   ],
+   "flags": {},
+   "order": 15,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "EmptyFlux2LatentImage"
+   },
+   "title": "Empty Flux2 Latent · base size",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      12
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    1024,
+    1280,
+    1
+   ]
+  },
+  {
+   "id": 17,
+   "type": "KSampler",
+   "pos": [
+    3430,
+    242
+   ],
+   "size": [
+    340,
+    268
+   ],
+   "flags": {},
+   "order": 16,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "title": "KSampler · pass 1",
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 9
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 10
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 11
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 12
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      13,
+      16
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    20261023,
+    "fixed",
+    8,
+    1.0,
+    "euler",
+    "simple",
+    1.0
+   ]
+  },
+  {
+   "id": 18,
+   "type": "VAEDecode",
+   "pos": [
+    3810,
+    76
+   ],
+   "size": [
+    340,
+    56
+   ],
+   "flags": {},
+   "order": 17,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "title": "VAE Decode · pass 1",
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 13
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 14
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      15,
+      23
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": []
+  },
+  {
+   "id": 19,
+   "type": "PreviewImage",
+   "pos": [
+    3810,
+    192
+   ],
+   "size": [
+    340,
+    380
+   ],
+   "flags": {},
+   "order": 18,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "PreviewImage"
+   },
+   "title": "Preview · pass 1",
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 15
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": []
+  },
+  {
+   "id": 20,
+   "type": "MarkdownNote",
+   "pos": [
+    4290,
+    76
+   ],
+   "size": [
+    380,
+    338
+   ],
+   "flags": {},
+   "order": 19,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "### 4 · Hi-res pass (latent ×1.5)\nLatent upscale (bicubic ×1.5) → second sampler at **denoise 0.5**, 4 steps, cfg 1, euler/simple.\nAdds real detail instead of interpolated blur.\n\n**ColorMatch** (KJNodes, `hm-mkl-hm`, strength **0.22**): pulls pass-2 colours back toward the pass-1 decode —\nthe hi-res pass tends to drift saturation/contrast. Higher strength = closer to pass 1.\n\n- denoise 0.45–0.6: higher = more new detail but more drift from pass 1\n- 1024×1280 → 1536×1920"
+   ]
+  },
+  {
+   "id": 21,
+   "type": "LatentUpscaleBy",
+   "pos": [
+    4710,
+    76
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 20,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LatentUpscaleBy"
+   },
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 16
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      20
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "bicubic",
+    1.5
+   ]
+  },
+  {
+   "id": 22,
+   "type": "KSampler",
+   "pos": [
+    4710,
+    218
+   ],
+   "size": [
+    340,
+    268
+   ],
+   "flags": {},
+   "order": 21,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "title": "KSampler · hi-res",
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 17
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 18
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 19
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 20
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      21
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    20261023,
+    "fixed",
+    4,
+    1.0,
+    "euler",
+    "simple",
+    0.5
+   ]
+  },
+  {
+   "id": 23,
+   "type": "VAEDecode",
+   "pos": [
+    5090,
+    76
+   ],
+   "size": [
+    340,
+    56
+   ],
+   "flags": {},
+   "order": 22,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "title": "VAE Decode · hi-res",
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 21
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 22
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      24
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": []
+  },
+  {
+   "id": 24,
+   "type": "ColorMatch",
+   "pos": [
+    5090,
+    192
+   ],
+   "size": [
+    340,
+    128
+   ],
+   "flags": {},
+   "order": 23,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "ColorMatch"
+   },
+   "title": "ColorMatch → pass 1",
+   "inputs": [
+    {
+     "name": "image_ref",
+     "type": "IMAGE",
+     "link": 23
+    },
+    {
+     "name": "image_target",
+     "type": "IMAGE",
+     "link": 24
+    }
+   ],
+   "outputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "links": [
+      25
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "hm-mkl-hm",
+    0.22,
+    true
+   ]
+  },
+  {
+   "id": 25,
+   "type": "MarkdownNote",
+   "pos": [
+    5570,
+    76
+   ],
+   "size": [
+    380,
+    250
+   ],
+   "flags": {},
+   "order": 24,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "### 5 · Face detailer (Impact)\nYOLO face bbox (`face_yolov8m.pt`) → crop → re-sample at **guide/max size 1440** → paste back.\n4 steps, cfg 1, `dpmpp_2m_sde` / `sgm_uniform`, **denoise 0.5**.\n\n- denoise 0.35–0.5: lower keeps the face identity, higher fixes more\n- bbox_crop_factor 3 = context around the face\n- No SAM model — bbox mask is enough at this size"
+   ]
+  },
+  {
+   "id": 26,
+   "type": "UltralyticsDetectorProvider",
+   "pos": [
+    5570,
+    386
+   ],
+   "size": [
+    340,
+    80
+   ],
+   "flags": {},
+   "order": 25,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "UltralyticsDetectorProvider"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "BBOX_DETECTOR",
+     "type": "BBOX_DETECTOR",
+     "links": [
+      31
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "SEGM_DETECTOR",
+     "type": "SEGM_DETECTOR",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "widgets_values": [
+    "bbox/face_yolov8m.pt"
+   ]
+  },
+  {
+   "id": 27,
+   "type": "FaceDetailer",
+   "pos": [
+    5990,
+    76
+   ],
+   "size": [
+    360,
+    1090
+   ],
+   "flags": {},
+   "order": 26,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "FaceDetailer"
+   },
+   "title": "FaceDetailer",
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 25
+    },
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 26
+    },
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 27
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 28
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 29
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 30
+    },
+    {
+     "name": "bbox_detector",
+     "type": "BBOX_DETECTOR",
+     "link": 31
+    },
+    {
+     "name": "sam_model_opt",
+     "type": "SAM_MODEL",
+     "link": null
+    },
+    {
+     "name": "segm_detector_opt",
+     "type": "SEGM_DETECTOR",
+     "link": null
+    },
+    {
+     "name": "detailer_hook",
+     "type": "DETAILER_HOOK",
+     "link": null
+    },
+    {
+     "name": "scheduler_func_opt",
+     "type": "SCHEDULER_FUNC",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "links": [
+      32,
+      38
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "cropped_refined",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 1
+    },
+    {
+     "name": "cropped_enhanced_alpha",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 2
+    },
+    {
+     "name": "mask",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 3
+    },
+    {
+     "name": "detailer_pipe",
+     "type": "DETAILER_PIPE",
+     "links": [],
+     "slot_index": 4
+    },
+    {
+     "name": "cnet_images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 5
+    }
+   ],
+   "widgets_values": [
+    1440,
+    true,
+    1440,
+    20261023,
+    "fixed",
+    4,
+    1.0,
+    "euler",
+    "simple",
+    0.5,
+    5,
+    true,
+    true,
+    0.5,
+    10,
+    3.0,
+    "center-1",
+    0,
+    0.93,
+    0,
+    0.7,
+    "False",
+    10,
+    "",
+    1,
+    false,
+    20,
+    false,
+    false
+   ]
+  },
+  {
+   "id": 28,
+   "type": "MarkdownNote",
+   "pos": [
+    6490,
+    76
+   ],
+   "size": [
+    380,
+    338
+   ],
+   "flags": {},
+   "order": 27,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "### 6 · Ultimate SD Upscale ×1.9\n`OmniSR_X4_DIV2K` model upscale, then tiled re-sampling: **2 steps, euler/simple, denoise 0.1**\n(only sharpens; does not repaint). mask_blur 64, tile_padding 96, Linear mode.\n\nTiles ≈ (W·1.9 + 192)/2 → **1552×1920** for 1536×1920 (= 2×2 tiles). Change the tile size if you change the base resolution.\n\nAuthor also blends a `1xSkinContrast` upscale at 5 % — not available, skipped.\nOutput ≈ 2918×3648 — for the video still use the hi-res/face output instead."
+   ]
+  },
+  {
+   "id": 29,
+   "type": "UpscaleModelLoader",
+   "pos": [
+    6490,
+    474
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 28,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "UpscaleModelLoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "UPSCALE_MODEL",
+     "type": "UPSCALE_MODEL",
+     "links": [
+      37
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "OmniSR_X4_DIV2K.safetensors"
+   ]
+  },
+  {
+   "id": 30,
+   "type": "UltimateSDUpscale",
+   "pos": [
+    6910,
+    76
+   ],
+   "size": [
+    360,
+    648
+   ],
+   "flags": {},
+   "order": 29,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "UltimateSDUpscale"
+   },
+   "title": "Ultimate SD Upscale ×1.9",
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 32
+    },
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 33
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 34
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 35
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 36
+    },
+    {
+     "name": "upscale_model",
+     "type": "UPSCALE_MODEL",
+     "link": 37
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      39
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    1.9,
+    20261023,
+    "fixed",
+    2,
+    1.0,
+    "euler",
+    "simple",
+    0.1,
+    "Linear",
+    1552,
+    1920,
+    64,
+    96,
+    "None",
+    1.0,
+    64,
+    8,
+    16,
+    true,
+    false,
+    1
+   ]
+  },
+  {
+   "id": 31,
+   "type": "MarkdownNote",
+   "pos": [
+    7410,
+    76
+   ],
+   "size": [
+    380,
+    140
+   ],
+   "flags": {},
+   "order": 30,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "### 7 · Save\n- **final** — after upscale (big, for viewing)\n- **face** — after face detailer at hi-res size: use this one as the video first frame (03)\nFiles land in `ComfyUI-Shared/output/H3test/`."
+   ]
+  },
+  {
+   "id": 32,
+   "type": "SaveImage",
+   "pos": [
+    7410,
+    276
+   ],
+   "size": [
+    380,
+    420
+   ],
+   "flags": {},
+   "order": 31,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "title": "Save · face (video still)",
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 38
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "H3test/moss_face"
+   ]
+  },
+  {
+   "id": 33,
+   "type": "SaveImage",
+   "pos": [
+    7830,
+    76
+   ],
+   "size": [
+    420,
+    600
+   ],
+   "flags": {},
+   "order": 32,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "title": "Save · final",
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 39
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "H3test/moss_final"
+   ]
+  }
+ ],
+ "links": [
+  [
+   1,
+   3,
+   0,
+   6,
+   0,
+   "MODEL"
+  ],
+  [
+   2,
+   6,
+   0,
+   7,
+   0,
+   "MODEL"
+  ],
+  [
+   3,
+   7,
+   0,
+   8,
+   0,
+   "MODEL"
+  ],
+  [
+   4,
+   8,
+   0,
+   9,
+   0,
+   "MODEL"
+  ],
+  [
+   5,
+   9,
+   0,
+   10,
+   0,
+   "MODEL"
+  ],
+  [
+   6,
+   10,
+   0,
+   11,
+   0,
+   "MODEL"
+  ],
+  [
+   7,
+   4,
+   0,
+   13,
+   0,
+   "CLIP"
+  ],
+  [
+   8,
+   4,
+   0,
+   14,
+   0,
+   "CLIP"
+  ],
+  [
+   9,
+   11,
+   0,
+   17,
+   0,
+   "MODEL"
+  ],
+  [
+   10,
+   13,
+   0,
+   17,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   11,
+   14,
+   0,
+   17,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   12,
+   16,
+   0,
+   17,
+   3,
+   "LATENT"
+  ],
+  [
+   13,
+   17,
+   0,
+   18,
+   0,
+   "LATENT"
+  ],
+  [
+   14,
+   5,
+   0,
+   18,
+   1,
+   "VAE"
+  ],
+  [
+   15,
+   18,
+   0,
+   19,
+   0,
+   "IMAGE"
+  ],
+  [
+   16,
+   17,
+   0,
+   21,
+   0,
+   "LATENT"
+  ],
+  [
+   17,
+   11,
+   0,
+   22,
+   0,
+   "MODEL"
+  ],
+  [
+   18,
+   13,
+   0,
+   22,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   19,
+   14,
+   0,
+   22,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   20,
+   21,
+   0,
+   22,
+   3,
+   "LATENT"
+  ],
+  [
+   21,
+   22,
+   0,
+   23,
+   0,
+   "LATENT"
+  ],
+  [
+   22,
+   5,
+   0,
+   23,
+   1,
+   "VAE"
+  ],
+  [
+   23,
+   18,
+   0,
+   24,
+   0,
+   "IMAGE"
+  ],
+  [
+   24,
+   23,
+   0,
+   24,
+   1,
+   "IMAGE"
+  ],
+  [
+   25,
+   24,
+   0,
+   27,
+   0,
+   "IMAGE"
+  ],
+  [
+   26,
+   11,
+   0,
+   27,
+   1,
+   "MODEL"
+  ],
+  [
+   27,
+   4,
+   0,
+   27,
+   2,
+   "CLIP"
+  ],
+  [
+   28,
+   5,
+   0,
+   27,
+   3,
+   "VAE"
+  ],
+  [
+   29,
+   13,
+   0,
+   27,
+   4,
+   "CONDITIONING"
+  ],
+  [
+   30,
+   14,
+   0,
+   27,
+   5,
+   "CONDITIONING"
+  ],
+  [
+   31,
+   26,
+   0,
+   27,
+   6,
+   "BBOX_DETECTOR"
+  ],
+  [
+   32,
+   27,
+   0,
+   30,
+   0,
+   "IMAGE"
+  ],
+  [
+   33,
+   11,
+   0,
+   30,
+   1,
+   "MODEL"
+  ],
+  [
+   34,
+   13,
+   0,
+   30,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   35,
+   14,
+   0,
+   30,
+   3,
+   "CONDITIONING"
+  ],
+  [
+   36,
+   5,
+   0,
+   30,
+   4,
+   "VAE"
+  ],
+  [
+   37,
+   29,
+   0,
+   30,
+   5,
+   "UPSCALE_MODEL"
+  ],
+  [
+   38,
+   27,
+   0,
+   32,
+   0,
+   "IMAGE"
+  ],
+  [
+   39,
+   30,
+   0,
+   33,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "0 · About",
+   "bounding": [
+    0,
+    0,
+    540,
+    664
+   ],
+   "color": "#335",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "1 · Models + LoRA stack",
+   "bounding": [
+    620,
+    0,
+    1720,
+    614
+   ],
+   "color": "#3f789e",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 3,
+   "title": "2 · Prompt",
+   "bounding": [
+    2420,
+    0,
+    480,
+    1050
+   ],
+   "color": "#8A8",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 4,
+   "title": "3 · Pass 1",
+   "bounding": [
+    2980,
+    0,
+    1200,
+    602
+   ],
+   "color": "#a1309b",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 5,
+   "title": "4 · Hi-res pass",
+   "bounding": [
+    4260,
+    0,
+    1200,
+    516
+   ],
+   "color": "#b06634",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 6,
+   "title": "5 · Face detailer",
+   "bounding": [
+    5540,
+    0,
+    840,
+    1196
+   ],
+   "color": "#b58b2a",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 7,
+   "title": "6 · Upscale",
+   "bounding": [
+    6460,
+    0,
+    840,
+    754
+   ],
+   "color": "#4a7a3f",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 8,
+   "title": "7 · Save",
+   "bounding": [
+    7380,
+    0,
+    900,
+    726
+   ],
+   "color": "#444",
+   "font_size": 24,
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.45,
+   "offset": [
+    60,
+    120
+   ]
+  },
+  "workflowRendererVersion": "LG"
+ },
+ "version": 0.4
+}

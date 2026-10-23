@@ -1,0 +1,652 @@
+{
+ "id": "540df61a-d61b-5811-a3ff-4e930d18860f",
+ "revision": 0,
+ "last_node_id": 13,
+ "last_link_id": 8,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "MarkdownNote",
+   "pos": [
+    30,
+    76
+   ],
+   "size": [
+    440,
+    360
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "# 04 · Post: upscale ×2 + RIFE ×2 → 48 fps\nThe reference author's \"upscale\" is plain **lanczos** (to 1600×2000), then frame interpolation.\nHere: 768×960 → **1536×1920**, RIFE 4.7 ×2 (24 → 48 fps), audio passed through.\n×3 → 72 fps also works, but at 768×960 / 124 frames system RAM peaks at 61 of 62 GB — use it only for short/small clips.\n\n**Input:** the H3 mp4 from 03 (copy into `ComfyUI-Shared/input`).\n**Timings:** RTX 5070 Ti 16 GB · 124 f 768×960 → 1536×1920: **RIFE ×2 / 48 fps 27 s** (RAM 53 GB) · RIFE ×3 / 72 fps 39 s (RAM 61 GB) · OmniSR variant ≈ 2.4× slower than lanczos, no visible gain"
+   ]
+  },
+  {
+   "id": 2,
+   "type": "MarkdownNote",
+   "pos": [
+    610,
+    76
+   ],
+   "size": [
+    340,
+    120
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "### 1 · Load video\nCore **Load Video** → **Get Video Components** (frames, audio, fps)."
+   ]
+  },
+  {
+   "id": 3,
+   "type": "LoadVideo",
+   "pos": [
+    610,
+    256
+   ],
+   "size": [
+    340,
+    420
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoadVideo"
+   },
+   "title": "Load H3 video",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VIDEO",
+     "type": "VIDEO",
+     "links": [
+      1
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "H3test_h3.mp4",
+    "image"
+   ]
+  },
+  {
+   "id": 4,
+   "type": "GetVideoComponents",
+   "pos": [
+    990,
+    76
+   ],
+   "size": [
+    340,
+    122
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "GetVideoComponents"
+   },
+   "inputs": [
+    {
+     "name": "video",
+     "type": "VIDEO",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [
+      2
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "links": [
+      8
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "fps",
+     "type": "FLOAT",
+     "links": [],
+     "slot_index": 2
+    },
+    {
+     "name": "bit_depth",
+     "type": "COMBO",
+     "links": [],
+     "slot_index": 3
+    },
+    {
+     "name": "color_space",
+     "type": "COMBO",
+     "links": [],
+     "slot_index": 4
+    }
+   ],
+   "widgets_values": []
+  },
+  {
+   "id": 5,
+   "type": "MarkdownNote",
+   "pos": [
+    1470,
+    76
+   ],
+   "size": [
+    380,
+    228
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "### 2 · Upscale\nDefault: **lanczos ×2** (author's method — fast, no hallucinated detail).\n\nVariant (bypassed, purple): **OmniSR ×4 → lanczos ×0.5** = model-sharpened ×2.\nTo switch: bypass *Lanczos ×2* and un-bypass the two OmniSR nodes (Ctrl+B). Costs much more time/VRAM per frame."
+   ]
+  },
+  {
+   "id": 6,
+   "type": "ImageScaleBy",
+   "pos": [
+    1890,
+    76
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "ImageScaleBy"
+   },
+   "title": "Lanczos ×2",
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      4
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "lanczos",
+    2.0
+   ]
+  },
+  {
+   "id": 7,
+   "type": "UpscaleModelLoader",
+   "pos": [
+    1890,
+    218
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 4,
+   "properties": {
+    "Node name for S&R": "UpscaleModelLoader"
+   },
+   "title": "OmniSR ×4 (variant)",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "UPSCALE_MODEL",
+     "type": "UPSCALE_MODEL",
+     "links": [
+      3
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "OmniSR_X4_DIV2K.safetensors"
+   ]
+  },
+  {
+   "id": 8,
+   "type": "ImageUpscaleWithModel",
+   "pos": [
+    2270,
+    76
+   ],
+   "size": [
+    340,
+    56
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 4,
+   "properties": {
+    "Node name for S&R": "ImageUpscaleWithModel"
+   },
+   "title": "OmniSR ×4 (variant, bypassed)",
+   "inputs": [
+    {
+     "name": "upscale_model",
+     "type": "UPSCALE_MODEL",
+     "link": 3
+    },
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 4
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": []
+  },
+  {
+   "id": 9,
+   "type": "ImageScaleBy",
+   "pos": [
+    2270,
+    192
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 4,
+   "properties": {
+    "Node name for S&R": "ImageScaleBy"
+   },
+   "title": "Lanczos ×0.5 after OmniSR (variant)",
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 5
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "lanczos",
+    0.5
+   ]
+  },
+  {
+   "id": 10,
+   "type": "MarkdownNote",
+   "pos": [
+    2750,
+    76
+   ],
+   "size": [
+    380,
+    228
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "### 3 · RIFE VFI\n**rife47**, multiplier **2** (24 → 48 fps; ×3 → 72 fps needs ~61 GB RAM at 1536×1920×124 f), fast_mode on, ensemble on, scale_factor 1.\nclear_cache_after_n_frames 10 keeps VRAM flat. Interpolated frames are clean (only fast hand moves blur slightly).\nfps must equal 24 × multiplier, otherwise the motion speed changes."
+   ]
+  },
+  {
+   "id": 11,
+   "type": "RIFE VFI",
+   "pos": [
+    3170,
+    76
+   ],
+   "size": [
+    340,
+    272
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "RIFE VFI"
+   },
+   "title": "RIFE VFI ×2 (rife47)",
+   "inputs": [
+    {
+     "name": "frames",
+     "type": "IMAGE",
+     "link": 6
+    },
+    {
+     "name": "optional_interpolation_states",
+     "type": "INTERPOLATION_STATES",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      7
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "rife47.pth",
+    10,
+    2,
+    true,
+    true,
+    1.0,
+    "float32",
+    false,
+    1
+   ]
+  },
+  {
+   "id": 12,
+   "type": "MarkdownNote",
+   "pos": [
+    3650,
+    76
+   ],
+   "size": [
+    340,
+    120
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "### 4 · Save\nVHS Video Combine **48 fps** (set 72 with RIFE ×3), h264-mp4 **crf 14**, yuv420p, audio from the source."
+   ]
+  },
+  {
+   "id": 13,
+   "type": "VHS_VideoCombine",
+   "pos": [
+    4030,
+    76
+   ],
+   "size": [
+    420,
+    560
+   ],
+   "flags": {},
+   "order": 12,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "VHS_VideoCombine"
+   },
+   "title": "Video Combine · 48 fps",
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 7
+    },
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": 8
+    },
+    {
+     "name": "meta_batch",
+     "type": "VHS_BatchManager",
+     "link": null
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "Filenames",
+     "type": "VHS_FILENAMES",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": {
+    "frame_rate": 48,
+    "loop_count": 0,
+    "filename_prefix": "H3test/h3_rife48",
+    "format": "video/h264-mp4",
+    "pingpong": false,
+    "save_output": true,
+    "pix_fmt": "yuv420p",
+    "crf": 14,
+    "save_metadata": true,
+    "trim_to_audio": false,
+    "videopreview": {
+     "hidden": false,
+     "paused": false,
+     "params": {}
+    }
+   }
+  }
+ ],
+ "links": [
+  [
+   1,
+   3,
+   0,
+   4,
+   0,
+   "VIDEO"
+  ],
+  [
+   2,
+   4,
+   0,
+   6,
+   0,
+   "IMAGE"
+  ],
+  [
+   3,
+   7,
+   0,
+   8,
+   0,
+   "UPSCALE_MODEL"
+  ],
+  [
+   4,
+   6,
+   0,
+   8,
+   1,
+   "IMAGE"
+  ],
+  [
+   5,
+   8,
+   0,
+   9,
+   0,
+   "IMAGE"
+  ],
+  [
+   6,
+   9,
+   0,
+   11,
+   0,
+   "IMAGE"
+  ],
+  [
+   7,
+   11,
+   0,
+   13,
+   0,
+   "IMAGE"
+  ],
+  [
+   8,
+   4,
+   1,
+   13,
+   1,
+   "AUDIO"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "0 · About",
+   "bounding": [
+    0,
+    0,
+    500,
+    466
+   ],
+   "color": "#335",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "1 · Load",
+   "bounding": [
+    580,
+    0,
+    780,
+    706
+   ],
+   "color": "#3f5f8a",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 3,
+   "title": "2 · Upscale",
+   "bounding": [
+    1440,
+    0,
+    1200,
+    334
+   ],
+   "color": "#4a7a3f",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 4,
+   "title": "3 · RIFE",
+   "bounding": [
+    2720,
+    0,
+    820,
+    378
+   ],
+   "color": "#a1309b",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 5,
+   "title": "4 · Save",
+   "bounding": [
+    3620,
+    0,
+    860,
+    666
+   ],
+   "color": "#444",
+   "font_size": 24,
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.45,
+   "offset": [
+    60,
+    120
+   ]
+  },
+  "workflowRendererVersion": "LG"
+ },
+ "version": 0.4
+}

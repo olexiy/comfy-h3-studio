@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Локальная студия H3</title>
+<meta name="description" content="Krea 2 → MiniMax H3 → RIFE: локальный пайплайн ComfyUI на RTX 5070 Ti 16 GB — workflow, замеры, выводы.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+:root{
+  --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
+  --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Onest", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 80px;display:grid;gap:56px}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(20px,3vw,26px);font-weight:500;margin-bottom:14px}
+h3{font-size:16px;font-weight:500}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.lead{font-size:18px;color:var(--muted);max-width:62ch;margin-top:14px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+section{display:grid;gap:18px;min-width:0}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.step .n{font:500 12px var(--mono);color:var(--accent)}
+.step .t{font:500 26px/1 var(--display)}
+.step .t small{font:400 13px var(--body);color:var(--muted)}
+.total{font:500 14px var(--mono);color:var(--muted)}
+.total b{color:var(--fg)}
+/* media */
+.strip{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+figure{margin:0;display:grid;gap:8px;min-width:0}
+figure img,figure video{width:100%;max-width:100%;height:auto;border-radius:8px;background:#000;display:block}
+figcaption{font-size:13px;color:var(--muted)}
+figcaption b{color:var(--fg);font-weight:600}
+.wide img{border-radius:8px}
+.tag{display:inline-block;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-right:6px;vertical-align:1px}
+.tag.good{color:var(--good)}.tag.warn{color:var(--warn)}.tag.bad{color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);white-space:nowrap}
+tr.win td{background:var(--accent-soft)}
+/* workflows */
+.wf{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .file{font:500 13px var(--mono);color:var(--accent);word-break:break-all}
+.card ul{margin:0;padding-left:18px;font-size:14px}
+.card .time{font:500 13px var(--mono);color:var(--muted)}
+.rules{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.rules li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.rules b{font-weight:600}
+pre{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font:13px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{font:500 13px var(--body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible,video:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.paths td:first-child{white-space:nowrap}
+.repo{font-family:var(--mono);font-size:13px}
+.repo a{color:var(--accent)}
+footer{margin:48px 0 24px;color:var(--muted);font-size:13px}
+@media (max-width:760px){.pipe,.strip,.wf{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">ComfyUI · RTX 5070 Ti 16 GB · 62 GB RAM · 23.10.2026</div>
+  <h1>Локальная студия H3</h1>
+  <p class="repo">Workflow, инструменты и README (English): <a href="https://github.com/olexiy/comfy-h3-studio">github.com/olexiy/comfy-h3-studio</a></p>
+  <p class="lead">Как из одного промпта получить фотореалистичный кадр, оживить его в 5-секундное видео со звуком и довести до 1536×1920 / 48 fps. Всё локально, на домашнем ПК. Ниже: workflow, результаты, настройки и выводы ночных тестов.</p>
+</header>
+
+<section aria-labelledby="pipe">
+  <h2 id="pipe">Пайплайн за ~4 минуты</h2>
+  <div class="pipe">
+    <div class="step"><span class="n">1 · картинка</span><span class="t">57 с <small>Krea 2</small></span><span class="mono">01_image_krea2_realism</span><span>2856×4560, два прохода, детейлер лица, апскейл</span></div>
+    <div class="step"><span class="n">2 · видео</span><span class="t">164 с <small>MiniMax H3</small></span><span class="mono">03_video_h3_i2v</span><span>768×960, 124 кадра = 5 с, звук улицы</span></div>
+    <div class="step"><span class="n">3 · постобработка</span><span class="t">27 с <small>RIFE</small></span><span class="mono">04_post_rife_upscale</span><span>lanczos ×2 → 1536×1920, RIFE ×2 → 48 fps</span></div>
+  </div>
+  <p class="total">Итог: <b>FINAL_V13_post_00001-audio.mp4</b> · 1536×1920 · 48 fps · 5 с · пик VRAM 15,5 ГБ · пик RAM 58,6 ГБ</p>
+</section>
+
+<section aria-labelledby="video">
+  <h2 id="video">Видео: что получилось</h2>
+  <div class="strip">
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/v13-winner-poster.jpg" src="media/v13-winner.mp4"></video>
+      <figcaption><span class="tag good">победитель</span><b>V13</b> · 768×960 · 5 с · shift 8 · 165 с. Лицо стабильно, все действия по раскадровке.</figcaption>
+    </figure>
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/v1-baseline-poster.jpg" src="media/v1-baseline.mp4"></video>
+      <figcaption><span class="tag warn">первая версия</span><b>V1</b> · 640×800 · 3 с · 66 с. Работает, но мелкие детали (веснушки) теряются.</figcaption>
+    </figure>
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/v14-moss-poster.jpg" src="media/v14-moss.mp4"></video>
+      <figcaption><span class="tag bad">мыльно</span><b>V14</b> · те же настройки, первый кадр из MOSS. Резкость 124 против ≈980 у Krea.</figcaption>
+    </figure>
+  </div>
+  <p class="prose" style="color:var(--muted);font-size:14px">В роликах есть звук, его генерирует сама H3 по строке <code>overall_soundscape</code>. Включи его в плеере.</p>
+  <figure class="wide">
+    <img src="media/h3-video-configs-grid.jpg" alt="Кадры из четырёх видео-конфигураций: V1, V11, V13, V14" loading="lazy" width="914" height="1216">
+    <figcaption>По три кадра (начало, середина, конец) из V1, V11, V13 и V14. У V14 (MOSS) лицо меняется и всё мягче.</figcaption>
+  </figure>
+</section>
+
+<section aria-labelledby="h3tbl">
+  <h2 id="h3tbl">Настройки видео: два раунда тестов</h2>
+  <p class="prose">Один и тот же первый кадр и сид. Время включает загрузку моделей. Пик VRAM везде 15,5–15,9 ГБ, пик RAM 58–60 ГБ.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Изменение</th><th>Размер · длина</th><th>Время</th><th>Вывод</th></tr></thead>
+    <tbody>
+      <tr><td class="num">V1</td><td>базовая: турбо 8 шагов, euler, shift 12</td><td class="num">640×800 · 3 с</td><td class="num">66 с</td><td>работает, детали мелкие теряются</td></tr>
+      <tr><td class="num">V2</td><td>sampler res_multistep</td><td class="num">640×800 · 3 с</td><td class="num">73 с</td><td>≈ euler, разницы нет</td></tr>
+      <tr><td class="num">V3</td><td>разрешение 768×960</td><td class="num">768×960 · 3 с</td><td class="num">105 с</td><td>заметно больше деталей лица</td></tr>
+      <tr><td class="num">V4</td><td>124 кадра</td><td class="num">640×800 · 5 с</td><td class="num">117 с</td><td>5 с работают без проблем</td></tr>
+      <tr><td class="num">V5</td><td>без турбо, 20 шагов</td><td class="num">640×800 · 3 с</td><td class="num">122 с</td><td>стабильно, но действия вялые</td></tr>
+      <tr><td class="num">V6</td><td>короткий простой промпт</td><td class="num">640×800 · 3 с</td><td class="num">66 с</td><td>хуже всех: лицо плывёт, действия пропадают</td></tr>
+      <tr><td class="num">V7</td><td>shift 8</td><td class="num">640×800 · 3 с</td><td class="num">69 с</td><td>самый резкий, подмигивание есть</td></tr>
+      <tr><td class="num">V8</td><td>shift 16</td><td class="num">640×800 · 3 с</td><td class="num">67 с</td><td>мягче, чем 8</td></tr>
+      <tr><td class="num">V10</td><td>768 + без турбо, 20 шагов</td><td class="num">768×960 · 3 с</td><td class="num">202 с</td><td>вдвое дольше, не лучше турбо</td></tr>
+      <tr><td class="num">V11</td><td>768 + shift 8 + 124 кадра</td><td class="num">768×960 · 5 с</td><td class="num">185 с</td><td>лучшая комбинация настроек</td></tr>
+      <tr><td class="num">V12</td><td>896×1120 + shift 8</td><td class="num">896×1120 · 3 с</td><td class="num">126 с</td><td>работает, VRAM 15,5 ГБ</td></tr>
+      <tr class="win"><td class="num">V13</td><td>V11 + первый кадр из оптимизированного Krea</td><td class="num">768×960 · 5 с</td><td class="num">165 с</td><td><b>победитель</b></td></tr>
+      <tr><td class="num">V14</td><td>V11 + первый кадр из MOSS</td><td class="num">768×960 · 5 с</td><td class="num">162 с</td><td>очень мыльно</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="stills">
+  <h2 id="stills">Картинки: Krea 2 против MOSS</h2>
+  <figure class="wide">
+    <img src="media/h3-stills-t1-krea-a-b-moss.jpg" alt="Один промпт: Krea простой, Krea рецепт автора, MOSS" loading="lazy" width="1156" height="560">
+    <figcaption><b>Один промпт, один сид.</b> Слева Krea простой (один проход, 13–32 с): самый натуральный. В центре рецепт автора (два прохода, детейлер, апскейл, 97 с): больше деталей, но «инстаграмный» глянец от LoRA. Справа MOSS (57–81 с): насыщенный стилизованный вид.</figcaption>
+  </figure>
+  <figure class="wide">
+    <img src="media/h3-stills-t4-krea-b-opt-moss.jpg" alt="Первый кадр для видео: Krea B, Krea B оптимизированный, MOSS" loading="lazy" width="1352" height="560">
+    <figcaption><b>Первый кадр для видео.</b> Krea B → Krea B оптимизированный (живее кожа и веснушки) → MOSS (потеряла стеклянную остановку из промпта).</figcaption>
+  </figure>
+  <figure>
+    <img src="media/face-fix-u1-u2.jpg" alt="Лицо до и после оптимизации" loading="lazy" width="968" height="480" style="max-width:640px">
+    <figcaption><b>Как убрать «ИИшное» лицо.</b> Слева исходный рецепт, справа оптимизированный: Realism Engine 0.7 → 0.5, denoise апскейла 0.1 → 0.22, в промпте «late-20s, mature facial features, uneven skin tone, harsh side light». Веснушки разной плотности, нормальные ресницы, видны поры.</figcaption>
+  </figure>
+</section>
+
+<section aria-labelledby="body">
+  <h2 id="body">Фигура: почему мягкие слова не работают</h2>
+  <figure>
+    <img src="media/body-wording-best.jpg" alt="Кадр для видео: медитация в гостиной, серая майка" loading="lazy" width="640" height="800" style="max-width:420px">
+    <figcaption><span class="tag good">кадр для видео</span><b>M6 · seed 7</b> · оптимизированный <code>01</code> · 896×1120 → 1344×1680 · 65 с.</figcaption>
+  </figure>
+  <figure class="wide">
+    <img src="media/body-wording-before-after.jpg" alt="Слева кадр с мягкими словами о фигуре, справа три сида с сильными словами" loading="lazy" width="1464" height="450">
+    <figcaption><b>Слева:</b> мягкие слова о телосложении («curvy», «full»), фигура осталась спортивной. <b>Справа три сида:</b> конкретные, сильные слова о телосложении. Workflow и настройки одинаковые, изменились только слова.</figcaption>
+  </figure>
+  <ul class="rules prose">
+    <li><b>Krea 2 Turbo слушает только сильные слова о теле.</b> Модель дистиллирована и работает с cfg 1, поэтому мягкие прилагательные почти ничего не меняют. Проверено на 8 кадрах в <code>01</code> и <code>01b</code>, прозой и тегами. Конкретные, «тяжёлые» слова о телосложении срабатывают с первого сида.</li>
+    <li><b>Сцена тянет фигуру к своему стереотипу.</b> Йога и медитация дают «спортивное» тело, если не перебить это словами о теле. Сложенные у груди ладони вдобавок прячут силуэт. Помогает описать связь тела и позы (что на что опирается).</li>
+    <li><b>Одежда:</b> облегающая одежда показывает форму. Против просвечивания пиши «thick opaque fabric».</li>
+    <li><b>Для видео</b> те же слова о фигуре повторяются в appearance lock раскадровки, иначе H3 начинает «стройнить» тело к концу клипа.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="wf">
+  <h2 id="wf">Workflow в репозитории</h2>
+  <p class="prose">Папка <code>workflows/</code> репозитория: перетащи JSON в окно ComfyUI. Внутри каждого файла пронумерованные группы и заметки с замерами времени.</p>
+  <div class="wf">
+    <div class="card"><span class="file">01_image_krea2_realism.json</span><h3>Картинка, оптимизированный</h3>
+      <ul><li>Krea 2 Turbo int8 + Realism Engine <b>0.5</b> + Realistic Snapshot 0.9</li><li>Проход 1: 1000×1600, 8 шагов, euler_ancestral / sgm_uniform, cfg 1</li><li>Проход 2: латент ×1.5, 4 шага, denoise 0.54 → ColorMatch</li><li>FaceDetailer 1440 px → UltimateSDUpscale ×1.9, denoise <b>0.22</b></li></ul><span class="time">57–111 с · 2856×4560</span></div>
+    <div class="card"><span class="file">01b_image_krea2_simple.json</span><h3>Картинка, быстрый вариант</h3>
+      <ul><li>Один проход, 8 шагов, euler / beta, cfg 1</li><li><code>qwen_image_vae</code>, LoRA выключены</li><li>Самый натуральный «телефонный» вид</li></ul><span class="time">13–32 с · 1000×1600</span></div>
+    <div class="card"><span class="file">02_image_moss.json</span><h3>Картинка на MOSS SFT</h3>
+      <ul><li>MOSS SFT bf16 + Qwen3.5 9B int8 + flux2-vae</li><li><code>ModelSamplingAuraFlow</code> shift 5 (с SD3 получается шум)</li><li>LoRA: NiceGirls 0.4, Lenovo 0.5, турбо DMD 1.0, 2000s Analog 0.4, 8 шагов</li></ul><span class="time">56–81 с · 1024×1280</span></div>
+    <div class="card"><span class="file">03_video_h3_i2v.json</span><h3>Видео, лучшие настройки</h3>
+      <ul><li>H3 fl2va pruned int8 + турбо-LoRA 8 шагов</li><li>768×960, 124 кадра (5 с), euler, shift <b>8</b></li><li>Промпт-раскадровка по секундам, звук</li></ul><span class="time">164–185 с · 768×960</span></div>
+    <div class="card"><span class="file">03b_video_h3_long.json</span><h3>Видео, длинный клип 12 с</h3>
+      <ul><li>Как <code>03</code>, но 294 кадра и раскадровка на 12 с</li><li>Практический предел дома, RAM 59 ГБ</li></ul><span class="time">694 с · 768×960</span></div>
+    <div class="card"><span class="file">03c_video_h3_chain.json</span><h3>Видео, продолжение клипа</h3>
+      <ul><li>Последние 22 кадра и звук предыдущего клипа как якорь (<code>MiniMaxH3AddGuide</code>)</li><li>+5 с, склейка в один mp4, можно цепочкой</li></ul><span class="time">233 с за +5 с</span></div>
+    <div class="card"><span class="file">05_video_h3_erosmax_i2v.json</span><h3>Видео, Eros Max</h3>
+      <ul><li>Eros Max beta5 int8 + VBVR 0.25, без турбо-LoRA</li><li>8 шагов euler / simple, shift <b>8</b></li><li>Дообучение сообщества, мягче официальной H3</li></ul><span class="time">158–171 с · 768×960</span></div>
+    <div class="card"><span class="file">04_post_rife_upscale.json</span><h3>Постобработка</h3>
+      <ul><li>lanczos ×2 (OmniSR не лучше и в 2,4 раза медленнее)</li><li>RIFE ×2 → 48 fps; ×3 → 72 fps доводит RAM до 61,3 из 62 ГБ</li><li>Звук сохраняется</li></ul><span class="time">27 с (×2) · 41 с (×3)</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="rules">
+  <h2 id="rules">Выводы</h2>
+  <ul class="rules prose">
+    <li><b>Реализм кадра определяют модель и промпт.</b> Дополнительные проходы добавляют резкость и разрешение, а LoRA реализма дают глянец. Хочешь «как с телефона», бери простой вариант.</li>
+    <li><b>Для картинок теги работают не хуже прозы.</b> <code>photo \(medium\)</code>, <code>crisp detailed instagram photograph</code>, субъект, поза, одежда, место, <code>bokeh</code> через запятую. «Instagram photograph» даёт глянец, «amateur phone photo» сырой бытовой вид.</li>
+    <li><b>Для видео нужна раскадровка по секундам.</b> С коротким промптом лицо плывёт и действия теряются. Обязательны блоки appearance lock и background lock.</li>
+    <li><b>Разрешение видео важнее числа шагов.</b> 768×960 с турбо лучше, чем 640×800 без турбо на 20 шагах.</li>
+    <li><b>Стороны кадра кратны 32.</b> 576×720 не работает, 640×800, 768×960 и 896×1120 работают.</li>
+    <li><b>Узкое место — оперативная память.</b> Текстовый энкодер H3 на 32B держит 58–61 ГБ из 62. Видеокарте хватает.</li>
+    <li><b>Пиши возраст явно</b> (25+, late-20s). Модели по умолчанию делают лица моложе заданного.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="prompts">
+  <h2 id="prompts">Шаблоны промптов</h2>
+  <div class="copyrow"><h3>Видео: раскадровка на 5 секунд (победитель V13)</h3><button type="button" data-copy="p-video">Копировать</button></div>
+  <pre id="p-video">integrated_multimodal_description: [Shot 1] &lt;Picture 1&gt; is the first frame. Whole clip is 5 seconds. Live-action. Static medium shot of a fictional 28-year-old woman sitting on a black metal mesh bench inside a glass bus shelter in daylight.
+Appearance lock: long wavy copper-red hair, freckles, mature adult face, light everyday makeup, untucked white linen blouse with rolled sleeves, dark-blue high-waisted jeans, small silver pendant, silver hoop earrings, black bag on the bench. Keep face, outfit and proportions exactly as in &lt;Picture 1&gt;.
+Background lock: red brick shop with striped awning, yellow curb, glass shelter panels with soft reflections; background stays still apart from natural light flicker.
+[Shot 2] 0s-2.5s: she lifts her right hand and tucks a strand of hair behind her ear, then smiles warmly at the camera; small natural breathing and blinking.
+[Shot 3] 2.5s-5s: she glances briefly to her left toward the street, looks back at the camera and gives a small playful wink, then relaxes, hands return to her lap and she keeps smiling softly.
+camera: handheld phone feel, almost static, very slight natural sway, no zoom, no cuts.
+overall_soundscape: quiet city street ambience, distant traffic, a soft breeze, faint footsteps on the pavement.
+non_diegetic_music: None.
+negative: morphing face, identity drift, extra fingers, warped hands, flicker, jitter, text, subtitles, watermark, music, talking.</pre>
+  <div class="copyrow"><h3>Картинка: структура в тегах</h3><button type="button" data-copy="p-tags">Копировать</button></div>
+  <pre id="p-tags">crisp detailed instagram photograph of
+masterpiece, best quality, realistic, photorealistic, photo \(medium\),
+[age]-year-old adult woman, [face], [hair], [build],
+[pose and hands], [clothing],
+[location: 3–5 concrete objects], [light], [camera angle], bokeh, depth of field</pre>
+  <div class="copyrow"><h3>Картинка: структура прозой (как у автора образца)</h3><button type="button" data-copy="p-prose">Копировать</button></div>
+  <pre id="p-prose">Amateur smartphone photo of a fictional [age]-year-old adult woman, late-20s, mature facial features,
+[face: eyes, nose, lips, freckles, uneven skin tone, faint visible veins],
+[hair], [build], [pose and action], [clothing item by item],
+[location with 3–5 concrete background objects],
+[light: harsh side light with deep shadows on the far side],
+slight phone-camera noise, natural skin texture, unretouched.</pre>
+</section>
+
+<section aria-labelledby="lora">
+  <h2 id="lora">Персона и своя LoRA: план под наш пайплайн</h2>
+  <p class="prose">Цель: одно и то же вымышленное лицо на сотнях кадров, а затем видео через H3. Всё ниже рассчитано на Krea 2 Turbo из <code>01</code> и видео из <code>03</code>. Это план по исследованию, а не проверенный рецепт: цифры из карточек моделей и отчётов пользователей.</p>
+  <div class="pipe">
+    <div class="step"><span class="n">1 · эталонное лицо</span><span class="t">1–3 <small>лица из 100–200 сидов</small></span><span><code>01b</code>, нейтральный свет, анфас. Задать 2–3 постоянные приметы (родинка, асимметричные брови). Проверить обратным поиском, что лицо не похоже на реального человека.</span></div>
+    <div class="step"><span class="n">2 · датасет</span><span class="t">~28 → 50 <small>кадров</small></span><span>Krea 2 Identity Edit V2 (ноды <code>comfyui-krea2edit</code>, 8 шагов, CFG 1, ≤ 2 МП) переносит лицо в новые позы, одежду и свет. Отбор по ArcFace и глазами.</span></div>
+    <div class="step"><span class="n">3 · обучение</span><span class="t">2–3 ч <small>на 5070 Ti, оценка</small></span><span>ostris ai-toolkit, Krea 2 <b>Raw</b>, rank 32, LR 1e-4, 2000 шагов, qfloat8 + offload. Два захода: черновая LoRA, генерация 200 кандидатов, финальная LoRA с нуля.</span></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Датасет</th><th>Норма</th><th>Зачем</th></tr></thead>
+    <tbody>
+      <tr><td>Размер</td><td class="num">40–60</td><td>больше 30 без разнообразия даёт переобучение</td></tr>
+      <tr><td>Крупность</td><td class="num">35 / 35 / 30 %</td><td>лицо · по пояс · в рост; без крупных планов лицо искажается</td></tr>
+      <tr><td>Одежда</td><td class="num">≥ 10, каждая ≤ 15 %</td><td>иначе одежда «прилипнет» к персоне</td></tr>
+      <tr><td>Фоны</td><td class="num">≥ 12, каждый ≤ 10 %</td><td>то же с фоном</td></tr>
+      <tr><td>Разрешение</td><td class="num">бакеты 512 + 1024</td><td>Krea 2 не обучали на 768</td></tr>
+      <tr><td>Подписи</td><td>триггер + всё изменяемое</td><td>лицо и приметы не описывать, их «впитает» триггер</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="rules prose">
+    <li><b>Применение:</b> LoRA персоны на Turbo с силой 0.8–1.0. LoRA реализма тогда держать ≤ 0.5: на 0.8 + 0.7 лицо начинает «спорить» само с собой.</li>
+    <li><b>Видео:</b> отдельную LoRA для H3 пока не нужно. Кадр с персоной идёт первым кадром в <code>03</code>, H3 держит лицо из него. Дальше стоит попробовать H3 Ref2V с 1–2 референсами. Обучать H3 на 16 ГБ никто не пробовал (33B параметров), это кандидат на аренду GPU.</li>
+    <li><b>Лицензии:</b> Identity Edit V2 только для некоммерческого использования. Krea 2 разрешает коммерцию при выручке до $1 млн. У H3 открытые веса не распространяются на ЕС.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="next">
+  <h2 id="next">Длина видео и склейка клипов</h2>
+  <p class="prose">Те же настройки победителя (768×960, турбо 8 шагов, shift 8), длинные раскадровки, одно действие на 1,5–2,5 с. По правилу ноды число кадров должно быть 17k+5, обученный диапазон H3 — 124–362 кадра (5–15 с).</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Длина</th><th>Кадров</th><th>Время</th><th>с расчёта / 1 с видео</th><th>RAM</th><th>Резкость начало / середина / конец</th><th>Вывод</th></tr></thead>
+    <tbody>
+      <tr><td class="num">5 с</td><td class="num">124</td><td class="num">165 с</td><td class="num">33</td><td class="num">58,6 ГБ</td><td class="num">1010 / 932 / 957</td><td>эталон</td></tr>
+      <tr><td class="num">6 с</td><td class="num">141</td><td class="num">219 с</td><td class="num">36</td><td class="num">54,3 ГБ</td><td class="num">972 / 683 / 732</td><td>все действия</td></tr>
+      <tr class="win"><td class="num">9 с</td><td class="num">226</td><td class="num">434 с</td><td class="num">48</td><td class="num">55,7 ГБ</td><td class="num">946 / 724 / 712</td><td><b>лучшее соотношение качества и времени</b></td></tr>
+      <tr><td class="num">12 с</td><td class="num">294</td><td class="num">694 с</td><td class="num">57</td><td class="num">59,4 ГБ</td><td class="num">1062 / 811 / 869</td><td>все действия; <b>практический предел дома</b></td></tr>
+      <tr><td class="num">15 с</td><td class="num">362</td><td class="num">956 с</td><td class="num">63</td><td class="num">58,8 ГБ</td><td class="num">1145 / 1017 / 399</td><td>фон плывёт, конец мыльный</td></tr>
+    </tbody>
+  </table></div>
+  <div class="strip">
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/len-12s-poster.jpg" src="media/len-12s.mp4"></video>
+      <figcaption><span class="tag good">12 с</span><b>Один клип</b> · 294 кадра · 694 с. Все действия, лицо держится.</figcaption>
+    </figure>
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/chain-5s-plus-5s-poster.jpg" src="media/chain-5s-plus-5s.mp4"></video>
+      <figcaption><span class="tag good">склейка</span><b>5 с + 5 с через 03c</b> · 164 + 233 = 397 с. Шва не видно, звук продолжается.</figcaption>
+    </figure>
+  </div>
+  <figure class="wide">
+    <img src="media/chain-vs-single-9s.jpg" alt="Кадры: склейка 5+5 с сверху, один клип 9 с снизу" loading="lazy" width="1400" height="461">
+    <figcaption><b>Сверху склейка, снизу один клип на 9 с</b>, кадров одинаково (226). У склейки в середине резкость 892 против 724 и расчёт на 9 % быстрее. Минусы: дрейф лица чуть больше, бит «встаёт» пропущен, на быстром движении в конце резкость падает до ≈290.</figcaption>
+  </figure>
+  <ul class="rules prose">
+    <li><b>Как работает склейка <code>03c</code>.</b> Последние 22 кадра и звук предыдущего клипа ставятся якорем (нода <code>MiniMaxH3AddGuide</code>) в начало нового. Перекрытие обрезается, части склеиваются в один mp4. Результат можно подать на вход снова.</li>
+    <li><b>Правило:</b> до 9 с — один клип (<code>03</code>); 10–12 с — один клип (<code>03b</code>) или две части; больше 12 с — цепочка частей по 5–8 с через <code>03c</code>.</li>
+    <li><b>Время растёт быстрее длины:</b> 6 → 9 с даёт ×2 времени на ×1,6 кадров. VRAM не растёт (динамическая загрузка), RAM держится до 59 ГБ.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="eros">
+  <h2 id="eros">H3 Eros Max против официальной H3</h2>
+  <p class="prose">Одетая сцена с медитацией, кадр из секции «Фигура», один сид и одна раскадровка, 768×960, 124 кадра. Eros Max beta5 — дообученный чекпойнт сообщества из образца с Civitai (int8, уже турбо) + LoRA VBVR 0.25.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Вариант</th><th>Время</th><th>RAM</th><th>Резкость начало / середина / конец</th><th>Дрейф лица</th><th>Вывод</th></tr></thead>
+    <tbody>
+      <tr class="win"><td><code>03</code> официальная H3</td><td class="num">174 с</td><td class="num">58,5 ГБ</td><td class="num">79 / 64 / 75</td><td class="num">7</td><td><b>самая резкая</b>, все действия</td></tr>
+      <tr><td><code>05</code> Eros Max</td><td class="num">171 с</td><td class="num">59,3 ГБ</td><td class="num">56 / 44 / 50</td><td class="num">7</td><td>на ≈30 % мягче, «пластиковое» сглаживание</td></tr>
+      <tr><td><code>05</code> + shift 8</td><td class="num">159 с</td><td class="num">58,8 ГБ</td><td class="num">61 / 52 / 57</td><td class="num">13</td><td>shift возвращает треть резкости; дорисовал кольцо</td></tr>
+    </tbody>
+  </table></div>
+  <div class="strip">
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/E1_official-poster.jpg" src="media/E1_official.mp4"></video>
+      <figcaption><span class="tag good">резче</span><b>03 официальная</b> · 174 с</figcaption>
+    </figure>
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/E3_erosmax_s8-poster.jpg" src="media/E3_erosmax_s8.mp4"></video>
+      <figcaption><span class="tag warn">мягче</span><b>05 Eros Max + shift 8</b> · 159 с</figcaption>
+    </figure>
+  </div>
+  <figure class="wide">
+    <img src="media/eros-vs-official-grid.jpg" alt="По 6 кадров из трёх роликов: официальная H3, Eros Max, Eros Max с shift 8" loading="lazy" width="1170" height="771">
+    <figcaption>Сверху вниз: 03 официальная, 05 Eros Max, 05 + shift 8. Движение почти одинаковое, все три выполняют раскадровку. Абсолютная резкость здесь ниже, чем на остановке: мягкий свет в комнате, мало мелких деталей. Сравнивать можно только строки между собой.</figcaption>
+  </figure>
+  <ul class="rules prose">
+    <li><b>Для обычных сцен бери <code>03</code>.</b> Eros Max не быстрее и мягче.</li>
+    <li><b>В <code>05</code> по умолчанию shift 8.</b></li>
+    <li><b>Пальцы плывут, когда руки касаются тела в последней секунде.</b> Действие с касанием ставь в середину клипа, а заканчивай спокойным удержанием. В negative: <code>fused fingers, missing fingers</code>.</li>
+    <li><b>Не запускай H3 в двух ComfyUI одновременно.</b> Два ComfyUI с H3 оставили 3 ГБ свободной RAM, время выросло вдвое.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="remote">
+  <h2 id="remote">Аренда GPU: когда это имеет смысл</h2>
+  <p class="prose">Правило простое: арендуем, только когда локально задача <b>не помещается</b> (упираемся в оперативную память) или когда компьютер должен быть свободен. Пятисекундные ролики выгоднее делать дома. Цены RunPod Secure Cloud на 23.10.2026, часть времени — оценки, отмечены «≈».</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Задача</th><th>Дома (5070 Ti)</th><th>RunPod</th><th>API</th><th>Решение</th></tr></thead>
+    <tbody>
+      <tr><td>H3, 5 с, 768×960</td><td class="num">164 с, 0 €</td><td class="num">5090 ≈ 1–2 мин, ≈ $0.03</td><td class="num">MiniMax $0.40</td><td><span class="tag good">дома</span></td></tr>
+      <tr><td>H3, 10 с</td><td class="num">≈ 9–12 мин, 0 € (влезает, RAM 59 ГБ)</td><td class="num">5090 ≈ 5–8 мин, ≈ $0.15</td><td class="num">$0.80–1.30</td><td><span class="tag good">дома</span></td></tr>
+      <tr><td>H3, 15 с, ~1080p</td><td>не помещается</td><td class="num">PRO 6000 / H100 ≈ $0.35–0.80</td><td class="num">MiniMax 2K $1.95</td><td><span class="tag bad">аренда</span></td></tr>
+      <tr><td>LoRA персоны, 2000 шагов</td><td class="num">≈ 2–3 ч, ПК занят</td><td class="num">5090 ≈ 1,9 ч, ≈ $2.2</td><td class="num">fal $6.00</td><td>дома или аренда, если ПК нужен</td></tr>
+      <tr><td>200 картинок для датасета</td><td class="num">45 мин – 6 ч</td><td class="num">≈ $0.5–1.5</td><td class="num">≈ $2.4</td><td><span class="tag good">дома, ночью</span></td></tr>
+      <tr><td>LoRA для самой H3 (33B)</td><td>невозможно на 16 ГБ</td><td class="num">H100 80 ГБ, ≈ $20–60</td><td>fal (цена не проверена)</td><td>отложить</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Площадка</th><th>Чем хороша</th><th>Минус</th></tr></thead>
+    <tbody>
+      <tr><td><b>RunPod Pods</b> (рекомендация)</td><td>посекундная оплата, 5090 $1.19/ч, сетевой том под 45 ГБ моделей, SSH и CLI <code>runpodctl</code>; там тот же ComfyUI и наши workflow</td><td>нужно самому следить, чтобы поды не остались включёнными</td></tr>
+      <tr><td>RunPod Serverless</td><td>платишь только за работу</td><td>официальный ComfyUI-воркер не возвращает видео, только картинки</td></tr>
+      <tr><td>Comfy Cloud</td><td>уже есть в Desktop, шаблоны H3 и Krea 2, коммерческие права на H3; Creator $35/мес</td><td>только поддерживаемые кастомные ноды, максимум 30 мин на workflow</td></tr>
+      <tr><td>fal.ai / MiniMax API</td><td>без настройки; H3 2K $0.13/с; тренер Krea 2 LoRA</td><td>модерация, своей турбо-LoRA нет</td></tr>
+      <tr><td>Vast.ai / Modal</td><td>Vast дешевле, Modal удобно скриптовать</td><td>Vast: нет общего тома, модели качать каждый раз</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="rules prose">
+    <li><b>Лимит расходов:</b> предоплата без автопополнения — это и есть жёсткий потолок. API-ключ держи в переменной окружения, не в файлах репозитория.</li>
+    <li><b>Схема:</b> один дешёвый под один раз качает модели с Hugging Face в сетевой том (≈ 25–75 мин). Дальше под на 5090 с таймером самоостановки, ComfyUI через SSH-туннель, те же workflow через <code>comfytool.py</code>. В конце сессии проверить, что ничего не осталось включённым.</li>
+    <li><b>Условия площадок:</b> у каждой свои правила допустимого контента — прочитай их до загрузки своих данных.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="alt">
+  <h2 id="alt">Есть ли модели лучше? Обзор на октябрь 2026</h2>
+  <p class="prose">Свежий обзор (рейтинги Artificial Analysis, счётчики Civitai, карточки моделей). Отзывы с Reddit проверить не удалось: для инструментов поиска сайт закрыт.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Модель</th><th>Что это</th><th>Зачем тестировать</th></tr></thead>
+    <tbody>
+      <tr class="win"><td><b>MiniMax H3</b> (наша)</td><td>видео, №1 среди открытых моделей в рейтинге image-to-video (Elo 1140)</td><td>остаётся лидером по качеству; минус — лицензия не действует в ЕС</td></tr>
+      <tr><td>LTX-2.5 (NVFP4)</td><td>видео, до 20 с, звук, мульти-шот; Elo ≈ 984</td><td>скорость, длина и запас RAM; бесплатна до $10 млн выручки, в ЕС можно</td></tr>
+      <tr><td>Wan 2.2 + lightx2v 4 шага</td><td>видео, Apache-2.0, самая большая библиотека LoRA</td><td>запасной путь без проблем с лицензией</td></tr>
+      <tr><td>Wan-Animate-2</td><td>перенос движения с реального видео на картинку</td><td>когда промптом не добиться нужного движения</td></tr>
+      <tr class="win"><td><b>Krea 2</b> (наша)</td><td>картинки; на Civitai доминирует в фотореализме</td><td>плюс проверить NVFP4-вариант на скорость</td></tr>
+      <tr><td>FLUX.3 Image Klein</td><td>5.6B, вышла 15.10, №1 открытых text-to-image (Elo 1043)</td><td>реализм людей ещё никто не сравнивал</td></tr>
+      <tr><td>Qwen-Image-2.1 Turbo</td><td>до 10 референсов, 2K, сильное редактирование</td><td>кандидат на инструмент для датасета персоны</td></tr>
+      <tr><td>Z-Image Turbo</td><td>Apache-2.0, живая экосистема реалистичных дообучений</td><td>дешёвая база без проблем с лицензией</td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose" style="color:var(--muted);font-size:14px">Вывод: для частной работы H3 и Krea 2 остаются сильнейшими. Если персону нужно будет публиковать, понадобится видео-путь без проблем с лицензией в ЕС (LTX-2.5 или Wan 2.2). Бенчмарк запланирован в серии 2: картинки ≈ 45 ГБ, видео ≈ 94 ГБ загрузок.</p>
+</section>
+
+<section aria-labelledby="series">
+  <h2 id="series">Следующие серии экспериментов</h2>
+  <p class="prose">План следующих экспериментов. Результаты будут появляться на этой странице и в репозитории.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>№</th><th>Серия</th><th>Где</th><th>Затраты</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Скорость, память и резкость H3: SageAttention, w6a8, турбо 4 шага, видео-апскейлеры</td><td>дома</td><td class="num">3–4 ч · ~25 ГБ</td></tr>
+      <tr><td class="num">2</td><td>Разведка моделей + своя система оценки (резкость, эстетика, соответствие промпту, кожа, возраст лица)</td><td>дома</td><td class="num">3–4 ч · ~40 ГБ</td></tr>
+      <tr><td class="num">3</td><td>Своя «облачная копия» ComfyUI на RunPod + ролики 10–15 с и ~1 МП</td><td><span class="tag warn">RunPod</span></td><td class="num">≈ $5–10</td></tr>
+      <tr><td class="num">4</td><td>Пилот персоны: эталонное лицо, датасет, обучение LoRA на RunPod 5090, видео</td><td><span class="tag warn">RunPod</span></td><td class="num">5–6 ч · ≈ $3–5</td></tr>
+      <tr><td class="num">5</td><td>Рецепты топ-креаторов Civitai и YouTube, тест трёх лучших</td><td>решает сама</td><td class="num">2–3 ч</td></tr>
+      <tr><td class="num">6</td><td>Управление движением (ControlNet для H3) и мини-сцена 20–30 с</td><td>решает сама</td><td class="num">3–4 ч · ~10 ГБ</td></tr>
+      <tr><td class="num">7</td><td>Лаборатория промптов: теги или проза, длина, возраст, плотность раскадровки</td><td>дома</td><td class="num">2–3 ч</td></tr>
+      <tr><td class="num">8</td><td>Финишная обработка против «ИИ-вида»: кожа, зерно, цвет, деталь тела</td><td>дома</td><td class="num">3 ч · ~5 ГБ</td></tr>
+      <tr><td class="num">9</td><td>Звук, речь и липсинк</td><td>решает сама</td><td class="num">3–4 ч · ~15 ГБ</td></tr>
+      <tr><td class="num">10</td><td>Конвейер пакетной генерации: список промптов на входе, автоотбор лучших, ночной прогон</td><td>решает сама</td><td class="num">3 ч + ночь</td></tr>
+      <tr><td class="num">11</td><td>Редактирование и консистентность: edit-модели, inpaint, смена одежды и фона, 4K</td><td>дома</td><td class="num">3–4 ч · ~25 ГБ</td></tr>
+      <tr><td class="num">12</td><td>Потолок платных API: MiniMax, fal, Comfy Cloud против дома и RunPod</td><td>API</td><td class="num">≈ $5–15</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="pit">
+  <h2 id="pit">Грабли, на которые наступили</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Симптом</th><th>Причина</th><th>Решение</th></tr></thead>
+    <tbody>
+      <tr><td>MOSS выдаёт чистый шум</td><td><code>ModelSamplingSD3</code> (шкала ×1000)</td><td><code>ModelSamplingAuraFlow</code>, shift 5</td></tr>
+      <tr><td>H3 падает на 576×720</td><td>720 не кратно 32</td><td>640×800, 768×960, 896×1120</td></tr>
+      <tr><td>Desktop: нет <code>face_yolov8m.pt</code></td><td>Impact Pack ищет в папке установки, а не в общей</td><td>копия в <code>ComfyUI\models\ultralytics\bbox</code></td></tr>
+      <tr><td>Обновление Desktop падает</td><td>битый <code>.git</code> из standalone-сборки</td><td>пересобран <code>.git</code>, бэкап рядом</td></tr>
+      <tr><td>Тонкая белая майка просвечивает</td><td>слово «thin» + LoRA</td><td>«thick, opaque ribbed cotton … over a sports bra»</td></tr>
+      <tr><td>Видео OOM или подтормаживает</td><td>два ComfyUI сразу делят RAM/VRAM</td><td>один ComfyUI за раз или <code>POST /free</code></td></tr>
+      <tr><td>Фигура не меняется от слов в промпте</td><td>мягкие слова о теле, Krea Turbo при cfg 1 их не слышит</td><td>сильные теги (секция «Фигура»)</td></tr>
+      <tr><td>Пальцы плывут в конце ролика</td><td>касание рук в последней секунде</td><td>касание в середину, в конце удержание</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="files">
+  <h2 id="files">Что где в репозитории</h2>
+  <div class="tbl paths"><table><tbody>
+    <tr><td>Workflow</td><td class="mono">workflows/</td></tr>
+    <tr><td>Генераторы и замеры</td><td class="mono">tools/ (comfytool.py, build_*.py, video.py, lenstats.py, sheet.py)</td></tr>
+    <tr><td>Промпты-раскадровки</td><td class="mono">prompts/</td></tr>
+    <tr><td>Замеры времени</td><td class="mono">tools/timings.json</td></tr>
+    <tr><td>Эта страница</td><td class="mono">docs/</td></tr>
+  </tbody></table></div>
+  <p class="prose" style="color:var(--muted);font-size:14px">Серия 0 закрыта 23.10.2026. Следующая — серия 1: скорость, память и резкость H3.</p>
+</section>
+
+<footer>Все люди на странице вымышлены и сгенерированы; примеры только SFW. Веса моделей не распространяются — у каждой своя лицензия (у MiniMax H3 открытые веса исключают ЕС, США, Великобританию и Корею). Код и тексты: MIT, <a href="https://github.com/olexiy/comfy-h3-studio">github.com/olexiy/comfy-h3-studio</a>.</footer>
+</div>
+
+<script>
+document.querySelectorAll('button[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.copy), txt=el.textContent;
+    var done=function(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Копировать'},1500)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
+    try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
+  });
+});
+</script>

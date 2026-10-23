@@ -1,0 +1,10 @@
+integrated_multimodal_description: [Shot 1] <Picture 1> is the first frame. Whole clip is 5 seconds. Live-action. Static straight-on medium shot of a fictional 28-year-old woman kneeling on a yoga mat in a bright living room in front of a beige couch.
+Appearance lock: sleek pulled-back blonde ponytail, narrow face, mature adult facial features, natural lips, opaque black sports bra and black athletic leggings. Keep face, outfit and proportions exactly as in <Picture 1>.
+Background lock: beige couch, green plants, bright window with soft daylight; background stays still.
+[Shot 2] 0s-2s: she sits still with eyes closed and palms pressed together in front of her chest, breathing slowly and calmly; her shoulders rise and fall gently.
+[Shot 3] 2s-3.5s: she slowly opens her eyes and lowers her hands to rest on her thighs.
+[Shot 4] 3.5s-5s: she looks at the camera and smiles softly, relaxed.
+camera: static tripod-like phone shot, no zoom, no cuts.
+overall_soundscape: quiet room tone, soft breathing, birdsong outside the window.
+non_diegetic_music: None.
+negative: nudity, revealing clothing, morphing face, identity drift, extra fingers, warped hands, flicker, jitter, text, subtitles, watermark, music, talking.

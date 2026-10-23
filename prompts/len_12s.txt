@@ -1,0 +1,13 @@
+integrated_multimodal_description: [Shot 1] <Picture 1> is the first frame. Whole clip is 12 seconds. Live-action. Static medium shot of a fictional 28-year-old woman sitting on a black metal mesh bench inside a glass bus shelter in daylight.
+Appearance lock: long wavy copper-red hair, freckles, mature adult face, light everyday makeup, untucked white linen blouse with rolled sleeves, dark-blue high-waisted jeans, small silver pendant, silver hoop earrings, black bag on the bench. Keep face, outfit and proportions exactly as in <Picture 1>.
+Background lock: red brick shop with striped awning, yellow curb, glass shelter panels with soft reflections; background stays consistent.
+[Shot 2] 0s-2s: she lifts her right hand and tucks a strand of hair behind her ear, then smiles warmly at the camera; natural breathing and blinking.
+[Shot 3] 2s-4s: she glances to her left toward the street, watching it for a moment.
+[Shot 4] 4s-6s: she takes her phone out of the black bag, looks at the screen briefly, then puts it back into the bag.
+[Shot 5] 6s-8s: she looks back at the camera and gives a small playful wink, hands rest in her lap.
+[Shot 6] 8s-10s: a red city bus drives past behind the glass in the background from left to right while she stays seated and smiles.
+[Shot 7] 10s-12s: she stands up from the bench, lifts the black bag and puts its strap over her shoulder, adjusting it.
+camera: handheld phone feel, almost static, very slight natural sway, no zoom, no cuts.
+overall_soundscape: quiet city street ambience, distant traffic, a soft breeze, faint footsteps on the pavement, a city bus passing.
+non_diegetic_music: None.
+negative: nudity, revealing clothing, morphing face, identity drift, extra fingers, warped hands, flicker, jitter, text, subtitles, watermark, music, talking.
