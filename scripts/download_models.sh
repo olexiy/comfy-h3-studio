@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Sequential, resumable downloads of the Hugging Face models used by the workflows.
-# Usage: COMFY_MODELS=/path/to/ComfyUI/models bash scripts/download_models.sh [all|krea|h3|moss|extras]
+# Usage: COMFY_MODELS=/path/to/ComfyUI/models bash scripts/download_models.sh [all|krea|h3|extras]
 # Community LoRAs/finetunes from Civitai are NOT downloaded here (login required) — see README.
 set -u
 M="${COMFY_MODELS:?Set COMFY_MODELS to your ComfyUI models folder}"
@@ -22,7 +22,7 @@ if want krea; then   # stills: 01, 01b
   get vae              "$HF/Comfy-Org/Krea-2/resolve/main/vae/qwen_image_vae.safetensors"
   get vae              "$HF/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors"
 fi
-if want h3; then     # video: 03, 03b, 03c, 05 (05 also needs the Civitai finetune)
+if want h3; then     # video: 03, 03c (the Eros Max toggle also needs the Civitai finetune)
   get diffusion_models "$HF/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors"
   get text_encoders    "$HF/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors"
   get vae              "$HF/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_fp16.safetensors"
@@ -30,12 +30,7 @@ if want h3; then     # video: 03, 03b, 03c, 05 (05 also needs the Civitai finetu
   get loras            "$HF/Comfy-Org/MiniMax-H3/resolve/main/loras/minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors"
   get vae_approx       "$HF/Kijai/MiniMax-H3-TAE/resolve/main/vae_approx/taeh3.safetensors"
 fi
-if want moss; then   # stills: 02
-  get diffusion_models "$HF/Comfy-Org/MOSS-Image/resolve/main/diffusion_models/moss_image_sft_bf16.safetensors"
-  get text_encoders    "$HF/Comfy-Org/MOSS-Image/resolve/main/text_encoders/qwen3.5_9b_int8_convrot.safetensors"
-  get vae              "$HF/Comfy-Org/MOSS-Image/resolve/main/vae/flux2-vae.safetensors"
-fi
-if want extras; then # face detailer (01, 02), OmniSR upscale (01, 02, 04 variant); RIFE downloads itself
+if want extras; then # face detailer + OmniSR upscale (01); RIFE downloads itself
   get ultralytics/bbox "$HF/Bingsu/adetailer/resolve/main/face_yolov8m.pt"
   get upscale_models   "$HF/Acly/Omni-SR/resolve/main/OmniSR_X4_DIV2K.safetensors"
 fi

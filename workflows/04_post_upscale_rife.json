@@ -1,0 +1,811 @@
+{
+ "id": "8e3ab6cd-e820-54ca-ba9a-6809e56aaa99",
+ "revision": 0,
+ "last_node_id": 10,
+ "last_link_id": 17,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "MarkdownNote",
+   "pos": [
+    0,
+    0
+   ],
+   "size": [
+    440,
+    620
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "# 04 · Post: upscale + smooth an existing video\n**Use:** pick a finished H3 clip in *Load video* → set the fields → Run → `H3test/post_*.mp4`.\n\n| Field | Meaning |\n|---|---|\n| upscale ×2 | lanczos ×2 (768×960 → 1536×1920); the reference author's method — fast, no invented detail |\n| smooth (RIFE) | frame interpolation; **multiplier** 2 = 48 fps, 3 = 72 fps (×3 at 1536×1920 needs ~61 GB RAM) |\n| fps | must be 24 × multiplier, otherwise motion speed changes |\n\nAudio is passed through. OmniSR model upscale was tested: 2.4× slower, no visible gain → dropped.\n\n**Measured:** RTX 5070 Ti 16 GB · 124 f 768×960 → 1536×1920: **RIFE ×2 / 48 fps 27 s** (RAM 53 GB) · RIFE ×3 / 72 fps 39 s (RAM 61 GB) · OmniSR variant ≈ 2.4× slower than lanczos, no visible gain"
+   ]
+  },
+  {
+   "id": 2,
+   "type": "LoadVideo",
+   "pos": [
+    480,
+    0
+   ],
+   "size": [
+    380,
+    460
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoadVideo"
+   },
+   "title": "Load video",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VIDEO",
+     "type": "VIDEO",
+     "links": [
+      1
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "H3test_h3.mp4",
+    "image"
+   ]
+  },
+  {
+   "id": 9,
+   "type": "SaveVideo",
+   "pos": [
+    1440,
+    0
+   ],
+   "size": [
+    440,
+    600
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "SaveVideo"
+   },
+   "title": "Save video",
+   "inputs": [
+    {
+     "name": "video",
+     "type": "VIDEO",
+     "link": 10
+    },
+    {
+     "name": "codec",
+     "type": "COMFY_DYNAMICCOMBO_V3",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "video",
+     "type": "VIDEO",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "H3test/post",
+    "mp4",
+    "h264",
+    "re-encode",
+    14.0
+   ]
+  },
+  {
+   "id": 10,
+   "type": "fa60f947-7602-486d-bcce-4ad1b48299ca",
+   "title": "Post · upscale + RIFE",
+   "pos": [
+    900,
+    0
+   ],
+   "size": [
+    480,
+    320
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "video",
+     "type": "VIDEO",
+     "link": 11
+    },
+    {
+     "label": "upscale ×2 (lanczos)",
+     "name": "switch",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "switch"
+     },
+     "link": null
+    },
+    {
+     "label": "smooth (RIFE)",
+     "name": "switch_1",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "switch_1"
+     },
+     "link": null
+    },
+    {
+     "label": "RIFE multiplier (2 = 48 fps)",
+     "name": "multiplier",
+     "type": "INT",
+     "widget": {
+      "name": "multiplier"
+     },
+     "link": null
+    },
+    {
+     "label": "fps (24 × multiplier)",
+     "name": "fps",
+     "type": "FLOAT",
+     "widget": {
+      "name": "fps"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "VIDEO",
+     "type": "VIDEO",
+     "links": [
+      10
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core"
+   },
+   "widgets_values": [
+    true,
+    true,
+    2,
+    48.0
+   ]
+  }
+ ],
+ "links": [
+  [
+   11,
+   2,
+   0,
+   10,
+   0,
+   "VIDEO"
+  ],
+  [
+   10,
+   10,
+   0,
+   9,
+   0,
+   "VIDEO"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.45,
+   "offset": [
+    60,
+    120
+   ]
+  },
+  "workflowRendererVersion": "LG"
+ },
+ "version": 0.4,
+ "definitions": {
+  "subgraphs": [
+   {
+    "id": "fa60f947-7602-486d-bcce-4ad1b48299ca",
+    "version": 1,
+    "state": {
+     "lastGroupId": 2,
+     "lastNodeId": 8,
+     "lastLinkId": 17,
+     "lastRerouteId": 0
+    },
+    "revision": 0,
+    "config": {},
+    "name": "Post · upscale + RIFE",
+    "inputNode": {
+     "id": -10,
+     "bounding": [
+      750,
+      76,
+      180,
+      180
+     ]
+    },
+    "outputNode": {
+     "id": -20,
+     "bounding": [
+      2670,
+      76,
+      140,
+      68
+     ]
+    },
+    "inputs": [
+     {
+      "id": "1c3e3f14-2f36-4e33-a9e4-472c77a75677",
+      "name": "video",
+      "type": "VIDEO",
+      "linkIds": [
+       1
+      ],
+      "pos": [
+       790,
+       96
+      ]
+     },
+     {
+      "id": "30300cb1-1b01-4db5-87ce-bd2c9b954c1e",
+      "name": "switch",
+      "type": "BOOLEAN",
+      "linkIds": [
+       13
+      ],
+      "label": "upscale ×2 (lanczos)",
+      "pos": [
+       790,
+       96
+      ]
+     },
+     {
+      "id": "58ef03f9-1f03-46c6-9185-81f1c3e71457",
+      "name": "switch_1",
+      "type": "BOOLEAN",
+      "linkIds": [
+       14
+      ],
+      "label": "smooth (RIFE)",
+      "pos": [
+       790,
+       96
+      ]
+     },
+     {
+      "id": "b9222f16-a457-411d-8570-b2f836519e1c",
+      "name": "multiplier",
+      "type": "INT",
+      "linkIds": [
+       15
+      ],
+      "label": "RIFE multiplier (2 = 48 fps)",
+      "pos": [
+       790,
+       96
+      ]
+     },
+     {
+      "id": "2ac6b536-b81d-48cb-9866-07502e6aa250",
+      "name": "fps",
+      "type": "FLOAT",
+      "linkIds": [
+       16
+      ],
+      "label": "fps (24 × multiplier)",
+      "pos": [
+       790,
+       96
+      ]
+     }
+    ],
+    "outputs": [
+     {
+      "id": "a700000c-789b-4788-ab38-42c3d8a35b60",
+      "name": "VIDEO",
+      "type": "VIDEO",
+      "linkIds": [
+       12
+      ],
+      "localized_name": "VIDEO",
+      "pos": [
+       2700,
+       96
+      ]
+     }
+    ],
+    "widgets": [],
+    "nodes": [
+     {
+      "id": 3,
+      "type": "GetVideoComponents",
+      "pos": [
+       1010,
+       76
+      ],
+      "size": [
+       340,
+       122
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "GetVideoComponents"
+      },
+      "inputs": [
+       {
+        "name": "video",
+        "type": "VIDEO",
+        "link": 1
+       }
+      ],
+      "outputs": [
+       {
+        "name": "images",
+        "type": "IMAGE",
+        "links": [
+         2,
+         4
+        ],
+        "slot_index": 0
+       },
+       {
+        "name": "audio",
+        "type": "AUDIO",
+        "links": [
+         9
+        ],
+        "slot_index": 1
+       },
+       {
+        "name": "fps",
+        "type": "FLOAT",
+        "links": null,
+        "slot_index": 2
+       },
+       {
+        "name": "bit_depth",
+        "type": "COMBO",
+        "links": null,
+        "slot_index": 3
+       },
+       {
+        "name": "color_space",
+        "type": "COMBO",
+        "links": null,
+        "slot_index": 4
+       }
+      ],
+      "widgets_values": []
+     },
+     {
+      "id": 4,
+      "type": "ImageScaleBy",
+      "pos": [
+       1490,
+       76
+      ],
+      "size": [
+       340,
+       82
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ImageScaleBy"
+      },
+      "title": "Lanczos ×2",
+      "inputs": [
+       {
+        "name": "image",
+        "type": "IMAGE",
+        "link": 2
+       }
+      ],
+      "outputs": [
+       {
+        "name": "IMAGE",
+        "type": "IMAGE",
+        "links": [
+         3
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "lanczos",
+       2.0
+      ]
+     },
+     {
+      "id": 5,
+      "type": "ComfySwitchNode",
+      "pos": [
+       1490,
+       218
+      ],
+      "size": [
+       340,
+       80
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ComfySwitchNode"
+      },
+      "title": "Switch · upscale",
+      "inputs": [
+       {
+        "name": "on_false",
+        "type": "IMAGE",
+        "link": 4
+       },
+       {
+        "name": "on_true",
+        "type": "IMAGE",
+        "link": 3
+       },
+       {
+        "localized_name": "switch",
+        "name": "switch",
+        "type": "BOOLEAN",
+        "widget": {
+         "name": "switch"
+        },
+        "link": 13
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "IMAGE",
+        "links": [
+         5,
+         7
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       true
+      ]
+     },
+     {
+      "id": 6,
+      "type": "RIFE VFI",
+      "pos": [
+       1870,
+       76
+      ],
+      "size": [
+       340,
+       272
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "RIFE VFI"
+      },
+      "title": "RIFE VFI (rife47)",
+      "inputs": [
+       {
+        "name": "frames",
+        "type": "IMAGE",
+        "link": 5
+       },
+       {
+        "name": "optional_interpolation_states",
+        "type": "INTERPOLATION_STATES",
+        "link": null
+       },
+       {
+        "localized_name": "multiplier",
+        "name": "multiplier",
+        "type": "INT",
+        "widget": {
+         "name": "multiplier"
+        },
+        "link": 15
+       }
+      ],
+      "outputs": [
+       {
+        "name": "IMAGE",
+        "type": "IMAGE",
+        "links": [
+         6
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "rife47.pth",
+       10,
+       2,
+       true,
+       true,
+       1.0,
+       "float32",
+       false,
+       1
+      ]
+     },
+     {
+      "id": 7,
+      "type": "ComfySwitchNode",
+      "pos": [
+       1870,
+       408
+      ],
+      "size": [
+       340,
+       80
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ComfySwitchNode"
+      },
+      "title": "Switch · RIFE",
+      "inputs": [
+       {
+        "name": "on_false",
+        "type": "IMAGE",
+        "link": 7
+       },
+       {
+        "name": "on_true",
+        "type": "IMAGE",
+        "link": 6
+       },
+       {
+        "localized_name": "switch",
+        "name": "switch",
+        "type": "BOOLEAN",
+        "widget": {
+         "name": "switch"
+        },
+        "link": 14
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "IMAGE",
+        "links": [
+         8
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       true
+      ]
+     },
+     {
+      "id": 8,
+      "type": "CreateVideo",
+      "pos": [
+       2250,
+       76
+      ],
+      "size": [
+       340,
+       152
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "CreateVideo"
+      },
+      "title": "CreateVideo",
+      "inputs": [
+       {
+        "name": "images",
+        "type": "IMAGE",
+        "link": 8
+       },
+       {
+        "name": "audio",
+        "type": "AUDIO",
+        "link": 9
+       },
+       {
+        "localized_name": "fps",
+        "name": "fps",
+        "type": "FLOAT",
+        "widget": {
+         "name": "fps"
+        },
+        "link": 16
+       }
+      ],
+      "outputs": [
+       {
+        "name": "VIDEO",
+        "type": "VIDEO",
+        "links": [
+         12
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       48.0,
+       "auto",
+       "sRGB",
+       "none"
+      ]
+     }
+    ],
+    "groups": [
+     {
+      "id": 1,
+      "title": "1 · Load",
+      "bounding": [
+       580,
+       0,
+       800,
+       526
+      ],
+      "color": "#3f5f8a",
+      "font_size": 24,
+      "flags": {}
+     },
+     {
+      "id": 2,
+      "title": "2 · Upscale + RIFE",
+      "bounding": [
+       1460,
+       0,
+       1260,
+       918
+      ],
+      "color": "#4a7a3f",
+      "font_size": 24,
+      "flags": {}
+     }
+    ],
+    "links": [
+     {
+      "id": 1,
+      "origin_id": -10,
+      "origin_slot": 0,
+      "target_id": 3,
+      "target_slot": 0,
+      "type": "VIDEO"
+     },
+     {
+      "id": 2,
+      "origin_id": 3,
+      "origin_slot": 0,
+      "target_id": 4,
+      "target_slot": 0,
+      "type": "IMAGE"
+     },
+     {
+      "id": 3,
+      "origin_id": 4,
+      "origin_slot": 0,
+      "target_id": 5,
+      "target_slot": 1,
+      "type": "IMAGE"
+     },
+     {
+      "id": 4,
+      "origin_id": 3,
+      "origin_slot": 0,
+      "target_id": 5,
+      "target_slot": 0,
+      "type": "IMAGE"
+     },
+     {
+      "id": 5,
+      "origin_id": 5,
+      "origin_slot": 0,
+      "target_id": 6,
+      "target_slot": 0,
+      "type": "IMAGE"
+     },
+     {
+      "id": 6,
+      "origin_id": 6,
+      "origin_slot": 0,
+      "target_id": 7,
+      "target_slot": 1,
+      "type": "IMAGE"
+     },
+     {
+      "id": 7,
+      "origin_id": 5,
+      "origin_slot": 0,
+      "target_id": 7,
+      "target_slot": 0,
+      "type": "IMAGE"
+     },
+     {
+      "id": 8,
+      "origin_id": 7,
+      "origin_slot": 0,
+      "target_id": 8,
+      "target_slot": 0,
+      "type": "IMAGE"
+     },
+     {
+      "id": 9,
+      "origin_id": 3,
+      "origin_slot": 1,
+      "target_id": 8,
+      "target_slot": 1,
+      "type": "AUDIO"
+     },
+     {
+      "id": 12,
+      "origin_id": 8,
+      "origin_slot": 0,
+      "target_id": -20,
+      "target_slot": 0,
+      "type": "VIDEO"
+     },
+     {
+      "id": 13,
+      "origin_id": -10,
+      "origin_slot": 1,
+      "target_id": 5,
+      "target_slot": 2,
+      "type": "BOOLEAN"
+     },
+     {
+      "id": 14,
+      "origin_id": -10,
+      "origin_slot": 2,
+      "target_id": 7,
+      "target_slot": 2,
+      "type": "BOOLEAN"
+     },
+     {
+      "id": 15,
+      "origin_id": -10,
+      "origin_slot": 3,
+      "target_id": 6,
+      "target_slot": 2,
+      "type": "INT"
+     },
+     {
+      "id": 16,
+      "origin_id": -10,
+      "origin_slot": 4,
+      "target_id": 8,
+      "target_slot": 2,
+      "type": "FLOAT"
+     }
+    ],
+    "extra": {}
+   }
+  ]
+ }
+}

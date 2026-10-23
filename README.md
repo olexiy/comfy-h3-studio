@@ -29,16 +29,26 @@ No Triton / SageAttention needed.
 
 ## Workflows
 
-| File | What it does | Measured time (RTX 5070 Ti 16 GB) |
-|---|---|---|
-| `01_image_krea2_realism` | Krea 2 Turbo + Realism Engine 0.5 + Realistic Snapshot 0.9, 2 passes, ColorMatch, face detailer, Ultimate SD Upscale ×1.9 | 896×1120 → 2552×3192: **54–57 s** · 1000×1600 → 2856×4560: 88–106 s |
-| `01b_image_krea2_simple` | Krea 2 Turbo, one pass, 8 steps, no LoRAs — the most natural "phone photo" look | 1000×1600: **13–14 s** warm |
-| `02_image_moss` | MOSS-Image SFT + LoRA stack, 8-step DMD (A/B reference) | 1024×1280 → 1.9× upscale: **56–81 s** |
-| `03_video_h3_i2v` | MiniMax H3 i2v, turbo LoRA 8 steps, **768×960, shift 8**, 124 frames (5 s) with audio | **160–184 s** |
-| `03b_video_h3_long` | Same, one long clip with a 12 s shot-list (294 frames) | 6 s 219 s · 9 s 434 s · **12 s 694 s** |
-| `03c_video_h3_chain` | Continue a clip: last 22 frames + audio of the previous clip as anchor (`MiniMaxH3AddGuide`), +5 s, joined into one mp4 | **233 s** per +5 s |
-| `04_post_rife_upscale` | lanczos ×2 → 1536×1920, RIFE 4.7 ×2 → 48 fps, audio passed through | **27 s** (×3 / 72 fps: 39 s, RAM 61 GB) |
-| `05_video_h3_erosmax_i2v` | Community H3 finetune (Eros Max beta5) + VBVR LoRA 0.25, wrapped as one **subgraph** with promoted widgets: size in MP (no crop), frames, seed, shift, sound on/off + volume, 48 fps toggle | **158–171 s** at 768×960 / 5 s |
+All five use the same layout: on the canvas only the input (image / video), **one subgraph node with the
+fields you actually change plus on/off toggles**, and the save node. The technical graph lives inside the
+subgraph (double-click its title; the breadcrumb brings you back). Toggles drive lazy `ComfySwitchNode`s, so a
+switched-off branch never runs.
+
+| File | What it does | Fields · toggles | Measured time (RTX 5070 Ti 16 GB) |
+|---|---|---|---|
+| `01_image_krea2_realism` | Krea 2 Turbo + Realism Engine 0.5 + Realistic Snapshot 0.9, 2 passes, ColorMatch, face detailer, Ultimate SD Upscale ×1.9 | prompt, width/height (896×1120 for video), seed, realism strength · **face detail**, **upscale ×1.9** | 896×1120 → 2552×3192: **54–57 s** · 1000×1600 → 2856×4560: 88–106 s |
+| `01b_image_krea2_simple` | Krea 2 Turbo, one pass, 8 steps euler/beta — the most natural "phone photo" look | prompt, size, seed · **realism LoRAs** (glossier) | 1000×1600: **13–14 s** warm |
+| `03_video_h3_i2v` | MiniMax H3 i2v, turbo LoRA 8 steps, shift 8, timed shot-list, audio. First frame scaled to a pixel budget (`ImageScaleToTotalPixels` 0.70 MP, steps of 32 → `GetImageSize`), **never cropped**; output frame 0 (= the input still) and 1 frame of audio are cut | prompt, size (MP), frames, seed, shift · **Eros Max**, **keep first-frame light**, **sound** + volume (dB), **48 fps** | 768×960 · 5 s: **160–184 s** · 9 s 434 s · 12 s 694 s |
+| `03c_video_h3_chain` | Continue a clip: last 22 frames + audio of the previous clip as anchor (`MiniMaxH3AddGuide`), +5 s, joined into one mp4; size taken from the clip | same as 03 | **233 s** per +5 s |
+| `04_post_upscale_rife` | lanczos ×2 → 1536×1920, RIFE 4.7 → 48 fps, audio passed through | RIFE multiplier, fps (= 24 × multiplier) · **upscale ×2**, **RIFE** | **27 s** (×3 / 72 fps: 39 s, RAM 61 GB) |
+
+Toggles in the video workflows:
+- **Eros Max** — off = official H3 + turbo LoRA (sharper); on = community finetune Eros Max beta5 + VBVR LoRA 0.25
+  (158–171 s, same time, ≈ 30 % softer, drifts darker). Only the selected branch loads.
+- **keep first-frame light** — ColorMatch (mkl) of every frame against the first frame; removes H3's darkening /
+  warming drift (−9 to −31 % brightness over a clip). Switch off when the light is meant to change.
+- **sound** + **volume** — off = video without an audio track; volume in dB (−6 = half as loud).
+- **48 fps** — RIFE ×2 on the result (+15–25 s, +3–5 GB RAM).
 
 Peak VRAM is 15.2–15.9 GB everywhere. Raw numbers: [`tools/timings.json`](tools/timings.json).
 
@@ -57,14 +67,14 @@ All Hugging Face files are mirrored in ComfyUI folder layout; `scripts/download_
 | vae | `minimax_h3_video_vae_fp16`, `minimax_h3_audio_vae_fp32` | Comfy-Org/MiniMax-H3 |
 | loras | `minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16` | Comfy-Org/MiniMax-H3 |
 | vae_approx | `taeh3` (optional live preview) | [Kijai/MiniMax-H3-TAE](https://huggingface.co/Kijai/MiniMax-H3-TAE) |
-| diffusion_models / text_encoders / vae | `moss_image_sft_bf16`, `qwen3.5_9b_int8_convrot`, `flux2-vae` | [Comfy-Org/MOSS-Image](https://huggingface.co/Comfy-Org/MOSS-Image) |
 | ultralytics/bbox | `face_yolov8m.pt` | [Bingsu/adetailer](https://huggingface.co/Bingsu/adetailer) |
 | upscale_models | `OmniSR_X4_DIV2K` | [Acly/Omni-SR](https://huggingface.co/Acly/Omni-SR) |
 | (auto) | `rife47.pth` | downloaded by ComfyUI-Frame-Interpolation on first run |
-| loras | `realism_engine_krea2_v3.1`, `RealisticSnapshotKrea2V2` (01) | Civitai community LoRAs — [search](https://civitai.com/search/models?query=realism%20engine%20krea2) |
-| loras | `MOSS_Image_SFT_8_steps_dmd_v0.1`, `nicegirls_v2_moss`, `lenovo_moss`, `hi8_v2_moss` (02) | Civitai community LoRAs (search by name) |
-| diffusion_models | `h3ErosMax_beta5` (05, int8, ≈ 20 GB) | Civitai community finetune — [search](https://civitai.com/search/models?query=H3%20Eros%20Max) |
-| loras | `H3_VBVR_Pro_attn_only` (05) | Civitai — [search](https://civitai.com/search/models?query=H3%20VBVR) |
+| loras | `realism_engine_krea2_v3.1`, `RealisticSnapshotKrea2V2` (01, 01b toggle) | Civitai community LoRAs — [search](https://civitai.com/search/models?query=realism%20engine%20krea2) |
+| diffusion_models | `h3ErosMax_beta5` (Eros Max toggle in 03/03c, int8, ≈ 20 GB) | Civitai community finetune — [search](https://civitai.com/search/models?query=H3%20Eros%20Max) |
+| loras | `H3_VBVR_Pro_attn_only` (Eros Max toggle) | Civitai — [search](https://civitai.com/search/models?query=H3%20VBVR) |
+
+The Eros Max files are only needed if you switch that toggle on; the off branch never loads them.
 
 Links only; no weights are redistributed here. Civitai downloads need a login.
 
@@ -73,10 +83,10 @@ Links only; no weights are redistributed here. Civitai downloads need a login.
 1. Install ComfyUI (Desktop or git, core ≥ 0.42) and the custom nodes listed above.
 2. Download the models (table above). Impact Pack looks for `ultralytics/bbox/face_yolov8m.pt` inside the
    *core* `models/` folder — copy it there if you use a shared models directory.
-3. Drag a JSON from `workflows/` into the ComfyUI window. Every workflow has numbered, coloured groups and a
-   note per group explaining the settings and the measured timings.
-4. Typical run: `01` (or `01b`) → use the *face* output as the first frame → `03` → `04`.
-   For clips longer than ~9 s chain with `03c`.
+3. Drag a JSON from `workflows/` into the ComfyUI window. The note on the canvas explains every field and
+   toggle and lists the measured timings.
+4. Typical run: `01` (or `01b`) → first frame for `03` → `04` (or just the 48 fps toggle in `03`).
+   Longer clips: raise *frames* in `03` up to 294 (12 s), beyond that chain with `03c`.
 5. Write video prompts as a **timed shot-list** — see [`prompts/`](prompts/) (`prompt_5s.txt`, `len_*.txt`).
 
 Close other ComfyUI instances before H3: two H3 processes at once leave ≈ 3 GB free RAM and double the run time.
@@ -93,10 +103,15 @@ Close other ComfyUI instances before H3: two H3 processes at once leave ≈ 3 GB
 - **Chaining beats long single clips:** `03c` 5 s + 5 s = 397 s vs 434 s for one 9 s clip, invisible seam,
   sharper middle (892 vs 724 Laplacian). Rule: ≤ 9 s single clip, > 12 s chain 5–8 s hops.
 - **First-frame pop fix:** frame 0 of H3's output is the input still itself (sharper, slightly different
-  colour), so the clip visibly "jumps" after it. Drop it with `ImageFromBatch` (batch_index 1) after decode —
-  done in `05`.
-- **No-crop sizing:** `05` scales the input to a pixel budget (megapixels, aspect kept, snapped to /32) instead
-  of cropping to a fixed size — 0.70 MP ≈ 768×960 for 4:5.
+  colour), so the clip visibly "jumps" after it. Drop it with `ImageFromBatch` (batch_index 1) after decode
+  (and trim one frame of audio) — done in `03` / `03c`.
+- **Never crop the first frame.** Cropping a 5:8 still to 4:5 while the *background lock* lists objects that
+  are no longer in the frame makes H3 repaint the whole background within 0.75–1.5 s. Scale to a pixel budget
+  instead (megapixels, aspect kept, snapped to /32 — 0.70 MP ≈ 768×960 for 4:5, 672×1088 for 5:8) and lock
+  "the room exactly as in &lt;Picture 1&gt;, nothing added". Verified by a render: 5:8 → 672×1088, background stable.
+- **Mood words move the light.** "warm", "dim" and similar — even in the music line — shift brightness and
+  colour over the clip; H3 (and Eros Max more so) also drifts darker / yellower by itself (−9 to −31 %).
+  Keep mood words out of the shot-list and use the *keep first-frame light* toggle.
 - **Krea 2 Turbo needs strong body wording.** At cfg 1 the distilled model ignores soft adjectives about build;
   concrete, strong tag words (plus describing how the body relates to the pose) work on the first seed. Scene
   context pulls the figure towards its stereotype (yoga → athletic). Repeat the same words in the video
@@ -106,10 +121,10 @@ Close other ComfyUI instances before H3: two H3 processes at once leave ≈ 3 GB
 - **"AI face" fix (01):** Realism Engine 0.7 → 0.5, upscale denoise 0.1 → 0.22, and prompt words for mature
   features, uneven skin tone and hard side light.
 - **RAM, not VRAM, is the ceiling** on 62 GB: H3 sits at 58–60 GB; RIFE ×3 at 1536×1920 × 124 frames hits 61 GB → use ×2.
-- **MOSS-Image** renders pure noise with `ModelSamplingSD3` (multiplier 1000); use `ModelSamplingAuraFlow`
-  shift 5. Its stills make soft H3 video — not a good first-frame model here.
-- **Eros Max (05) vs official H3 (03)** on the same clothed scene: same time, ≈ 30 % softer; shift 8 recovers
-  about a third. For ordinary scenes `03` is the sharper choice.
+- **MOSS-Image** (tested, dropped from the repo) renders pure noise with `ModelSamplingSD3` (multiplier 1000);
+  use `ModelSamplingAuraFlow` shift 5. Its stills make soft H3 video — not a good first-frame model here.
+- **Eros Max vs official H3** on the same clothed scene: same time, ≈ 30 % softer; shift 8 recovers about a
+  third. For ordinary scenes keep the toggle off.
 
 ## Tools
 
@@ -120,22 +135,22 @@ environment variables ([`tools/paths.py`](tools/paths.py)):
 |---|---|---|
 | `COMFY_URL` | ComfyUI server | `http://127.0.0.1:8189` |
 | `COMFY_WF_DIR` | where `build_*.py` write and runners read workflows | `<repo>/workflows` |
-| `COMFY_DATA` | ComfyUI folder holding `input/` and `output/` | — (required by `video.py`) |
+| `COMFY_DATA` | ComfyUI folder holding `input/` and `output/` | — (base for relative paths in `sheet.py` / `lenstats.py`) |
 
 | Script | Purpose |
 |---|---|
+| `build_v2.py` | builds all five workflows in `workflows/` (subgraph + promoted fields + lazy toggles) |
+| `subgraph.py` | generic "wrap a flat graph into one subgraph node with promoted widgets" helper (format of the official `video_minimax_h3_i2v` template) |
 | `comfytool.py` | UI ⇄ API converter driven by `/object_info` (expands subgraphs), `check`, `queue` with timing + peak VRAM/RAM logging to `results.json` |
-| `build_workflows.py` | builds `01b`, `02`, `03`, `04` (numbered groups + notes); `01` was hand-tuned afterwards |
-| `build_long.py` | `03b` (`python build_long.py 294 ../prompts/len_12s.txt`) and `03c` (`python build_long.py chain`) |
-| `build_eros.py`, `subgraph.py` | `05` and the generic "wrap a flat graph into one subgraph with promoted widgets" helper |
-| `video.py`, `eros_cmp.py` | queue H3 / post runs with overrides (size, length, shift, seed, prompt file) |
+| `build_workflows.py`, `build_long.py` | earlier flat-graph generators; now used as libraries (default SFW prompts, seed, chain prompt) |
+| `eros_cmp.py` | queue `03` with the Eros Max toggle off/on on the same frame / seed / shot-list (`--shift`, `--len`, `--seed`) |
 | `lenstats.py`, `sheet.py` | per-clip sharpness / temporal diff / face drift + frame grids; image contact sheets (need numpy + Pillow, ffmpeg) |
 
 ```bash
 cd tools
 python comfytool.py refresh          # cache /object_info from the running server (needed once)
+python build_v2.py                   # regenerate ../workflows
 python comfytool.py check ../workflows/03_video_h3_i2v.json
-python build_workflows.py            # regenerate into ../workflows
 ```
 
 ## Content policy

@@ -97,7 +97,7 @@ footer{margin:48px 0 24px;color:var(--muted);font-size:13px}
   <div class="pipe">
     <div class="step"><span class="n">1 · картинка</span><span class="t">57 с <small>Krea 2</small></span><span class="mono">01_image_krea2_realism</span><span>2856×4560, два прохода, детейлер лица, апскейл</span></div>
     <div class="step"><span class="n">2 · видео</span><span class="t">164 с <small>MiniMax H3</small></span><span class="mono">03_video_h3_i2v</span><span>768×960, 124 кадра = 5 с, звук улицы</span></div>
-    <div class="step"><span class="n">3 · постобработка</span><span class="t">27 с <small>RIFE</small></span><span class="mono">04_post_rife_upscale</span><span>lanczos ×2 → 1536×1920, RIFE ×2 → 48 fps</span></div>
+    <div class="step"><span class="n">3 · постобработка</span><span class="t">27 с <small>RIFE</small></span><span class="mono">04_post_upscale_rife</span><span>lanczos ×2 → 1536×1920, RIFE ×2 → 48 fps</span></div>
   </div>
   <p class="total">Итог: <b>FINAL_V13_post_00001-audio.mp4</b> · 1536×1920 · 48 fps · 5 с · пик VRAM 15,5 ГБ · пик RAM 58,6 ГБ</p>
 </section>
@@ -186,23 +186,18 @@ footer{margin:48px 0 24px;color:var(--muted);font-size:13px}
   <h2 id="wf">Workflow в репозитории</h2>
   <p class="prose">Папка <code>workflows/</code> репозитория: перетащи JSON в окно ComfyUI. Внутри каждого файла пронумерованные группы и заметки с замерами времени.</p>
   <div class="wf">
-    <div class="card"><span class="file">01_image_krea2_realism.json</span><h3>Картинка, оптимизированный</h3>
-      <ul><li>Krea 2 Turbo int8 + Realism Engine <b>0.5</b> + Realistic Snapshot 0.9</li><li>Проход 1: 1000×1600, 8 шагов, euler_ancestral / sgm_uniform, cfg 1</li><li>Проход 2: латент ×1.5, 4 шага, denoise 0.54 → ColorMatch</li><li>FaceDetailer 1440 px → UltimateSDUpscale ×1.9, denoise <b>0.22</b></li></ul><span class="time">57–111 с · 2856×4560</span></div>
-    <div class="card"><span class="file">01b_image_krea2_simple.json</span><h3>Картинка, быстрый вариант</h3>
-      <ul><li>Один проход, 8 шагов, euler / beta, cfg 1</li><li><code>qwen_image_vae</code>, LoRA выключены</li><li>Самый натуральный «телефонный» вид</li></ul><span class="time">13–32 с · 1000×1600</span></div>
-    <div class="card"><span class="file">02_image_moss.json</span><h3>Картинка на MOSS SFT</h3>
-      <ul><li>MOSS SFT bf16 + Qwen3.5 9B int8 + flux2-vae</li><li><code>ModelSamplingAuraFlow</code> shift 5 (с SD3 получается шум)</li><li>LoRA: NiceGirls 0.4, Lenovo 0.5, турбо DMD 1.0, 2000s Analog 0.4, 8 шагов</li></ul><span class="time">56–81 с · 1024×1280</span></div>
-    <div class="card"><span class="file">03_video_h3_i2v.json</span><h3>Видео, лучшие настройки</h3>
-      <ul><li>H3 fl2va pruned int8 + турбо-LoRA 8 шагов</li><li>768×960, 124 кадра (5 с), euler, shift <b>8</b></li><li>Промпт-раскадровка по секундам, звук</li></ul><span class="time">164–185 с · 768×960</span></div>
-    <div class="card"><span class="file">03b_video_h3_long.json</span><h3>Видео, длинный клип 12 с</h3>
-      <ul><li>Как <code>03</code>, но 294 кадра и раскадровка на 12 с</li><li>Практический предел дома, RAM 59 ГБ</li></ul><span class="time">694 с · 768×960</span></div>
-    <div class="card"><span class="file">03c_video_h3_chain.json</span><h3>Видео, продолжение клипа</h3>
-      <ul><li>Последние 22 кадра и звук предыдущего клипа как якорь (<code>MiniMaxH3AddGuide</code>)</li><li>+5 с, склейка в один mp4, можно цепочкой</li></ul><span class="time">233 с за +5 с</span></div>
-    <div class="card"><span class="file">05_video_h3_erosmax_i2v.json</span><h3>Видео, Eros Max</h3>
-      <ul><li>Eros Max beta5 int8 + VBVR 0.25, без турбо-LoRA</li><li>8 шагов euler / simple, shift <b>8</b></li><li>Дообучение сообщества, мягче официальной H3</li></ul><span class="time">158–171 с · 768×960</span></div>
-    <div class="card"><span class="file">04_post_rife_upscale.json</span><h3>Постобработка</h3>
-      <ul><li>lanczos ×2 (OmniSR не лучше и в 2,4 раза медленнее)</li><li>RIFE ×2 → 48 fps; ×3 → 72 fps доводит RAM до 61,3 из 62 ГБ</li><li>Звук сохраняется</li></ul><span class="time">27 с (×2) · 41 с (×3)</span></div>
+    <div class="card"><span class="file">01_image_krea2_realism.json</span><h3>Картинка, реализм</h3>
+      <ul><li>Krea 2 Turbo + Realism Engine 0.5 + Realistic Snapshot 0.9, 2 прохода, ColorMatch</li><li>Поля: prompt, ширина/высота (896×1120 для видео), seed, сила Realism</li><li>Тогглы: <b>детейлер лица</b>, <b>апскейл ×1.9</b></li></ul><span class="time">55–110 с</span></div>
+    <div class="card"><span class="file">01b_image_krea2_simple.json</span><h3>Картинка, быстро и натурально</h3>
+      <ul><li>Один проход, 8 шагов euler/beta, «телефонный» вид</li><li>Поля: prompt, размер, seed</li><li>Тоггл: <b>LoRA реализма</b> (глянцевее)</li></ul><span class="time">13–32 с</span></div>
+    <div class="card"><span class="file">03_video_h3_i2v.json</span><h3>Видео из картинки</h3>
+      <ul><li>Поля: prompt-раскадровка, размер в МП (<b>без обрезки</b>), кадры, seed, shift</li><li>Тогглы: <b>Eros Max</b> (вместо отдельного 05), <b>свет как на первом кадре</b>, <b>звук</b> + громкость, <b>48 fps</b></li><li>Кадр 0 отрезается автоматически</li></ul><span class="time">160–185 с за 5 с</span></div>
+    <div class="card"><span class="file">03c_video_h3_chain.json</span><h3>Продолжить ролик (+5 с)</h3>
+      <ul><li>Якорь: последние 22 кадра и звук прошлого ролика, размер берётся из него</li><li>Те же поля и тогглы, что у 03; результат можно подавать снова</li></ul><span class="time">≈ 233 с за +5 с</span></div>
+    <div class="card"><span class="file">04_post_upscale_rife.json</span><h3>Постобработка готового ролика</h3>
+      <ul><li>Тогглы: <b>апскейл ×2</b> (lanczos), <b>RIFE</b></li><li>Поля: множитель RIFE, fps (= 24 × множитель)</li></ul><span class="time">≈ 27 с</span></div>
   </div>
+  <p class="prose" style="color:var(--muted);font-size:14px">Все workflow в одном стиле: на холсте картинка или видео на входе, одна нода с полями и тогглами, сохранение. Техника спрятана внутри субграфа (двойной клик по заголовку). Из первой версии репозитория убраны дубли: неоптимизированный 01, MOSS (02), 03b (длина теперь поле в 03), отдельный 05 (теперь тоггл в 03).</p>
 </section>
 
 <section aria-labelledby="rules">
@@ -331,8 +326,8 @@ slight phone-camera noise, natural skin texture, unretouched.</pre>
     <figcaption>Сверху вниз: 03 официальная, 05 Eros Max, 05 + shift 8. Движение почти одинаковое, все три выполняют раскадровку. Абсолютная резкость здесь ниже, чем на остановке: мягкий свет в комнате, мало мелких деталей. Сравнивать можно только строки между собой.</figcaption>
   </figure>
   <ul class="rules prose">
-    <li><b>Для обычных сцен бери <code>03</code>.</b> Eros Max не быстрее и мягче.</li>
-    <li><b>В <code>05</code> по умолчанию shift 8.</b></li>
+    <li><b>Для обычных сцен оставь тоггл Eros Max выключенным.</b> Eros Max не быстрее и мягче.</li>
+    <li><b>Eros Max теперь тоггл в <code>03</code> и <code>03c</code></b>, shift 8 по умолчанию; тоггл «свет как на первом кадре» гасит его потемнение.</li>
     <li><b>Пальцы плывут, когда руки касаются тела в последней секунде.</b> Действие с касанием ставь в середину клипа, а заканчивай спокойным удержанием. В negative: <code>fused fingers, missing fingers</code>.</li>
     <li><b>Не запускай H3 в двух ComfyUI одновременно.</b> Два ComfyUI с H3 оставили 3 ГБ свободной RAM, время выросло вдвое.</li>
   </ul>
@@ -422,6 +417,8 @@ slight phone-camera noise, natural skin texture, unretouched.</pre>
       <tr><td>Тонкая белая майка просвечивает</td><td>слово «thin» + LoRA</td><td>«thick, opaque ribbed cotton … over a sports bra»</td></tr>
       <tr><td>Видео OOM или подтормаживает</td><td>два ComfyUI сразу делят RAM/VRAM</td><td>один ComfyUI за раз или <code>POST /free</code></td></tr>
       <tr><td>Фигура не меняется от слов в промпте</td><td>мягкие слова о теле, Krea Turbo при cfg 1 их не слышит</td><td>сильные теги (секция «Фигура»)</td></tr>
+      <tr><td>Через ~1 с полностью меняется фон</td><td>первый кадр обрезан под 4:5 (у картинки 5:8) + в background lock перечислены предметы, которых нет на кадре</td><td>масштаб без обрезки (<code>03</code>); в lock: «the room exactly as in &lt;Picture 1&gt;, nothing added»</td></tr>
+      <tr><td>Кадр за 3 с темнеет и желтеет</td><td>дрейф H3 / Eros Max (до −31 %), «warm» в промпте, даже в строке музыки</td><td>тоггл «свет как на первом кадре» (ColorMatch); без слов настроения в промпте</td></tr>
       <tr><td>Пальцы плывут в конце ролика</td><td>касание рук в последней секунде</td><td>касание в середину, в конце удержание</td></tr>
     </tbody>
   </table></div>
