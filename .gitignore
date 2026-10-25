@@ -9,3 +9,6 @@ results.json
 .env
 __pycache__/
 *.bak
+
+# local-only material (adult study, creator reviews) — never commit
+private/

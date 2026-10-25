@@ -137,7 +137,7 @@ a{color:var(--accent)}
 <body>
 
 <div class="wrap">
-<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 10 из 16</span></nav>
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 10 из 15</span></nav>
 <header>
   <div class="eyebrow">Глава 10 · серии 8 и 12 · 25.10.2026</div>
   <h1>Датасеты для LoRA</h1>
@@ -208,7 +208,7 @@ a{color:var(--accent)}
       <tr><td>Danbooru2023</td><td>~8 ТБ аниме-артов с тегами</td><td><span class="tag bad">серая зона (чужие арты)</span></td><td>понять теги, на которых учились Illustrious/NoobAI; учить на нём — риск</td></tr>
     </tbody>
   </table></div>
-  <p><strong>Осторожно:</strong> Unsplash Lite разрешён только для внутреннего использования, без распространения; лицензии Pexels и Pixabay ничего не говорят про обучение ИИ. Наборов откровенных фото реальных людей с подтверждённым согласием в открытом доступе нет — креаторы взрослых LoRA учат на своих синтетических генерациях, лицензированном стоке и кропах без лиц.</p>
+  <p><strong>Осторожно:</strong> Unsplash Lite разрешён только для внутреннего использования, без распространения; лицензии Pexels и Pixabay ничего не говорят про обучение ИИ.</p>
 </section>
 
 <section class="prose" aria-labelledby="ds-tools">
@@ -217,7 +217,7 @@ a{color:var(--accent)}
     <thead><tr><th>Задача</th><th>Инструмент</th><th>Заметка</th></tr></thead>
     <tbody>
       <tr><td>Скачать датасет-ссылки</td><td><a href="https://github.com/rom1504/img2dataset">img2dataset</a></td><td>список URL → файлы или webdataset, с ресайзом</td></tr>
-      <tr><td>Подписи, подробно</td><td><a href="https://huggingface.co/fancyfeast/llama-joycaption-beta-one-hf-llava">JoyCaption Beta One</a></td><td>8B, открытые веса, понимает и SFW, и взрослое</td></tr>
+      <tr><td>Подписи, подробно</td><td><a href="https://huggingface.co/fancyfeast/llama-joycaption-beta-one-hf-llava">JoyCaption Beta One</a></td><td>8B, открытые веса, понимает и SFW</td></tr>
       <tr><td>Подписи, универсально</td><td><a href="https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct">Qwen3-VL</a></td><td>Apache-2.0; ноды ComfyUI пишут .txt рядом с каждой картинкой; ai-toolkit использует его же</td></tr>
       <tr><td>Подписи, быстро</td><td><a href="https://huggingface.co/microsoft/Florence-2-large">Florence-2-large</a></td><td>MIT, 0,77B, мало VRAM, подписи короче</td></tr>
       <tr><td>Убрать дубли</td><td><a href="https://github.com/idealo/imagededup">imagededup</a></td><td>pHash для точных копий, CNN для похожих; для генераций — CLIP-сходство ~0,92</td></tr>

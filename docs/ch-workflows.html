@@ -137,16 +137,16 @@ a{color:var(--accent)}
 <body>
 
 <div class="wrap">
-<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 6 из 16</span></nav>
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 6 из 15</span></nav>
 <header>
-  <div class="eyebrow">Глава 6 · claude · olexiy · nsfw</div>
+  <div class="eyebrow">Глава 6 · claude · olexiy</div>
   <h1>Workflow в ComfyUI</h1>
   <p class="lead">Каждый workflow собран одинаково: заметка-инструкция, загрузка картинки, одна нода с ручками и сохранение. Технические детали спрятаны внутри подграфа.</p>
 </header>
 
 <section aria-labelledby="wf">
   <h2 id="wf">Где лежат workflow</h2>
-  <p class="prose">ComfyUI Desktop → Workflows. С 25 октября папки разделены по владельцу, внутри по виду (<code>image</code>, <code>video</code>, <code>post</code>, <code>train</code>): <code>claude/</code> — workflow агента, их собирают скрипты, и агент пишет только сюда; <code>olexiy/</code> — свои, агент их только читает; <code>nsfw/</code> — взрослые задания, агент туда не заходит; <code>exchange/</code> — передача файлов в обе стороны; <code>claude/lab/S&lt;N&gt;/</code> — варианты из серий экспериментов. Внутри каждого файла пронумерованные группы и заметки с замерами времени.</p>
+  <p class="prose">ComfyUI Desktop → Workflows. С 25 октября папки разделены по владельцу, внутри по виду (<code>image</code>, <code>video</code>, <code>post</code>, <code>train</code>): <code>claude/</code> — workflow агента, их собирают скрипты, и агент пишет только сюда; <code>olexiy/</code> — свои, агент их только читает; <code>exchange/</code> — передача файлов в обе стороны; <code>claude/lab/S&lt;N&gt;/</code> — варианты из серий экспериментов. Внутри каждого файла пронумерованные группы и заметки с замерами времени.</p>
   <div class="wf">
     <div class="card"><span class="file">01_image_krea2_realism.json</span><h3>Картинка, реализм</h3>
       <ul><li>Krea 2 Turbo + Realism Engine 0.5 + Realistic Snapshot 0.9, 2 прохода, ColorMatch</li><li>Поля: prompt, ширина/высота (896×1120 для видео), seed, сила Realism</li><li>Тогглы: <b>детейлер лица</b>, <b>апскейл ×1.9</b></li></ul><span class="time">55–110 с</span></div>

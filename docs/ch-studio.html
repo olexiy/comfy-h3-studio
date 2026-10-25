@@ -137,7 +137,7 @@ a{color:var(--accent)}
 <body>
 
 <div class="wrap">
-<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 1 из 16</span></nav>
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 1 из 15</span></nav>
 <header>
   <div class="eyebrow">Глава 1 · RTX 5070 Ti 16 ГБ · 62 ГБ RAM · ComfyUI 0.42</div>
   <h1>Студия: железо и файлы</h1>
@@ -175,7 +175,7 @@ a{color:var(--accent)}
   <div class="tbl"><table>
     <thead><tr><th>Площадка</th><th>Чем хороша</th><th>Минус</th></tr></thead>
     <tbody>
-      <tr><td><b>RunPod Pods</b> (рекомендация)</td><td>посекундная оплата, 5090 $1.19/ч, сетевой том под 45 ГБ моделей, SSH и CLI <code>runpodctl</code>; там тот же ComfyUI и наши workflow</td><td>в условиях использования «adult content» значится как запрещённый</td></tr>
+      <tr><td><b>RunPod Pods</b> (рекомендация)</td><td>посекундная оплата, 5090 $1.19/ч, сетевой том под 45 ГБ моделей, SSH и CLI <code>runpodctl</code>; там тот же ComfyUI и наши workflow</td><td></td></tr>
       <tr><td>RunPod Serverless</td><td>платишь только за работу</td><td>официальный ComfyUI-воркер не возвращает видео, только картинки</td></tr>
       <tr><td>Comfy Cloud</td><td>уже есть в Desktop, шаблоны H3 и Krea 2, коммерческие права на H3; Creator $35/мес</td><td>только поддерживаемые кастомные ноды, максимум 30 мин на workflow</td></tr>
       <tr><td>fal.ai / MiniMax API</td><td>без настройки; H3 2K $0.13/с; тренер Krea 2 LoRA</td><td>модерация, своей турбо-LoRA нет; MiniMax блокирует откровенное</td></tr>
@@ -185,7 +185,6 @@ a{color:var(--accent)}
   <ul class="rules prose">
     <li><b>Что настраиваешь ты:</b> аккаунт RunPod, предоплата $30 без автопополнения (это и есть жёсткий лимит), отдельный API-ключ <code>claude-agent</code> в переменной окружения (в чат его не присылать). Сетевой том 150 ГБ в ЕС, ≈ $10.50/мес.</li>
     <li><b>Что делаю я:</b> один дешёвый под качает модели с Hugging Face прямо в том (≈ 25–75 мин один раз). Дальше под на 5090 с таймером самоостановки, ComfyUI через SSH-туннель, наши workflow через тот же <code>comfytool.py</code>, результаты скачиваются домой. В конце каждой сессии проверяю, что ничего не осталось включённым.</li>
-    <li><b>Контент:</b> у RunPod формально запрещено «adult content», хотя содержимое они активно не проверяют. До письменного ответа их поддержки на облаке делаем только SFW: обучение LoRA персоны, тесты длинных роликов. Откровенное остаётся дома.</li>
   </ul>
   <p class="prose" style="color:var(--muted);font-size:14px">Полный план с командами и источниками: <span class="mono">learning/remote-gpu-plan.md</span>.</p>
 </section>
