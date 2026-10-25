@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Для вашего агента · Локальная студия H3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+:root{
+  --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
+  --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Onest", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 80px;display:grid;gap:56px}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(20px,3vw,26px);font-weight:500;margin-bottom:14px}
+h3{font-size:16px;font-weight:500}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.lead{font-size:18px;color:var(--muted);max-width:62ch;margin-top:14px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+section{display:grid;gap:18px;min-width:0}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.step .n{font:500 12px var(--mono);color:var(--accent)}
+.step .t{font:500 26px/1 var(--display)}
+.step .t small{font:400 13px var(--body);color:var(--muted)}
+.total{font:500 14px var(--mono);color:var(--muted)}
+.total b{color:var(--fg)}
+/* media */
+.strip{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+figure{margin:0;display:grid;gap:8px;min-width:0}
+figure img,figure video{width:100%;max-width:100%;height:auto;border-radius:8px;background:#000;display:block}
+figcaption{font-size:13px;color:var(--muted)}
+figcaption b{color:var(--fg);font-weight:600}
+.wide img{border-radius:8px}
+.tag{display:inline-block;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-right:6px;vertical-align:1px}
+.tag.good{color:var(--good)}.tag.warn{color:var(--warn)}.tag.bad{color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);white-space:nowrap}
+tr.win td{background:var(--accent-soft)}
+/* workflows */
+.wf{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .file{font:500 13px var(--mono);color:var(--accent);word-break:break-all}
+.card ul{margin:0;padding-left:18px;font-size:14px}
+.card .time{font:500 13px var(--mono);color:var(--muted)}
+.rules{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.rules li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.rules b{font-weight:600}
+pre{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font:13px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{font:500 13px var(--body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible,video:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.paths td:first-child{white-space:nowrap}
+@media (max-width:760px){.pipe,.strip,.wf{grid-template-columns:minmax(0,1fr)}}
+
+/* book navigation */
+.bookbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between;
+  font:500 13px var(--mono);border-bottom:1px solid var(--line);padding-bottom:12px}
+.bookbar a{text-decoration:none}
+.bookbar .where{color:var(--muted)}
+.pager{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.pager a{display:grid;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--fg)}
+.pager a:hover{border-color:var(--accent)}
+.pager .dir{font:500 12px var(--mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.pager .next{text-align:right;grid-column:2}
+/* contents */
+.toc{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.toc li{border-bottom:1px solid var(--line)}
+.toc a{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;gap:4px 14px;align-items:baseline;padding:14px 4px;text-decoration:none;color:var(--fg)}
+.toc a:hover .ct{color:var(--accent)}
+.toc .cn{font:500 13px var(--mono);color:var(--accent)}
+.toc .ct{font:500 18px/1.25 var(--display)}
+.toc .cd{grid-column:2;color:var(--muted);font-size:14px}
+.toc .st{grid-row:1;grid-column:3}
+.news{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.news li{display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:12px}
+.news time{font:500 13px var(--mono);color:var(--muted)}
+@media (max-width:760px){.toc a{grid-template-columns:2.4em minmax(0,1fr)}.toc .st{grid-row:auto;grid-column:2}
+  .pager{grid-template-columns:minmax(0,1fr)}.pager .next{grid-column:1}.news li{grid-template-columns:minmax(0,1fr);gap:0}}
+/* trend replications (chapter ch-trends + trend-<id>.html pages, built by build_book.py) */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tcard{display:grid;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--fg)}
+.tcard:hover{border-color:var(--accent)}
+.tcard .pair{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.tcard img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.tcard .ci{display:grid;gap:4px;padding:10px 12px}
+.tcard .cm{font:500 12px var(--mono);color:var(--muted)}
+.tr-steps{counter-reset:st;display:grid;gap:28px}
+.tr-steps>section{display:grid;gap:12px}
+.tr-steps>section>h2::before{counter-increment:st;content:counter(st) " · ";color:var(--accent)}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.duo figure{margin:0;display:grid;gap:6px}
+.duo img{width:100%;height:auto;border-radius:8px;display:block}
+.duo figcaption{font-size:13px;color:var(--muted)}
+/* public build: link instead of a creator's original */
+.olink{display:flex;align-items:center;justify-content:center;text-align:center;aspect-ratio:3/4;background:var(--panel,rgba(127,127,127,.08));color:var(--muted);font:500 13px/1.4 var(--mono);text-decoration:none}
+.olink.big{aspect-ratio:auto;min-height:180px;padding:24px;border:1px dashed var(--line);border-radius:10px;color:var(--accent);font-size:15px}
+.olink small{color:var(--muted);font-size:12px}
+/* contents parts + "start here" highlights (cover) */
+.toc li.part{border-bottom:0;padding:26px 4px 6px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hl{display:grid;gap:6px;align-content:start;text-decoration:none;color:var(--fg)}
+.hl img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
+.hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
+@media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+</style>
+<style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 14 из 14</span></nav>
+<header>
+  <div class="eyebrow">Глава 14 · for AI agents · machine-readable</div>
+  <h1>Для вашего агента</h1>
+  <p class="lead">Written for AI agents, not people: everything an agent needs to reproduce this studio — exact files, settings, procedures, pitfalls.</p>
+</header>
+
+<section aria-labelledby="ag">
+  <h2 id="ag">For your agent — machine-readable guide</h2>
+  <p class="prose">This section is written for AI agents, not people. Plain files: <a href="agent-guide.md">agent-guide.md</a> · <a href="llms.txt">llms.txt</a>. Version 2026-10-25. The block below is the same markdown, unrendered, so it can be copied or parsed losslessly.</p>
+  <pre id="agent-guide" data-format="markdown" data-version="2026-10-25"># AGENT GUIDE — home ComfyUI studio (Krea 2 · Qwen-Image-Edit · MiniMax H3 · LTX-2.5) + RunPod
+
+```yaml
+doc: agent-guide
+audience: autonomous coding/ops agents driving ComfyUI and cloud GPUs (not humans)
+version: 2026-10-25
+evidence_tags: {MEASURED: &quot;run by us, numbers from our logs&quot;, SOURCE: &quot;official template / docs / community, not re-measured&quot;, RULE: &quot;derived decision rule&quot;}
+baseline_box: {gpu: &quot;RTX 5070 Ti 16 GB (Blackwell)&quot;, ram: &quot;62 GB&quot;, os: &quot;Windows 11&quot;, comfyui: &quot;0.42.x&quot;, torch: &quot;2.12+cu130&quot;, python: &quot;3.13&quot;}
+cloud_box: {provider: RunPod, gpu: &quot;RTX PRO 6000 Blackwell Server Edition 96 GB&quot;, price_usd_h: 2.49, cloud: SECURE, region: IE}
+content_policy: &quot;all examples SFW, depicted adults stated 25+&quot;
+```
+
+## 0. How to use this file
+- Sections are independent; each bullet = one fact or rule. Prefer MEASURED over SOURCE when they conflict.
+- File names below are exact (copy them). Node names are ComfyUI class_type names.
+- Numbers are for the baseline box unless a section says `cloud_box`.
+
+## 1. Driving ComfyUI headless (API)
+- Run a second headless instance next to the desktop app: `main.py --listen 127.0.0.1 --port 8189 --extra-model-paths-config &lt;yaml&gt; --input-directory &lt;dir&gt; --output-directory &lt;dir&gt; --disable-auto-launch --reserve-vram 1.5`. Never run two H3 jobs on two instances at once — free RAM falls to ~3 GB and both runs double in time. [MEASURED] Check `GET :8188/queue` before queueing.
+- API cycle: `POST /prompt {&quot;prompt&quot;: api_graph, &quot;client_id&quot;: id}` → poll `GET /history/&lt;prompt_id&gt;` → outputs; `GET /object_info` for node specs; `POST /free {&quot;unload_models&quot;:true,&quot;free_memory&quot;:true}` to release VRAM.
+- **Cache object_info but refetch when a class is missing** — after installing a custom node the cache lacks it (our symptom: `TypeError: &#x27;NoneType&#x27; object is not iterable` while building the graph). [MEASURED]
+- **Validation walks every input of every reachable node, including the switched-off side of `ComfySwitchNode`.** A graph with an off branch that references a missing custom node or model file is rejected on a bare install. Fix before submitting: drop `on_true`/`on_false` of the dead side, then drop nodes unreachable from the output node. [MEASURED]
+- `ComfySwitchNode` is lazy at execution: the off branch never runs (use it for optional passes: upscale, 48 fps, sound). An unconnected `on_false` returns None → `CreateVideo` writes no audio track. [MEASURED]
+- ComfyUI caches node outputs: re-running a graph where only a downstream widget changed re-executes only that tail (H3 clip re-cut with `Video Slice`: 3.3 s instead of 6 min). Exploit it for post knobs. [MEASURED]
+- UI-json → API conversion pitfalls: subgraphs must be expanded; some widget lists shift (LTX `LTXVEmptyLatentAudio` batch_size became 25 → tensor mismatch; force 1). Verify a built workflow with the real frontend: load page, `app.loadGraphData(wf)` → `app.graphToPrompt()` (no execution). [MEASURED]
+- `extra_model_paths.yaml` must list every folder a template uses: diffusion_models, text_encoders, vae, loras, upscale_models, latent_upscale_models, clip_vision, model_patches, controlnet, audio_encoders, style_models, frame_interpolation, ultralytics. [MEASURED]
+- User-facing workflow style that a human liked: main canvas = note + Load Image + ONE subgraph node exposing only the knobs (prompt, size MP, frames, seed, shift, toggles) + Save; optional parts = BOOLEAN toggles on lazy switches; build workflows by script, never hand-edit JSON. [RULE]
+
+## 2. Model recipes (exact settings)
+```yaml
+krea2_turbo:            # photoreal default, best prompt fidelity + physics (hands really use tools)
+  files: {unet: krea2_turbo_int8_convrot.safetensors, clip: qwen3vl_4b_fp8_scaled.safetensors (type krea2), vae: qwen_image_vae.safetensors}
+  sampler: {steps: 8, sampler: euler, scheduler: beta, cfg: 1.0}   # cfg 0 in Krea&#x27;s own tools == cfg 1 on KSampler
+  size: &quot;2 MP native (1280x1600); 1 MP loses pore/freckle detail&quot;  # MEASURED
+  speed: &quot;≈ 14 s at 2 MP, ≈ 6 s at 1 MP (5070 Ti)&quot;
+  prompt: &quot;30-80 words prose; subject → setting → camera → light → texture; no (word:1.3) weights; negatives useless at cfg 1&quot;
+  quirks: [&quot;seed diversity ≈ 0 for one prompt → iterate the prompt, not seeds&quot;, &quot;realism LoRAs make faces 5-10 y younger&quot;]
+  realism_loras: {realism_engine_krea2_v3.1: 0.5, RealisticSnapshotKrea2V2: 0.9}   # 0.7+ = glossy &#x27;AI face&#x27;
+krea2_raw: {use: &quot;LoRA training base, variety&quot;, sampler: &quot;≈ 30-50 steps, cfg 3.5-4&quot;}   # SOURCE
+qwen_image_edit_2511:   # edit / restage a person into new scenes, turnarounds
+  files: {unet: qwen_image_edit_2511_int8_convrot.safetensors, clip: qwen_2.5_vl_7b_fp8_scaled.safetensors (type qwen_image), vae: qwen_image_vae.safetensors}
+  chain: &quot;LoadImage → FluxKontextImageScale → TextEncodeQwenImageEditPlus(pos &amp; empty neg, image1) → FluxKontextMultiReferenceLatentMethod(index_timestep_zero) → ModelSamplingAuraFlow(3.1) → CFGNorm(1.0) → KSampler&quot;
+  sampler: {steps: 40, cfg: 4.0, sampler: euler, scheduler: simple}
+  speed: &quot;≈ 110 s per 1 MP edit (16 GB, int8)&quot;
+  quirks: [&quot;obeys scene/outfit/light/expression strongly&quot;, &quot;ages faces (forehead/eye wrinkles) on strong expressions&quot;, &quot;misplaces small marks&quot;, &quot;framing words weak (&#x27;close-up&#x27; ignored)&quot;]
+  angles_lora: {file: qwen-image-edit-2511-multiple-angles-lora.safetensors, prompt: &quot;&lt;sks&gt; front-left quarter view eye-level shot medium shot&quot;}   # &#x27;close-up&#x27; → macro crop
+krea2_identity_edit_v2:  # BEST persona restaging engine (needs custom node comfyui-krea2edit &gt;= 2.0)
+  files: {lora: krea2_identity_edit_v2_r128.safetensors on krea2_turbo, clip: qwen3vl_4b (type krea2), vae: qwen_image_vae}
+  nodes: &quot;Krea2EditModelPatch(model, source_latent=VAEEncode(img), vae, source_image, target_latent=EmptySD3LatentImage, ref_boost, fit_mode=fit, ref_position) + 2x Krea2EditGroundedEncode(clip, prompt, image) as pos/neg (neg prompt &#x27;&#x27;)&quot;
+  sampler: {steps: 10, cfg: 1.0, sampler: euler, scheduler: simple, size: &quot;1024x1280 (≤ 2 MP)&quot;}
+  best: {ref_position: &quot;aligned (trained)&quot;, ref_boost: 2}     # MEASURED; boost 4 ≈ copies the reference
+  speed: &quot;≈ 28 s&quot;
+  person_into_scene: &quot;first ref = scene image (source_latent/image, ref_position_a aligned), second ref = person (source_latent_b/image_b, ref_position beside); prompt &#x27;Replace the woman in the first image with the woman from the second image. Keep pose, framing, outfit, background and light of the first image&#x27;&quot;
+  licence: non-commercial
+minimax_h3:              # #1 open image→video with audio
+  files: {unet: minimax_h3_fl2va_pruned_int8_convrot.safetensors (21 GB), clip: qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors (type minimax), vae_video: minimax_h3_video_vae_fp16, vae_audio: minimax_h3_audio_vae_fp32}
+  quality_recipe: {turbo_lora: 0, steps: 30, sampler: res_multistep, scheduler: simple, shift_video: 12, shift_audio: 3, size: &quot;0.70 MP no-crop (768x960)&quot;, fps: 24}   # MEASURED best hands/fabric
+  speed: &quot;5 s ≈ 300-360 s, 9 s ≈ 12.5 min with SageAttention (MiniMaxH3MemoryEfficientSageAttentionPatch, ×2)&quot;
+  limits: {frames: &quot;17k+5 (124=5 s, 226=9 s, 294=12 s)&quot;, local_max: &quot;≈ 12 s (RAM ≤ 59 GB); longer → chain 5-8 s hops with MiniMaxH3AddGuide (22 anchor frames + audio)&quot;, native_cap: &quot;≈ 1 MP&quot;}
+  ram: &quot;5 s ≈ 27 GB over background; 9 s peaks 60-62 GB — RAM, not VRAM, is the ceiling (32B text encoder)&quot;
+  precision_test: &quot;fl2va_bf16 unpruned (66 GB) + TE bf16 (51.5 GB) vs pruned_int8 + TE nvfp4, same seed, cloud_box, no Sage: calm 5 s pixel diff 2-5/255, hard 9 s (fast hands, phone, passing bus) same beats and fingers → quantised weights are NOT the quality ceiling; don&#x27;t pay for full precision&quot;   # MEASURED
+  above_native: &quot;1.31 MP (1088x1280) = 2.2x time, no extra detail, more identity wander → stay ≈ 1 MP; get detail from a post upscaler&quot;   # MEASURED
+  cloud_box_speed: &quot;no Sage: 5 s ≈ 225 s (int8) / 280 s (bf16); 9 s ≈ 493 s / 595 s&quot;
+ltx_2_5:                 # fast video path
+  speed: &quot;9 s 1024x1280 in ≈ 3 min with H3-level sharpness (H3 12.5 min); weaker identity on head turns&quot;
+  prompt: &quot;timed lines, one action per 2-3 s, state hand + object in every line, explicit object count; keep appearance/background lock lines&quot;   # MEASURED beats the docs&#x27; &#x27;one flowing paragraph&#x27;
+others:
+  z_image_turbo: &quot;8 steps cfg 1 shift 3 res_multistep; wants 100-180-word paragraphs; seeds look alike&quot;
+  qwen_image_2_1_turbo: &quot;fastest (3-4 s/MP), stock look, drops small details&quot;
+  flux3_klein: &quot;rawest phone-photo realism, faces older; up to 10 reference images&quot;
+  moss_image: &quot;cfg 3, 25 steps; airy illustration, high seed diversity, weak physics (people pose, tools touch nothing)&quot;
+  anima: &quot;anime/2.5D; er_sde, never DPM/Karras, cfg 4-5&quot;
+  sdxl_juggernaut: &quot;77-token CLIP limit → short tag prompts; glossy beauty look&quot;
+  wan_2_2_i2v_a14b: &quot;75 min per 9 s at 768x960 on 16 GB, no audio, loose shot list → not worth it on this class of box&quot;
+```
+
+## 3. Prompting rules (tested)
+- Character consistency: split every prompt into an **identity layer** (age, face, hair, skin, permanent marks; short, verbatim every time) and a **shot layer** (outfit, pose, action, gaze, place, light, camera; rewritten fully — prompts are stateless, never &quot;still/again/same&quot;). [SOURCE + MEASURED]
+- Age: anchor with structure words (&quot;adult woman in her late twenties, defined cheekbones, mature composed look&quot;) not &quot;youthful&quot;; &quot;no retouching&quot; / &quot;fine lines&quot; + 45° side light = deep asymmetric mouth folds (+10 years). [MEASURED]
+- Small permanent marks (mole, scar) appear on Krea only with realism LoRAs; the model mirrors the requested side — accept the rendered side as canon and describe it consistently afterwards. [MEASURED]
+- Turnarounds with edit models: &quot;rotate left/right&quot; turns the head toward the marks both times. For the far side say: &quot;her face points toward the right edge of the image; we see her right cheek and ear; her left cheek with the mole is turned away and not visible&quot;. [MEASURED]
+- Restage prompts that keep identity best: medium/close framing, face toward the camera, closed-lip expression → 18/20 frames with ArcFace ≥ 0.53. [MEASURED]
+- H3 shot-list template (works):
+```text
+[Shot 1] &lt;Picture 1&gt; is the first frame. Whole clip is 5 seconds. Live-action. &lt;who, age, where — as framed in &lt;Picture 1&gt;&gt;.
+Appearance lock: &lt;identity layer words&gt;. Keep face, marks, outfit and proportions exactly as in &lt;Picture 1&gt;.
+Background lock: the background of &lt;Picture 1&gt; stays still apart from natural light flicker.
+Lighting lock: exposure, white balance and light exactly as in &lt;Picture 1&gt;.
+[Shot 2] 0s-2s: &lt;one action&gt;. [Shot 3] 2s-4s: &lt;one action, hands named&gt;. [Shot 4] 4s-5s: &lt;calm hold&gt;.
+camera: locked-off tripod, static, no zoom, no cuts.
+overall_soundscape: &lt;diegetic sounds&gt;.   non_diegetic_music: None.
+negative: morphing face, identity drift, wide toothy grin, extra fingers, warped hands, flicker, text, subtitles, watermark, music.
+```
+- H3: no mood words (warm, dim, cosy) anywhere incl. the music line → colour drift; hand-body contact mid-clip, calm hold at the end (finger melt happens in the last second); &quot;smiles softly with closed lips&quot; avoids big teeth. [MEASURED]
+
+## 4. First frame for image→video (H3)
+- Never crop the still: `ImageScaleToTotalPixels(lanczos, megapixels 0.70, resolution_steps 32)` → `GetImageSize` → H3 width/height. Cropping/resizing mismatch made H3 repaint the background in the first second. [MEASURED]
+- Drop output frame 0 (`ImageFromBatch` batch_index 1) — it is the input still and pops. [MEASURED]
+- Frame 0 must show the face frontal or ≤ 3/4 with every mark visible; starting turned away → H3 invents the hidden side (ArcFace 0.38 vs 0.59-0.69). Background lock must describe exactly what the still shows. Hands near the face are fine if fully in frame. [MEASURED]
+- Start &quot;pop&quot;: face sharpness falls 135 → 56 in the first 0.5 s before any motion. Remedy: shot-list beat `0s-0.5s: holds completely still, settling` + core `Video Slice(start_time 0.5)` (cuts frames and audio). [MEASURED]
+- Light drift (darker/warmer over 3 s): KJNodes `ColorMatch(mkl)` of every frame to the scaled first frame; turn OFF when a big new object enters (bus) — it greys skin. [MEASURED]
+
+## 5. Persona pipeline (one fictional face → LoRA)
+1. Hero still: Krea 2 Turbo 2 MP + realism LoRAs + identity layer, frontal butterfly light. Reverse-image check that it is not a real person (human step).
+2. Restage 50-80 SFW scenes: **Krea Identity Edit V2 aligned b2** for frontal / 3/4 / medium; Qwen-Edit for strong expressions, profiles, high angles; full-body = Qwen full-body scene + Identity Edit person-into-scene (Krea aligned alone never gives full body — layout is pinned to the reference). [MEASURED]
+3. Curate: ArcFace ≥ 0.5 vs hero + eye check of mark side on a face-crop sheet (edit engines flip the side in some frames). Dataset norms: 40-60 images, ~35/35/30 % close/medium/full, outfits ≤ 15 % each, rooms ≤ 10 %. [SOURCE + MEASURED]
+4. Captions: `&lt;trigger&gt;, a woman. &lt;scene text&gt;` — trigger first, prose (LLM text encoder), never describe face/marks/hair colour. [SOURCE]
+5. Train (ai-toolkit, Krea 2 Raw) — config below; evaluate on **Turbo** (the real inference), not on training samples.
+6. Expect: identity first (copper hair/freckles ≈ step 1000 at lr 1e-4), small marks last (only at the final 2500 steps).
+7. **Leak check is mandatory**: include a no-trigger prompt of a different woman. Without countermeasures the marks and eye colour leaked into every &quot;woman&quot; (they attached to the class word — every caption said &quot;a woman&quot;). A regularisation set (`is_reg: true`) cut the leak 0.48 → 0.24 **but ai-toolkit alternates steps with it** (`batch_step % 2 == 0` → reg batch, BaseSDTrainProcess ≈ l. 2578, commit ea3afb4): the subject got only half of the 2500 steps and the small marks never formed. Use **Differential Output Preservation** instead (train: `diff_output_preservation: true`, `diff_output_preservation_class: woman`, `diff_output_preservation_multiplier: 1.0`, process-level `trigger_word` required, no `train_text_encoder`; works with `cache_text_embeddings: true`), no reg folder — what creators do. [MEASURED code + SOURCE]
+- Unknown-word triggers can be rendered as text (book cover printed &quot;mrnholt&quot;) — the LLM text encoder reads them as words. [MEASURED]
+- No generative finishing on persona images: whole-frame img2img 0.12-0.3 and FaceDetailer 0.3-0.45 wipe the mole/scar every time; with realism LoRAs FaceDetailer even made the face teen-looking. Realism must come from the generator; finishing = pixel-only (grain/grade/CA). [MEASURED]
+
+```yaml
+# ai-toolkit (ostris) Krea 2 character LoRA — run 1 settings (worked; for the leak use DOP, not the reg dataset line below — see step 7)
+job: extension
+config:
+  name: persona_krea2
+  process:
+    - type: sd_trainer
+      training_folder: /workspace/output
+      device: cuda:0
+      network: {type: lora, linear: 32, linear_alpha: 32}
+      save: {dtype: bf16, save_every: 250, max_step_saves_to_keep: 10}
+      datasets:
+        - {folder_path: /workspace/data/persona, caption_ext: txt, caption_dropout_rate: 0.05, shuffle_tokens: false, cache_latents_to_disk: true, resolution: [512, 1024]}   # no 768: Krea 2 not pretrained on it
+        - {folder_path: /workspace/data/reg, caption_ext: txt, is_reg: true, caption_dropout_rate: 0.05, cache_latents_to_disk: true, resolution: [512, 1024]}
+      train: {batch_size: 1, cache_text_embeddings: true, steps: 2500, gradient_accumulation: 1, train_unet: true, train_text_encoder: false, gradient_checkpointing: true, noise_scheduler: flowmatch, optimizer: adamw8bit, lr: 1e-4, reg_weight: 1.0, dtype: bf16}
+      model: {name_or_path: /workspace/models/krea2_raw_bf16.safetensors, arch: krea2, quantize: false}   # 96 GB card; on 24-32 GB: quantize: true, qtype: qfloat8
+      sample: {sampler: flowmatch, sample_every: 250, width: 1024, height: 1280, guidance_scale: 4, sample_steps: 30, seed: 42, prompts: [&quot;&lt;trigger&gt;, a woman. Close-up portrait ...&quot;, &quot;A woman with dark curly hair ... (leak check, no trigger)&quot;]}
+```
+- Weights without an HF token: `Comfy-Org/Krea-2` → `diffusion_models/krea2_raw_bf16.safetensors` (26.3 GB, not gated; its 430 keys match ai-toolkit&#x27;s SingleStreamDiT exactly). `krea/Krea-2-Raw` is gated. Text encoder `Qwen/Qwen3-VL-4B-Instruct` and VAE `Qwen/Qwen-Image` download automatically. [MEASURED]
+- Speed `cloud_box`: ≈ 0.8 s/step at 512, ≈ 2.4 s/step at 1024, ≈ 55 min per 2500 steps + ≈ 2.7 min per sample round (5 images); VRAM 31.6 GB. ai-toolkit Krea 2 LoRAs load in ComfyUI `LoraLoaderModelOnly` unchanged. [MEASURED]
+- Inference: Turbo, strength 0.8 (1.0-1.2 raises identity but also the leak). [MEASURED]
+
+## 6. Evaluation harness (what metrics mean)
+- Identity: insightface buffalo_l ArcFace cosine of the largest face vs the reference. ≥ 0.6 ≈ same person; 0.5-0.6 usable; &lt; 0.3 different. Blind to profiles (≈ 0) and fooled by animal faces (picked a dog). Faces &lt; 100 px are unreliable. [MEASURED]
+- Taste: LAION aesthetic v2 reproduced a human&#x27;s per-image ranking; sharpness (Laplacian) and CLIP prompt-adherence did not. Physics/hand-object interaction is invisible to all metrics → eye check. [MEASURED]
+- Video: per-frame Laplacian of the face box for start pops / mid-clip blur; corner diff for background repaint; luma mean for colour drift. [MEASURED]
+- Show humans: stacked full-res crop sheets (same regions, same moments per variant) + side-by-side mp4; blind A/B with a shuffled-letter key for subjective choices. [RULE]
+- Judge speed tricks on a HARD scene (≥ 9 s, fast hands, held object, passing vehicle): a broken turbo recipe ranked first on a calm 5 s clip by metrics. [MEASURED]
+
+## 7. RunPod procedure (runpodctl 2.x)
+```bash
+runpodctl gpu list                       # ids, VRAM, stock level (no prices)
+runpodctl template search &quot;ai toolkit&quot;   # official ostris template id 0fqzfjy6f3, image ostris/aitoolkit:latest (ai-toolkit + torch 2.13 cu130)
+runpodctl pod create --template-id 0fqzfjy6f3 --gpu-id &quot;NVIDIA RTX PRO 6000 Blackwell Server Edition&quot; \
+  --cloud-type SECURE --container-disk-in-gb 150 --volume-in-gb 0 --ports &quot;22/tcp&quot; \
+  --env &#x27;{&quot;AI_TOOLKIT_AUTH&quot;:&quot;&lt;random&gt;&quot;}&#x27; --name &lt;name&gt; --terminate-after &lt;UTC ISO time&gt;
+runpodctl ssh info &lt;pod_id&gt;              # ip, port, key path
+runpodctl pod list ; runpodctl pod delete &lt;pod_id&gt; ; runpodctl me   # verify nothing bills; balance
+```
+- Security: the ostris template exposes UI port 8675 with password `password` by default → expose only `22/tcp` and set `AI_TOOLKIT_AUTH`. Always set `--terminate-after` as a safety net. [MEASURED]
+- Community cloud often has no stock for big cards (&quot;no longer any instances available&quot;) → fall back to SECURE. [MEASURED]
+- SSH: use the key `runpodctl doctor` created (`~/.runpod/ssh/runpodctl-ssh-key`); a separately registered ed25519 key was refused. [MEASURED]
+- `/workspace` may not exist when `--volume-in-gb 0` → `mkdir -p` first. [MEASURED]
+- In-datacenter HF downloads are extremely fast: 26 GB in &lt; 1 min, 135 GB in a few minutes (`hf download`, Xet). `HF_HUB_ENABLE_HF_TRANSFER` is deprecated → `HF_XET_HIGH_PERFORMANCE=1`. Pass globs with `--include`. [MEASURED]
+- System Python is PEP 668-locked: use a venv for tools (insightface 2.1 installs from wheels), or `pip install --break-system-packages` only inside the throw-away container (ComfyUI requirements did not disturb ai-toolkit&#x27;s torch). [MEASURED]
+- ComfyUI on a pod in 2 min: `git clone ComfyUI; pip install --break-system-packages -r requirements.txt; hf download Comfy-Org/&lt;model repo&gt; &lt;files&gt; --local-dir /workspace/hfc; ln -s` into `models/*`; run on 127.0.0.1:8188; drive it from the local machine through `ssh -N -L 8190:127.0.0.1:8188 -p &lt;port&gt; root@&lt;ip&gt;` with the same API scripts. Training and a ComfyUI can share one 96 GB card. [MEASURED]
+- Background jobs over ssh: `setsid nohup cmd &lt; /dev/null &gt; log 2&gt;&amp;1 &amp;` (plain `nohup … &amp;` keeps the ssh session open). A Windows-made tar extracts with &quot;Cannot change ownership&quot; (exit 1) → `--no-same-owner`, don&#x27;t chain with `&amp;&amp;`. [MEASURED]
+- Cost reference: LoRA run (setup + 2500 steps + eval) ≈ 1.7 h ≈ $4.2 on PRO 6000 SECURE. [MEASURED]
+- Decision rule: if a local job takes hours and the cloud does it for a few dollars, use the cloud — especially for daytime experiments a human is waiting on; overnight batches can stay local. &quot;Local hardware can&#x27;t do better&quot; may only be claimed after the same input was rendered on full-precision weights in the cloud. [RULE]
+
+## 7b. Replicating a Civitai post (trend loop)
+- Metadata without login: `GET https://civitai.com/api/v1/images?imageId=&lt;id&gt;&amp;withMeta=true&amp;nsfw=X` → `meta` (may be nested once more as `meta.meta`): prompt, negativePrompt, sampler, scheduler, steps, cfgScale, seed, `civitaiResources` [{modelVersionId, weight, type}], sometimes the full ComfyUI API graph as a JSON string in `meta.comfy`. Resolve each version: `GET /api/v1/model-versions/&lt;id&gt;` → trainedWords (triggers), files[].downloadUrl, sizeKB, baseModel. [MEASURED]
+- `/api/trpc/image.getGenerationData` returns 401 without a browser login (worked logged-in on 2026-10-24). [MEASURED]
+- Downloads: `GET /api/download/models/&lt;versionId&gt;` answers 307 → file (anonymous) or 307 → `/login?reason=download-auth` (creator requires an account — most style LoRAs and finetunes). Use an API key (`Authorization: Bearer &lt;key&gt;`) or the human&#x27;s browser. HEAD the URL first; following the redirect blindly saves a login page as the &quot;model&quot;. [MEASURED]
+- Posts made in ComfyUI list LoRAs by file name only (`meta.additionalResources`); find the version with `GET /api/v1/models?query=&lt;name&gt;`; some (private/renamed) cannot be found. [MEASURED]
+- The `prompt` field is one text node; trace `ComfySwitchNode`/`StringConcatenate` inputs in `meta.comfy` to get the effective conditioning text (hidden style suffixes, LLM prompt expanders that may be on or off). [MEASURED]
+- Posts from the Civitai on-site generator (meta keys `workflow`, `ecosystem`) do not reproduce pixel-exact with the same seed in ComfyUI — compare style, not pixels. [MEASURED]
+- Page format: 1 closest copy + 2 own-subject renders in the same aesthetic (keep style sentences, LoRAs, sampler; swap the subject). NSFW originals are shown blurred; own renders of NSFW trends are clothed/covered. [USER RULE]
+- Diagnosis: right subject + wrong medium in the no-LoRA render = the look is a style LoRA (adding ta86_myw4y made post 146084006 near-identical); don&#x27;t rewrite the prompt. [MEASURED]
+- Krea 2 Turbo two-pass used by half of top graphs (8 steps ≈ 1 MP → `LatentUpscaleBy` ×1.5 nearest-exact → 4 steps euler/simple denoise 0.4): same quality as one pass at 1280×1600, 18 % faster, one pass cleaner on small text — a speed knob, not a quality gain. [MEASURED]
+- Expected outcome (6 posts, 2026-10-25): prompt-only artist-style posts and posts whose model + LoRAs are already local replicate on the first render (14–40 s per image on a 16 GB card); posts whose look comes from a creator LoRA/finetune need that file — the no-LoRA render is still useful as a &quot;what the LoRA adds&quot; baseline. Cap size at ≈ 2.4 MP keeping aspect; published sizes are often upscaled. [MEASURED]
+
+## 8. Operating pitfalls for agents on Windows hosts
+- `python` not `python3`; console is cp1252 → avoid printing non-ASCII (→, …) from scripts or set `PYTHONIOENCODING=utf-8`. [MEASURED]
+- Bash heredocs in Git Bash eat backslashes in Windows paths and `\n` escapes → write scripts with a file-write tool, not heredocs. [MEASURED]
+- Killing Git-Bash-launched processes: PowerShell `Get-CimInstance Win32_Process | Where CommandLine -match …` + `Stop-Process`; `pkill -f` does not work. [MEASURED]
+- Custom-node installs and similar code-integration steps may be blocked by the agent&#x27;s permission classifier; a human&#x27;s explicit, specific chat authorisation unblocked it. List such steps and get them done **before** an unattended stretch. [MEASURED]
+- One downloader per file (two writers on one `.part` corrupted a 7 GB file); verify HF LFS sha256. [MEASURED]
+- Builders that regenerate all workflows when called without arguments will overwrite a human&#x27;s edited files — build one target per call. [MEASURED]
+
+## 9. Open questions (not yet measured)
+- Resolved 2026-10-25: regularisation set (47 same-scene images of other women, `is_reg: true`, reg_weight 1.0) cut the no-trigger leak from 0.48 to 0.24 ArcFace and removed leaked marks, at equal identity (0.60) — but at 2500 steps the persona&#x27;s small marks disappeared too (reg slows learning). Open: how many steps / which lr bring the marks back with reg on (try 4000 steps or lr 2e-4).
+- 9:16 vs 4:5 first frames; H3 Ref2V with persona references; H3 LoRA from still images; H3 15-30 s clips on a 96 GB card.
+- Resolved 2026-10-25: H3 full precision vs quantised → no visible gap (section 2, minimax_h3.precision_test).
+</pre>
+</section>
+
+<nav class="pager" aria-label="Главы"><a href="ch-lab.html"><span class="dir">← назад</span>План исследований</a></nav>
+</div>
+
+<script>
+document.querySelectorAll('button[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.copy), txt=el.textContent;
+    var done=function(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Копировать'},1500)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
+    try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
+  });
+});
+</script>
+</body>
+</html>

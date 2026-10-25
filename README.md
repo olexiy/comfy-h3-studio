@@ -7,7 +7,7 @@ A local ComfyUI pipeline for photoreal image-to-video on a single 16 GB consumer
 Ready-to-drop ComfyUI workflows, the Python tooling used to generate and benchmark them, and the measured
 results.
 
-- **Learning page (Russian, with videos and comparison sheets):** https://olexiy.github.io/comfy-h3-studio/
+- **Textbook (Russian, 14 chapters, with videos and comparison sheets):** https://olexiy.github.io/comfy-h3-studio/ — studio setup, Krea 2 stills, MiniMax H3 video, speed vs quality, model comparison, a fictional persona + LoRA trained on RunPod, Civitai creator breakdowns and trend replications, pitfalls, and a machine-readable guide for AI agents ([`docs/agent-guide.md`](docs/agent-guide.md), [`docs/llms.txt`](docs/llms.txt)).
 - **Workflows:** [`workflows/`](workflows/) · **Tools:** [`tools/`](tools/) · **Shot-list prompts:** [`prompts/`](prompts/)
 
 > **Model licence first.** This repo ships no weights. MiniMax H3's open-weights licence

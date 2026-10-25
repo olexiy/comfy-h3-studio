@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Видео на MiniMax H3 · Локальная студия H3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+:root{
+  --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
+  --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Onest", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 80px;display:grid;gap:56px}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(20px,3vw,26px);font-weight:500;margin-bottom:14px}
+h3{font-size:16px;font-weight:500}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.lead{font-size:18px;color:var(--muted);max-width:62ch;margin-top:14px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+section{display:grid;gap:18px;min-width:0}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.step .n{font:500 12px var(--mono);color:var(--accent)}
+.step .t{font:500 26px/1 var(--display)}
+.step .t small{font:400 13px var(--body);color:var(--muted)}
+.total{font:500 14px var(--mono);color:var(--muted)}
+.total b{color:var(--fg)}
+/* media */
+.strip{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+figure{margin:0;display:grid;gap:8px;min-width:0}
+figure img,figure video{width:100%;max-width:100%;height:auto;border-radius:8px;background:#000;display:block}
+figcaption{font-size:13px;color:var(--muted)}
+figcaption b{color:var(--fg);font-weight:600}
+.wide img{border-radius:8px}
+.tag{display:inline-block;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-right:6px;vertical-align:1px}
+.tag.good{color:var(--good)}.tag.warn{color:var(--warn)}.tag.bad{color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);white-space:nowrap}
+tr.win td{background:var(--accent-soft)}
+/* workflows */
+.wf{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .file{font:500 13px var(--mono);color:var(--accent);word-break:break-all}
+.card ul{margin:0;padding-left:18px;font-size:14px}
+.card .time{font:500 13px var(--mono);color:var(--muted)}
+.rules{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.rules li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.rules b{font-weight:600}
+pre{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font:13px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{font:500 13px var(--body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible,video:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.paths td:first-child{white-space:nowrap}
+@media (max-width:760px){.pipe,.strip,.wf{grid-template-columns:minmax(0,1fr)}}
+
+/* book navigation */
+.bookbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between;
+  font:500 13px var(--mono);border-bottom:1px solid var(--line);padding-bottom:12px}
+.bookbar a{text-decoration:none}
+.bookbar .where{color:var(--muted)}
+.pager{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.pager a{display:grid;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--fg)}
+.pager a:hover{border-color:var(--accent)}
+.pager .dir{font:500 12px var(--mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.pager .next{text-align:right;grid-column:2}
+/* contents */
+.toc{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.toc li{border-bottom:1px solid var(--line)}
+.toc a{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;gap:4px 14px;align-items:baseline;padding:14px 4px;text-decoration:none;color:var(--fg)}
+.toc a:hover .ct{color:var(--accent)}
+.toc .cn{font:500 13px var(--mono);color:var(--accent)}
+.toc .ct{font:500 18px/1.25 var(--display)}
+.toc .cd{grid-column:2;color:var(--muted);font-size:14px}
+.toc .st{grid-row:1;grid-column:3}
+.news{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.news li{display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:12px}
+.news time{font:500 13px var(--mono);color:var(--muted)}
+@media (max-width:760px){.toc a{grid-template-columns:2.4em minmax(0,1fr)}.toc .st{grid-row:auto;grid-column:2}
+  .pager{grid-template-columns:minmax(0,1fr)}.pager .next{grid-column:1}.news li{grid-template-columns:minmax(0,1fr);gap:0}}
+/* trend replications (chapter ch-trends + trend-<id>.html pages, built by build_book.py) */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tcard{display:grid;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--fg)}
+.tcard:hover{border-color:var(--accent)}
+.tcard .pair{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.tcard img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.tcard .ci{display:grid;gap:4px;padding:10px 12px}
+.tcard .cm{font:500 12px var(--mono);color:var(--muted)}
+.tr-steps{counter-reset:st;display:grid;gap:28px}
+.tr-steps>section{display:grid;gap:12px}
+.tr-steps>section>h2::before{counter-increment:st;content:counter(st) " · ";color:var(--accent)}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.duo figure{margin:0;display:grid;gap:6px}
+.duo img{width:100%;height:auto;border-radius:8px;display:block}
+.duo figcaption{font-size:13px;color:var(--muted)}
+/* public build: link instead of a creator's original */
+.olink{display:flex;align-items:center;justify-content:center;text-align:center;aspect-ratio:3/4;background:var(--panel,rgba(127,127,127,.08));color:var(--muted);font:500 13px/1.4 var(--mono);text-decoration:none}
+.olink.big{aspect-ratio:auto;min-height:180px;padding:24px;border:1px dashed var(--line);border-radius:10px;color:var(--accent);font-size:15px}
+.olink small{color:var(--muted);font-size:12px}
+/* contents parts + "start here" highlights (cover) */
+.toc li.part{border-bottom:0;padding:26px 4px 6px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hl{display:grid;gap:6px;align-content:start;text-decoration:none;color:var(--fg)}
+.hl img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
+.hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
+@media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+</style>
+<style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 3 из 14</span></nav>
+<header>
+  <div class="eyebrow">Глава 3 · image → video · серия 0</div>
+  <h1>Видео на MiniMax H3</h1>
+  <p class="lead">Как оживить кадр в ролик со звуком: какие настройки дали лучший результат, сколько секунд выдерживает домашний компьютер и как склеивать длинные сцены.</p>
+</header>
+
+<p class="prose" style="background:var(--accent-soft);border-radius:10px;padding:12px 14px"><b>Обновление 24.10.2026:</b> времена ниже из серии 0. С SageAttention и турбо-LoRA на 4 шага тот же 5-секундный ролик считается за 64 с — <a href="ch-speed.html">глава «Скорость и память»</a>.</p>
+
+<section aria-labelledby="pipe">
+  <h2 id="pipe">Пайплайн за ~4 минуты</h2>
+  <div class="pipe">
+    <div class="step"><span class="n">1 · картинка</span><span class="t">57 с <small>Krea 2</small></span><span class="mono">01_image_krea2_realism</span><span>2856×4560, два прохода, детейлер лица, апскейл</span></div>
+    <div class="step"><span class="n">2 · видео</span><span class="t">164 с <small>MiniMax H3</small></span><span class="mono">03_video_h3_i2v</span><span>768×960, 124 кадра = 5 с, звук улицы</span></div>
+    <div class="step"><span class="n">3 · постобработка</span><span class="t">27 с <small>RIFE</small></span><span class="mono">04_post_rife_upscale</span><span>lanczos ×2 → 1536×1920, RIFE ×2 → 48 fps</span></div>
+  </div>
+  <p class="total">Итог: <b>FINAL_V13_post_00001-audio.mp4</b> · 1536×1920 · 48 fps · 5 с · пик VRAM 15,5 ГБ · пик RAM 58,6 ГБ</p>
+</section>
+
+<section aria-labelledby="video">
+  <h2 id="video">Видео: что получилось</h2>
+  <div class="strip">
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/v13-winner-poster.jpg" src="media/v13-winner.mp4"></video>
+      <figcaption><span class="tag good">победитель</span><b>V13</b> · 768×960 · 5 с · shift 8 · 165 с. Лицо стабильно, все действия по раскадровке.</figcaption>
+    </figure>
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/v1-baseline-poster.jpg" src="media/v1-baseline.mp4"></video>
+      <figcaption><span class="tag warn">первая версия</span><b>V1</b> · 640×800 · 3 с · 66 с. Работает, но мелкие детали (веснушки) теряются.</figcaption>
+    </figure>
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/v14-moss-poster.jpg" src="media/v14-moss.mp4"></video>
+      <figcaption><span class="tag bad">мыльно</span><b>V14</b> · те же настройки, первый кадр из MOSS. Резкость 124 против ≈980 у Krea.</figcaption>
+    </figure>
+  </div>
+  <p class="prose" style="color:var(--muted);font-size:14px">В роликах есть звук, его генерирует сама H3 по строке <code>overall_soundscape</code>. Включи его в плеере.</p>
+  <figure class="wide">
+    <img src="media/h3-video-configs-grid.jpg" alt="Кадры из четырёх видео-конфигураций: V1, V11, V13, V14" loading="lazy" width="914" height="1216">
+    <figcaption>По три кадра (начало, середина, конец) из V1, V11, V13 и V14. У V14 (MOSS) лицо меняется и всё мягче.</figcaption>
+  </figure>
+</section>
+
+<section aria-labelledby="h3tbl">
+  <h2 id="h3tbl">Настройки видео: два раунда тестов</h2>
+  <p class="prose">Один и тот же первый кадр и сид. Время включает загрузку моделей. Пик VRAM везде 15,5–15,9 ГБ, пик RAM 58–60 ГБ.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Изменение</th><th>Размер · длина</th><th>Время</th><th>Вывод</th></tr></thead>
+    <tbody>
+      <tr><td class="num">V1</td><td>базовая: турбо 8 шагов, euler, shift 12</td><td class="num">640×800 · 3 с</td><td class="num">66 с</td><td>работает, детали мелкие теряются</td></tr>
+      <tr><td class="num">V2</td><td>sampler res_multistep</td><td class="num">640×800 · 3 с</td><td class="num">73 с</td><td>≈ euler, разницы нет</td></tr>
+      <tr><td class="num">V3</td><td>разрешение 768×960</td><td class="num">768×960 · 3 с</td><td class="num">105 с</td><td>заметно больше деталей лица</td></tr>
+      <tr><td class="num">V4</td><td>124 кадра</td><td class="num">640×800 · 5 с</td><td class="num">117 с</td><td>5 с работают без проблем</td></tr>
+      <tr><td class="num">V5</td><td>без турбо, 20 шагов</td><td class="num">640×800 · 3 с</td><td class="num">122 с</td><td>стабильно, но действия вялые</td></tr>
+      <tr><td class="num">V6</td><td>короткий простой промпт</td><td class="num">640×800 · 3 с</td><td class="num">66 с</td><td>хуже всех: лицо плывёт, действия пропадают</td></tr>
+      <tr><td class="num">V7</td><td>shift 8</td><td class="num">640×800 · 3 с</td><td class="num">69 с</td><td>самый резкий, подмигивание есть</td></tr>
+      <tr><td class="num">V8</td><td>shift 16</td><td class="num">640×800 · 3 с</td><td class="num">67 с</td><td>мягче, чем 8</td></tr>
+      <tr><td class="num">V10</td><td>768 + без турбо, 20 шагов</td><td class="num">768×960 · 3 с</td><td class="num">202 с</td><td>вдвое дольше, не лучше турбо</td></tr>
+      <tr><td class="num">V11</td><td>768 + shift 8 + 124 кадра</td><td class="num">768×960 · 5 с</td><td class="num">185 с</td><td>лучшая комбинация настроек</td></tr>
+      <tr><td class="num">V12</td><td>896×1120 + shift 8</td><td class="num">896×1120 · 3 с</td><td class="num">126 с</td><td>работает, VRAM 15,5 ГБ</td></tr>
+      <tr class="win"><td class="num">V13</td><td>V11 + первый кадр из оптимизированного Krea</td><td class="num">768×960 · 5 с</td><td class="num">165 с</td><td><b>победитель</b></td></tr>
+      <tr><td class="num">V14</td><td>V11 + первый кадр из MOSS</td><td class="num">768×960 · 5 с</td><td class="num">162 с</td><td>очень мыльно</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="next">
+  <h2 id="next">Длина видео и склейка клипов</h2>
+  <p class="prose">Те же настройки победителя (768×960, турбо 8 шагов, shift 8), длинные раскадровки, одно действие на 1,5–2,5 с. По правилу ноды число кадров должно быть 17k+5, обученный диапазон H3 — 124–362 кадра (5–15 с).</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Длина</th><th>Кадров</th><th>Время</th><th>с расчёта / 1 с видео</th><th>RAM</th><th>Резкость начало / середина / конец</th><th>Вывод</th></tr></thead>
+    <tbody>
+      <tr><td class="num">5 с</td><td class="num">124</td><td class="num">165 с</td><td class="num">33</td><td class="num">58,6 ГБ</td><td class="num">1010 / 932 / 957</td><td>эталон</td></tr>
+      <tr><td class="num">6 с</td><td class="num">141</td><td class="num">219 с</td><td class="num">36</td><td class="num">54,3 ГБ</td><td class="num">972 / 683 / 732</td><td>все действия</td></tr>
+      <tr class="win"><td class="num">9 с</td><td class="num">226</td><td class="num">434 с</td><td class="num">48</td><td class="num">55,7 ГБ</td><td class="num">946 / 724 / 712</td><td><b>лучшее соотношение качества и времени</b></td></tr>
+      <tr><td class="num">12 с</td><td class="num">294</td><td class="num">694 с</td><td class="num">57</td><td class="num">59,4 ГБ</td><td class="num">1062 / 811 / 869</td><td>все действия; <b>практический предел дома</b></td></tr>
+      <tr><td class="num">15 с</td><td class="num">362</td><td class="num">956 с</td><td class="num">63</td><td class="num">58,8 ГБ</td><td class="num">1145 / 1017 / 399</td><td>фон плывёт, конец мыльный</td></tr>
+    </tbody>
+  </table></div>
+  <div class="strip">
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/len-12s-poster.jpg" src="media/len-12s.mp4"></video>
+      <figcaption><span class="tag good">12 с</span><b>Один клип</b> · 294 кадра · 694 с. Все действия, лицо держится.</figcaption>
+    </figure>
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/chain-5s-plus-5s-poster.jpg" src="media/chain-5s-plus-5s.mp4"></video>
+      <figcaption><span class="tag good">склейка</span><b>5 с + 5 с через 03c</b> · 164 + 233 = 397 с. Шва не видно, звук продолжается.</figcaption>
+    </figure>
+  </div>
+  <figure class="wide">
+    <img src="media/chain-vs-single-9s.jpg" alt="Кадры: склейка 5+5 с сверху, один клип 9 с снизу" loading="lazy" width="1400" height="461">
+    <figcaption><b>Сверху склейка, снизу один клип на 9 с</b>, кадров одинаково (226). У склейки в середине резкость 892 против 724 и расчёт на 9 % быстрее. Минусы: дрейф лица чуть больше, бит «встаёт» пропущен, на быстром движении в конце резкость падает до ≈290.</figcaption>
+  </figure>
+  <ul class="rules prose">
+    <li><b>Как работает склейка <code>03c</code>.</b> Последние 22 кадра и звук предыдущего клипа ставятся якорем (нода <code>MiniMaxH3AddGuide</code>) в начало нового. Перекрытие обрезается, части склеиваются в один mp4. Результат можно подать на вход снова.</li>
+    <li><b>Правило:</b> до 9 с — один клип (<code>03</code>); 10–12 с — один клип (<code>03b</code>) или две части; больше 12 с — цепочка частей по 5–8 с через <code>03c</code>.</li>
+    <li><b>Время растёт быстрее длины:</b> 6 → 9 с даёт ×2 времени на ×1,6 кадров. VRAM не растёт (динамическая загрузка), RAM держится до 59 ГБ.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="eros">
+  <h2 id="eros">H3 Eros Max против официальной H3</h2>
+  <p class="prose">Одетая сцена с медитацией, кадр из секции «Фигура», один сид и одна раскадровка, 768×960, 124 кадра. Eros Max beta5 — дообученный чекпойнт сообщества из образца с Civitai (int8, уже турбо) + LoRA VBVR 0.25.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Вариант</th><th>Время</th><th>RAM</th><th>Резкость начало / середина / конец</th><th>Дрейф лица</th><th>Вывод</th></tr></thead>
+    <tbody>
+      <tr class="win"><td><code>03</code> официальная H3</td><td class="num">174 с</td><td class="num">58,5 ГБ</td><td class="num">79 / 64 / 75</td><td class="num">7</td><td><b>самая резкая</b>, все действия</td></tr>
+      <tr><td><code>05</code> Eros Max</td><td class="num">171 с</td><td class="num">59,3 ГБ</td><td class="num">56 / 44 / 50</td><td class="num">7</td><td>на ≈30 % мягче, «пластиковое» сглаживание</td></tr>
+      <tr><td><code>05</code> + shift 8</td><td class="num">159 с</td><td class="num">58,8 ГБ</td><td class="num">61 / 52 / 57</td><td class="num">13</td><td>shift возвращает треть резкости; дорисовал кольцо</td></tr>
+    </tbody>
+  </table></div>
+  <div class="strip">
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/E1_official-poster.jpg" src="media/E1_official.mp4"></video>
+      <figcaption><span class="tag good">резче</span><b>03 официальная</b> · 174 с</figcaption>
+    </figure>
+    <figure>
+      <video controls playsinline preload="metadata" poster="media/E3_erosmax_s8-poster.jpg" src="media/E3_erosmax_s8.mp4"></video>
+      <figcaption><span class="tag warn">мягче</span><b>05 Eros Max + shift 8</b> · 159 с</figcaption>
+    </figure>
+  </div>
+  <figure class="wide">
+    <img src="media/eros-vs-official-grid.jpg" alt="По 6 кадров из трёх роликов: официальная H3, Eros Max, Eros Max с shift 8" loading="lazy" width="1170" height="771">
+    <figcaption>Сверху вниз: 03 официальная, 05 Eros Max, 05 + shift 8. Движение почти одинаковое, все три выполняют раскадровку. Абсолютная резкость здесь ниже, чем на остановке: мягкий свет в комнате, мало мелких деталей. Сравнивать можно только строки между собой.</figcaption>
+  </figure>
+  <ul class="rules prose">
+    <li><b>Для одетых сцен бери <code>03</code>.</b> Eros Max не быстрее и мягче. Его единственный плюс — анатомия, которую официальная H3 размазывает.</li>
+    <li><b>В <code>05</code> теперь по умолчанию shift 8.</b> Старая версия сохранена как <code>05_video_h3_erosmax_i2v_baseline</code>.</li>
+    <li><b>Пальцы плывут, когда руки трогают тело в последней секунде.</b> Действие с касанием ставь в середину клипа, а заканчивай спокойным удержанием. В negative: <code>fused fingers, missing fingers</code>.</li>
+    <li><b>Не запускай H3 в Desktop, пока считает агент.</b> Два ComfyUI с H3 оставили 3 ГБ свободной RAM, время выросло вдвое.</li>
+  </ul>
+</section>
+
+<nav class="pager" aria-label="Главы"><a href="ch-stills.html"><span class="dir">← назад</span>Кадр: фото на Krea 2</a><a class="next" href="ch-speed.html"><span class="dir">дальше →</span>Скорость и качество</a></nav>
+</div>
+
+<script>
+document.querySelectorAll('button[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.copy), txt=el.textContent;
+    var done=function(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Копировать'},1500)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
+    try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
+  });
+});
+</script>
+</body>
+</html>

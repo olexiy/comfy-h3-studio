@@ -1,0 +1,589 @@
+{
+ "id": "9f95633b-b4b8-57e3-92e3-34ea33c3b2a3",
+ "revision": 0,
+ "last_node_id": 12,
+ "last_link_id": 11,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "MarkdownNote",
+   "pos": [
+    0,
+    0
+   ],
+   "size": [
+    520,
+    null
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "# S8 replication · Civitai 146077870 · Rick13972\nSource: https://civitai.com/images/146077870 — Krea 2 1256×1672, Euler simple, 8 steps, cfg 1.0, seed 803493742955366.\nOurs: krea2_turbo_int8_convrot.safetensors, 1248×1664 (cap 2.4 MP), euler/simple, LoRAs: krea2_ta86_inkriot_V2.safetensors @0.8, Purple_Aether-KR2.safetensors @1.0.\nMissing LoRAs: Krea 2\\ErenARIK_v1.safetensors. Built by `claude-tools/tools/s8_rep.py`; notes in `sheets/trends/posts.md`."
+   ]
+  },
+  {
+   "id": 2,
+   "type": "UNETLoader",
+   "pos": [
+    30,
+    76
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      1
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "krea2_turbo_int8_convrot.safetensors",
+    "default"
+   ]
+  },
+  {
+   "id": 3,
+   "type": "CLIPLoader",
+   "pos": [
+    30,
+    218
+   ],
+   "size": [
+    340,
+    106
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "CLIPLoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      3
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "qwen3vl_4b_fp8_scaled.safetensors",
+    "krea2",
+    "default"
+   ]
+  },
+  {
+   "id": 4,
+   "type": "VAELoader",
+   "pos": [
+    30,
+    384
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      10
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "qwen_image_vae.safetensors"
+   ]
+  },
+  {
+   "id": 5,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    410,
+    76
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "title": "LoRA · krea2_ta86_inkriot_V2.safetensors @0.8",
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      2
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "krea2_ta86_inkriot_V2.safetensors",
+    0.8
+   ]
+  },
+  {
+   "id": 6,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    410,
+    218
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "title": "LoRA · Purple_Aether-KR2.safetensors @1.0",
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "Purple_Aether-KR2.safetensors",
+    1.0
+   ]
+  },
+  {
+   "id": 7,
+   "type": "CLIPTextEncode",
+   "pos": [
+    890,
+    76
+   ],
+   "size": [
+    420,
+    300
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "title": "Prompt (from the post)",
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 3
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      4,
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "A sleek, elegant cat stretching in profile, composed of crisp geometric paper planes. Each body section uses a distinct flat color: burnt orange, teal, cream, and slate gray. Thin ink outlines define the silhouette and joints, while select panels feature tiny stepped geometric motifs. Behind the cat, a large floating ring intersects with a diagonal color bar and a small checkerboard panel, evoking graceful forward motion on a pale gray-beige background. The feline casts a sharply defined geometric drop shadow, adding modern dimensionality while maintaining a flat graphic poster look. Modern pop-art poster design, Bauhaus constructivism, screen-print texture, elegant asymmetrical composition, crisp color separations, generous negative space, visually simple and intentional, no text, no logos., muted minimalist sketch style"
+   ]
+  },
+  {
+   "id": 8,
+   "type": "ConditioningZeroOut",
+   "pos": [
+    890,
+    436
+   ],
+   "size": [
+    340,
+    34
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "ConditioningZeroOut"
+   },
+   "inputs": [
+    {
+     "name": "conditioning",
+     "type": "CONDITIONING",
+     "link": 4
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      7
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": []
+  },
+  {
+   "id": 9,
+   "type": "EmptyLatentImage",
+   "pos": [
+    1350,
+    76
+   ],
+   "size": [
+    340,
+    106
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "EmptyLatentImage"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      8
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    1248,
+    1664,
+    1
+   ]
+  },
+  {
+   "id": 10,
+   "type": "KSampler",
+   "pos": [
+    1350,
+    242
+   ],
+   "size": [
+    340,
+    268
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 5
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 6
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 7
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      9
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    42,
+    "fixed",
+    8,
+    1.0,
+    "euler",
+    "simple",
+    1.0
+   ]
+  },
+  {
+   "id": 11,
+   "type": "VAEDecode",
+   "pos": [
+    1350,
+    570
+   ],
+   "size": [
+    340,
+    56
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 9
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 10
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      11
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": []
+  },
+  {
+   "id": 12,
+   "type": "SaveImage",
+   "pos": [
+    1730,
+    76
+   ],
+   "size": [
+    400,
+    500
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 11
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "S8/146077870/v2_s42"
+   ]
+  }
+ ],
+ "links": [
+  [
+   1,
+   2,
+   0,
+   5,
+   0,
+   "MODEL"
+  ],
+  [
+   2,
+   5,
+   0,
+   6,
+   0,
+   "MODEL"
+  ],
+  [
+   3,
+   3,
+   0,
+   7,
+   0,
+   "CLIP"
+  ],
+  [
+   4,
+   7,
+   0,
+   8,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   5,
+   6,
+   0,
+   10,
+   0,
+   "MODEL"
+  ],
+  [
+   6,
+   7,
+   0,
+   10,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   7,
+   8,
+   0,
+   10,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   8,
+   9,
+   0,
+   10,
+   3,
+   "LATENT"
+  ],
+  [
+   9,
+   10,
+   0,
+   11,
+   0,
+   "LATENT"
+  ],
+  [
+   10,
+   4,
+   0,
+   11,
+   1,
+   "VAE"
+  ],
+  [
+   11,
+   11,
+   0,
+   12,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "1 · Models",
+   "bounding": [
+    0,
+    0,
+    780,
+    472
+   ],
+   "color": "#3f789e",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "2 · Sample",
+   "bounding": [
+    860,
+    0,
+    1300,
+    656
+   ],
+   "color": "#a1309b",
+   "font_size": 24,
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.45,
+   "offset": [
+    60,
+    120
+   ]
+  },
+  "workflowRendererVersion": "LG"
+ },
+ "version": 0.4
+}

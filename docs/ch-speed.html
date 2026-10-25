@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Скорость и качество · Локальная студия H3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+:root{
+  --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
+  --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Onest", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 80px;display:grid;gap:56px}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(20px,3vw,26px);font-weight:500;margin-bottom:14px}
+h3{font-size:16px;font-weight:500}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.lead{font-size:18px;color:var(--muted);max-width:62ch;margin-top:14px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+section{display:grid;gap:18px;min-width:0}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.step .n{font:500 12px var(--mono);color:var(--accent)}
+.step .t{font:500 26px/1 var(--display)}
+.step .t small{font:400 13px var(--body);color:var(--muted)}
+.total{font:500 14px var(--mono);color:var(--muted)}
+.total b{color:var(--fg)}
+/* media */
+.strip{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+figure{margin:0;display:grid;gap:8px;min-width:0}
+figure img,figure video{width:100%;max-width:100%;height:auto;border-radius:8px;background:#000;display:block}
+figcaption{font-size:13px;color:var(--muted)}
+figcaption b{color:var(--fg);font-weight:600}
+.wide img{border-radius:8px}
+.tag{display:inline-block;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-right:6px;vertical-align:1px}
+.tag.good{color:var(--good)}.tag.warn{color:var(--warn)}.tag.bad{color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);white-space:nowrap}
+tr.win td{background:var(--accent-soft)}
+/* workflows */
+.wf{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .file{font:500 13px var(--mono);color:var(--accent);word-break:break-all}
+.card ul{margin:0;padding-left:18px;font-size:14px}
+.card .time{font:500 13px var(--mono);color:var(--muted)}
+.rules{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.rules li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.rules b{font-weight:600}
+pre{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font:13px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{font:500 13px var(--body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible,video:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.paths td:first-child{white-space:nowrap}
+@media (max-width:760px){.pipe,.strip,.wf{grid-template-columns:minmax(0,1fr)}}
+
+/* book navigation */
+.bookbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between;
+  font:500 13px var(--mono);border-bottom:1px solid var(--line);padding-bottom:12px}
+.bookbar a{text-decoration:none}
+.bookbar .where{color:var(--muted)}
+.pager{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.pager a{display:grid;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--fg)}
+.pager a:hover{border-color:var(--accent)}
+.pager .dir{font:500 12px var(--mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.pager .next{text-align:right;grid-column:2}
+/* contents */
+.toc{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.toc li{border-bottom:1px solid var(--line)}
+.toc a{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;gap:4px 14px;align-items:baseline;padding:14px 4px;text-decoration:none;color:var(--fg)}
+.toc a:hover .ct{color:var(--accent)}
+.toc .cn{font:500 13px var(--mono);color:var(--accent)}
+.toc .ct{font:500 18px/1.25 var(--display)}
+.toc .cd{grid-column:2;color:var(--muted);font-size:14px}
+.toc .st{grid-row:1;grid-column:3}
+.news{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.news li{display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:12px}
+.news time{font:500 13px var(--mono);color:var(--muted)}
+@media (max-width:760px){.toc a{grid-template-columns:2.4em minmax(0,1fr)}.toc .st{grid-row:auto;grid-column:2}
+  .pager{grid-template-columns:minmax(0,1fr)}.pager .next{grid-column:1}.news li{grid-template-columns:minmax(0,1fr);gap:0}}
+/* trend replications (chapter ch-trends + trend-<id>.html pages, built by build_book.py) */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tcard{display:grid;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--fg)}
+.tcard:hover{border-color:var(--accent)}
+.tcard .pair{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.tcard img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.tcard .ci{display:grid;gap:4px;padding:10px 12px}
+.tcard .cm{font:500 12px var(--mono);color:var(--muted)}
+.tr-steps{counter-reset:st;display:grid;gap:28px}
+.tr-steps>section{display:grid;gap:12px}
+.tr-steps>section>h2::before{counter-increment:st;content:counter(st) " · ";color:var(--accent)}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.duo figure{margin:0;display:grid;gap:6px}
+.duo img{width:100%;height:auto;border-radius:8px;display:block}
+.duo figcaption{font-size:13px;color:var(--muted)}
+/* public build: link instead of a creator's original */
+.olink{display:flex;align-items:center;justify-content:center;text-align:center;aspect-ratio:3/4;background:var(--panel,rgba(127,127,127,.08));color:var(--muted);font:500 13px/1.4 var(--mono);text-decoration:none}
+.olink.big{aspect-ratio:auto;min-height:180px;padding:24px;border:1px dashed var(--line);border-radius:10px;color:var(--accent);font-size:15px}
+.olink small{color:var(--muted);font-size:12px}
+/* contents parts + "start here" highlights (cover) */
+.toc li.part{border-bottom:0;padding:26px 4px 6px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hl{display:grid;gap:6px;align-content:start;text-decoration:none;color:var(--fg)}
+.hl img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
+.hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
+@media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+</style>
+<style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 4 из 14</span></nav>
+<header>
+  <div class="eyebrow">Глава 4 · серия 1 · 24.10.2026</div>
+  <h1>Скорость и качество</h1>
+  <p class="lead">Что ускоряет H3 без потерь, что ломает качество и какой рецепт даёт лучшие руки и фактуру на трудной сцене.</p>
+</header>
+
+<p class="prose" style="background:var(--accent-soft);border-radius:10px;padding:12px 14px"><b>Поправка 24.10.2026: рецепт C1 не годится.</b> На 5-секундной спокойной сцене он выглядел резче, но на 9 с с быстрыми движениями руки плавятся, разрешение местами падает, цвет плывёт, предметы морфятся. Наши метрики (резкость по 5 кадрам, дрейф лица) этого не видели. Турбо 4 шага, LoRA v1.1 и веса w6a8 отклонены. Рабочий рецепт остаётся прежним (глава «Видео»); проверяется только SageAttention — та же математика, другое ядро.</p>
+
+<section aria-labelledby="sp-result">
+  <h2 id="sp-result">Первый замер: 163 → 64 секунды (на короткой сцене)</h2>
+  <p class="prose">Один и тот же кадр, один seed, 5 секунд видео 768×960. Слева исходный <span class="mono">03</span>, справа новый рецепт C1: SageAttention + веса w6a8 + турбо-LoRA на 4 шага. Движения те же, лицо держится стабильнее, середина ролика резче.</p>
+  <figure>
+    <video src="media/s1-a0-vs-c1.mp4" poster="media/s1-a0-vs-c1-poster.jpg" controls muted loop playsinline preload="none"></video>
+    <figcaption><b>Слева 163 с, справа 64 с.</b> A0 (int8, турбо 8 шагов) против C1 (Sage, w6a8, турбо 4 шага v1.3). Звук из правого ролика.</figcaption>
+  </figure>
+  <div class="pipe">
+    <div class="step"><span class="n">шаг 1 · SageAttention</span><span class="t">−41 % <small>163 → 96 с</small></span><span>быстрое «внимание» на int8; качество кадра не меняется</span></div>
+    <div class="step"><span class="n">шаг 2 · турбо 4 шага</span><span class="t">−33 % <small>96 → 64 с</small></span><span>LoRA <span class="mono">turbo_4step_v1.3_768p</span> вместо 8 шагов; резче и стабильнее</span></div>
+    <div class="step"><span class="n">шаг 3 · веса w6a8</span><span class="t">−5 ГБ <small>RAM</small></span><span>16 ГБ вместо 21 ГБ; скорость та же, запас памяти для длинных роликов</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="sp-table">
+  <h2 id="sp-table">Все варианты</h2>
+  <p class="prose">Время — от постановки в очередь до готового mp4, модели уже в памяти. Резкость — дисперсия лапласиана по кадрам (больше = резче) в начале, середине и конце ролика. Дрейф лица — насколько лицо в последнем кадре отличается от первого (меньше = стабильнее).</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Вариант</th><th>Что меняли</th><th class="num">Время</th><th class="num">Резкость</th><th class="num">Дрейф</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">A0</td><td>исходный 03: int8, турбо 8 шагов v1.0, shift 8</td><td class="num">163 с</td><td class="num">984 / 919 / 927</td><td class="num">26</td></tr>
+      <tr><td class="mono">A1 / A2</td><td>+ SageAttention (KJNodes или встроенная нода H3, результат одинаковый)</td><td class="num">96 с</td><td class="num">996 / 924 / 922</td><td class="num">25</td></tr>
+      <tr><td class="mono">A3</td><td>+ Sage, shift 6</td><td class="num">103 с</td><td class="num">1069 / 992 / 994</td><td class="num">26</td></tr>
+      <tr><td class="mono">A4</td><td>+ Sage, shift 10</td><td class="num">99 с</td><td class="num">952 / 877 / 882</td><td class="num">25</td></tr>
+      <tr><td class="mono">A5</td><td>+ Sage, 10 шагов</td><td class="num">117 с</td><td class="num">1017 / 930 / 944</td><td class="num">26</td></tr>
+      <tr><td class="mono">B2</td><td>+ Sage, турбо 4 шага v1.3</td><td class="num">65 с</td><td class="num">986 / 972 / 997</td><td class="num">12</td></tr>
+      <tr><td class="mono">B3</td><td>+ Sage, турбо 8 шагов v1.1</td><td class="num">100 с</td><td class="num">1035 / 993 / 1026</td><td class="num">11</td></tr>
+      <tr><td class="mono">C2</td><td>+ Sage, w6a8, турбо 8 шагов v1.1</td><td class="num">99 с</td><td class="num">1050 / 1018 / 1044</td><td class="num">13</td></tr>
+      <tr><td class="mono"><b>C1</b></td><td><b>+ Sage, w6a8, турбо 4 шага v1.3</b></td><td class="num"><b>64 с</b></td><td class="num"><b>1049 / 1050 / 1067</b></td><td class="num"><b>12</b></td></tr>
+    </tbody>
+  </table></div>
+  <figure class="wide">
+    <img src="media/s1-speed-variants.jpg" alt="Пять кадров из каждого ролика: A2, B2, C1, C2" loading="lazy">
+    <figcaption><b>Кадры 0 / 25 / 50 / 75 / 100 %.</b> Сверху вниз: A2 (Sage), B2 (турбо 4), C1 (w6a8 + турбо 4), C2 (w6a8 + турбо 8 v1.1). Все действия раскадровки на месте.</figcaption>
+  </figure>
+</section>
+
+<section aria-labelledby="sp-learn">
+  <h2 id="sp-learn">Что мы думали после первого замера</h2>
+  <ul class="rules prose">
+    <li><b>SageAttention — бесплатное ускорение.</b> На RTX 50-й серии считает «внимание» в 4,8 раза быстрее (микротест), весь ролик на 41 % быстрее, кадры визуально не отличаются.</li>
+    <li><b>Новые турбо-LoRA на коротком спокойном ролике выглядели лучше старой (на длинном — нет, см. поправку).</b> v1.1 и v1.3 (обе 768p) дают вдвое меньший дрейф лица и более спокойную камеру. Минус: тело и камера двигаются чуть скупее. Если нужна живость, это пишется в раскадровке.</li>
+    <li><b>4 шага на 5 с выглядели не хуже 8 — на 9 с с быстрыми руками это ломается.</b> Турбо 4-step v1.3 резче в середине ролика, чем старая 8-step на 8 шагах. Больше шагов (10) почти ничего не даёт.</li>
+    <li><b>Shift 6 резче shift 8.</b> Старое правило «8 = резче» относилось к сравнению с моделью без турбо. С турбо-LoRA shift 6–8 — рабочий диапазон, 10 уже мягче.</li>
+    <li><b>w6a8 экономит память, а не время.</b> 16 ГБ вместо 21 ГБ при той же скорости. Пригодится для длинных роликов и когда открыт браузер.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="sp-ram">
+  <h2 id="sp-ram">Куда уходит оперативная память</h2>
+  <p class="prose">Видеокарта (16 ГБ) у H3 заполнена всегда, но упираемся мы в оперативную память. Модели, которые не помещаются в видеопамять, ComfyUI держит в RAM и подкачивает по частям. Если RAM кончается, Windows начинает писать на диск, и ролик считается вдвое дольше или падает.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Что</th><th class="num">RAM</th><th>Комментарий</th></tr></thead>
+    <tbody>
+      <tr><td>H3 на 5 с сверх фона</td><td class="num">≈ 27 ГБ</td><td>текстовый энкодер 32B (nvfp4, 16 ГБ) + видео-модель + VAE</td></tr>
+      <tr><td>Windows + Claude + мелочи</td><td class="num">≈ 16 ГБ</td><td>фон без браузера</td></tr>
+      <tr><td>Chrome с десятками вкладок</td><td class="num">13–21 ГБ</td><td>включи «Экономию памяти» в настройках производительности</td></tr>
+      <tr><td>WSL2 + Docker Desktop</td><td class="num">до ~30 ГБ</td><td>виртуальная машина; в диспетчере задач видна как маленький <span class="mono">vmmem</span>, а держит много</td></tr>
+      <tr><td>ComfyUI Desktop + второй сервер</td><td class="num">×2</td><td>два ComfyUI с H3 одновременно не помещаются</td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose"><b>Перед длинным рендером:</b> закрой Docker Desktop, выполни <code>wsl --shutdown</code>, закрой лишний браузер и второй ComfyUI. Проверка: диспетчер задач → Производительность → Память → «Доступно» должно быть ≥ 35 ГБ.</p>
+</section>
+
+<section aria-labelledby="sp-sage">
+  <h2 id="sp-sage">Что такое SageAttention</h2>
+  <p class="prose"><b>Attention («внимание»)</b> — часть модели, которая держит ролик цельным. H3 режет видео на маленькие кусочки — токены (кусок кадра на несколько соседних кадров). На каждом шаге каждый токен сравнивается со всеми остальными: какие на него похожи, откуда брать информацию. Так лицо в сотом кадре остаётся тем же, что в первом, а предметы не теряются. Сравнение «каждый с каждым» растёт квадратично: ролик вдвое длиннее — внимание вчетверо дороже. Для видео это самая тяжёлая часть расчёта.</p>
+  <p class="prose"><b>SageAttention</b> считает ту же операцию с меньшей точностью чисел. Оценки сходства (Q·K) — в 8-битных целых вместо 16-битных дробных, взвешенную сумму (P·V) — в пониженной точности FP8/FP16. Перед округлением из данных вычитается среднее, чтобы редкие большие значения не съели точность остальных. Тензорные ядра RTX 50-й серии считают 8-битные числа в разы быстрее. Веса, LoRA и промпт не меняются, это не другая модель.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Замер</th><th class="num">Точный расчёт</th><th class="num">SageAttention</th></tr></thead>
+    <tbody>
+      <tr><td>Одна операция внимания (микротест)</td><td class="num">5,5 мс</td><td class="num">1,1 мс · ×4,8</td></tr>
+      <tr><td>Совпадение результата</td><td class="num">100 %</td><td class="num">99,93 %</td></tr>
+      <tr><td>Ролик 5 с, 768×960, спокойная сцена</td><td class="num">163 с</td><td class="num">96 с · −41 %</td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose"><b>Риск:</b> 99,93 % — не 100 %. Разница копится за шаги и сотни кадров; на трудной сцене (быстрые руки, мелкие предметы) детали могут поплыть сильнее. На спокойной сцене разницы не видно; трудную сцену проверяем сравнением «бок о бок». Выключается просто: убрать ноду из workflow.</p>
+</section>
+
+<section aria-labelledby="sp-how">
+  <h2 id="sp-how">Как включить SageAttention</h2>
+  <p class="prose">SageAttention ставится в Python-окружение ComfyUI двумя пакетами. Нужны версии под свой torch и CUDA: у нас torch 2.12 + CUDA 13.0, Python 3.13.</p>
+  <div class="copyrow"><h3>Установка (venv ComfyUI)</h3><button type="button" data-copy="sp-pip">Копировать</button></div>
+  <pre id="sp-pip">python -m pip install --no-deps "triton-windows&gt;=3.8,&lt;3.9"
+python -m pip install --no-deps https://github.com/woct0rdho/SageAttention/releases/download/v2.2.0-windows.post6/sageattention-2.2.0+cu130torch2.10.0andhigher.post6-cp310-abi3-win_amd64.whl</pre>
+  <p class="prose">В workflow после загрузки модели (до узла shift) вставь ноду <span class="mono">MiniMaxH3MemoryEfficientSageAttentionPatch</span> — она встроена в ComfyUI. Модели и LoRA не меняй: турбо 8 шагов v1.0 на int8 остаются эталоном.</p>
+</section>
+
+<section aria-labelledby="sp-live">
+  <h2 id="sp-live">Как смотреть рендер вживую</h2>
+  <p class="prose">ComfyUI шлёт прогресс и превью кадров только той вкладке, от имени которой поставлено задание. Чтобы видеть рендеры агента: открой <span class="mono">http://127.0.0.1:8189</span>, нажми F12 и выполни <code>app.api.clientId</code>, пришли строку агенту. Каждый вариант эксперимента лежит как обычный workflow в <span class="mono">claude/lab/S1/</span>, а в каждом готовом ролике записан граф, который его сделал.</p>
+</section>
+
+<section aria-labelledby="sp-quality">
+  <h2 id="sp-quality">Раунд качества: 30 шагов без турбо</h2>
+  <p class="prose">Трудная сцена 9 с, по советам официального гайда Comfy по H3. Сравниваем крупные вырезки одних и тех же мест в одни и те же моменты: так разница видна сразу, в отличие от просмотра роликов по очереди.</p>
+  <figure class="wide"><img src="media/s1-hands-e1-f2-f1.jpg" alt="Руки крупно: E1, F2, F1" loading="lazy">
+    <figcaption><b>Сверху вниз:</b> E1 (турбо 1.0, 8 шагов) · F2 (турбо 0,8, 12 шагов) · F1 (без турбо, 20 шагов). У F2 и F1 пальцы на телефоне раздельные, появился кулон из промпта.</figcaption></figure>
+  <figure class="wide"><img src="media/s1-hands-20-vs-30-steps.jpg" alt="Руки крупно: 20 и 30 шагов" loading="lazy">
+    <figcaption><b>20 шагов (сверху) против 30 (снизу):</b> чётче лён, кожа, пальцы и кольцо. 30 шагов — новый рецепт по умолчанию.</figcaption></figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Рецепт</th><th class="num">9 с считается</th><th>Итог</th></tr></thead>
+    <tbody>
+      <tr><td>турбо 1.0 · 8 шагов · euler · shift 8</td><td class="num">231 с</td><td>пальцы слипаются на движении</td></tr>
+      <tr><td>турбо 0,8 · 12 шагов · res_multistep · shift 12</td><td class="num">341 с</td><td>быстрый вариант</td></tr>
+      <tr><td>без турбо · 20 шагов · res_multistep · shift 12</td><td class="num">477 с</td><td>хорошо</td></tr>
+      <tr class="win"><td><b>без турбо · 30 шагов · res_multistep · shift 12</b></td><td class="num">747 с</td><td><b>лучше всех — по умолчанию в 03 и 03c</b></td></tr>
+    </tbody>
+  </table></div>
+  <ul class="rules prose">
+    <li><b>Потолок модели:</b> открытая H3 рассчитана на ≈ 1 МП (768 по короткой стороне), мы на нём. Пальцы в быстром движении размывает сама модель — это вопрос для облачных серий (полные веса, двухпроходный апскейл).</li>
+    <li><b>Light lock выключай, когда в кадр входит крупный цветной объект:</b> на проезжающем автобусе он перекрашивал волосы из медных в русые.</li>
+    <li><b>48 fps:</b> FILM ×2 чуть чище RIFE на быстрых руках — теперь он в тоггле «smooth 48 fps».</li>
+  </ul>
+  <figure class="wide"><img src="media/s1-seedvr2.jpg" alt="Простое растяжение, SeedVR2 3B, SeedVR2 7B sharp" loading="lazy" style="max-width:700px">
+    <figcaption><b>SeedVR2:</b> простое растяжение · 3B (чётко, но «пластиковая» кожа) · 7B sharp + цвет lab (естественнее). Слипшиеся пальцы не лечит ни один — только мягкая полировка.</figcaption></figure>
+</section>
+
+<section aria-labelledby="sp-selfie">
+  <h2 id="sp-selfie">Селфи вместо штатива</h2>
+  <p class="prose">Та же героиня, но кадр снят «с вытянутой руки»: сначала фото на Krea 2 в кадрировке фронтальной камеры (выбор зрителей — seed 7), потом 9 с H3 по рецепту качества. Камера двигается вместе с рукой, поворачивается к улице, героиня поправляет волосы и машет. <b>Минус:</b> лицо в первую секунду и в середине ролика — два разных лица; удержание лица разбираем в серии 3.</p>
+  <figure><video src="media/s1-selfie.mp4" poster="media/s1-selfie-poster.jpg" controls muted loop playsinline preload="none" style="max-width:432px"></video>
+    <figcaption><b>Селфи 9 с</b> · 20 шагов без турбо · 840 с. Продолжение — серия 9 (селфи на ходу, в зеркале, влог).</figcaption></figure>
+</section>
+
+<section aria-labelledby="sp-next">
+  <h2 id="sp-next">Уроки серии 1</h2>
+  <ul class="rules prose">
+    <li><b>Ускорение проверяется на трудной сцене.</b> 9 секунд, быстрые руки, предмет в руках, проезжающий транспорт. Спокойная 5-секундная сцена прячет брак.</li>
+    <li><b>Числа не заменяют глаз.</b> Резкость и дрейф лица по пяти кадрам не видят плавящихся пальцев и морфинга. Судья — человек, сравнение «бок о бок», кадры каждые 0,5 с, руки крупно.</li>
+    <li><b>Дальше:</b> эталон против эталона + SageAttention на трудной сцене; затем видео-апскейлеры.</li>
+  </ul>
+</section>
+
+<nav class="pager" aria-label="Главы"><a href="ch-video.html"><span class="dir">← назад</span>Видео на MiniMax H3</a><a class="next" href="ch-prompts.html"><span class="dir">дальше →</span>Промпты</a></nav>
+</div>
+
+<script>
+document.querySelectorAll('button[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.copy), txt=el.textContent;
+    var done=function(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Копировать'},1500)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
+    try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
+  });
+});
+</script>
+</body>
+</html>

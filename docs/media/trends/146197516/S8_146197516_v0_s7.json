@@ -1,0 +1,544 @@
+{
+ "id": "a2bb3a3a-f3c1-59c9-baa8-1cec68fbe897",
+ "revision": 0,
+ "last_node_id": 11,
+ "last_link_id": 10,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "MarkdownNote",
+   "pos": [
+    0,
+    0
+   ],
+   "size": [
+    520,
+    null
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "# S8 replication · Civitai 146197516 · Experimental_dAIver\nSource: https://civitai.com/images/146197516 — MOSS Image 2040×3082, er_sde , 10 steps, cfg 1.1, seed None.\nOurs: moss_image_sft_bf16.safetensors, 1248×1904 (cap 2.4 MP), er_sde/sgm_uniform, LoRAs: MOSS_Image_SFT_8_steps_dmd_v0.1.safetensors @0.6000000000000001.\nMissing LoRAs: MOSS_Image_SFT_8_steps_dmd_v0.1. Built by `claude-tools/tools/s8_rep.py`; notes in `sheets/trends/posts.md`."
+   ]
+  },
+  {
+   "id": 2,
+   "type": "UNETLoader",
+   "pos": [
+    30,
+    76
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      1
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "moss_image_sft_bf16.safetensors",
+    "default"
+   ]
+  },
+  {
+   "id": 3,
+   "type": "CLIPLoader",
+   "pos": [
+    30,
+    218
+   ],
+   "size": [
+    340,
+    106
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "CLIPLoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      2,
+      3
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "qwen3.5_9b_int8_convrot.safetensors",
+    "moss_image",
+    "default"
+   ]
+  },
+  {
+   "id": 4,
+   "type": "VAELoader",
+   "pos": [
+    30,
+    384
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      9
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "flux2-vae.safetensors"
+   ]
+  },
+  {
+   "id": 5,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    410,
+    76
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "title": "LoRA · MOSS_Image_SFT_8_steps_dmd_v0.1.safetensors @0.6000000000000001",
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      4
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "MOSS_Image_SFT_8_steps_dmd_v0.1.safetensors",
+    0.6000000000000001
+   ]
+  },
+  {
+   "id": 6,
+   "type": "CLIPTextEncode",
+   "pos": [
+    890,
+    76
+   ],
+   "size": [
+    420,
+    300
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "title": "Prompt (from the post)",
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    ", Ethereal bioluminescent jellyfish floating in pure black void, translucent bell glowing deep electric blue with bright magenta-pink core and scattered star-like specks, long flowing ribbon tentacles in blue to magenta gradient with tiny glowing particles along them, soft light bloom and floating blue-pink sparkles around, centered composition. Above the jellyfish the word LIFE in large elegant spaced capital letters with blue-to-magenta gradient, thin horizontal line with small central dot beneath it, and below the smaller spaced capital claim HOLD ON. EVERY DAY IS A GIFT in soft white-pink, all text clean and centered, highly detailed luminous organic forms"
+   ]
+  },
+  {
+   "id": 7,
+   "type": "CLIPTextEncode",
+   "pos": [
+    890,
+    436
+   ],
+   "size": [
+    340,
+    198
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "title": "Negative",
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 3
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "worst quality, bad anatomy, watermark, jpeg artifact, blurry, deformed, extra limbs, extra fingers, mutated hands, bad hands, poorly drawn face, large breasts, big breasts, huge breasts, full breasts, heavy breasts, sagging breasts, big tits, large tits, DD breasts, E cup, F cup, oversized chest, voluptuous breasts, illustration, painting, anime, cartoon, drawing, cgi, 3d render, rendered, digital art, sketch, comic, manga, stylized, artificial"
+   ]
+  },
+  {
+   "id": 8,
+   "type": "EmptyFlux2LatentImage",
+   "pos": [
+    1350,
+    76
+   ],
+   "size": [
+    340,
+    106
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "EmptyFlux2LatentImage"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      7
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    1248,
+    1904,
+    1
+   ]
+  },
+  {
+   "id": 9,
+   "type": "KSampler",
+   "pos": [
+    1350,
+    242
+   ],
+   "size": [
+    340,
+    268
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 4
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 5
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 6
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      8
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    7,
+    "fixed",
+    10,
+    1.1,
+    "er_sde",
+    "sgm_uniform",
+    1.0
+   ]
+  },
+  {
+   "id": 10,
+   "type": "VAEDecode",
+   "pos": [
+    1350,
+    570
+   ],
+   "size": [
+    340,
+    56
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 8
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 9
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      10
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": []
+  },
+  {
+   "id": 11,
+   "type": "SaveImage",
+   "pos": [
+    1730,
+    76
+   ],
+   "size": [
+    400,
+    500
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 10
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "S8/146197516/v0_s7"
+   ]
+  }
+ ],
+ "links": [
+  [
+   1,
+   2,
+   0,
+   5,
+   0,
+   "MODEL"
+  ],
+  [
+   2,
+   3,
+   0,
+   6,
+   0,
+   "CLIP"
+  ],
+  [
+   3,
+   3,
+   0,
+   7,
+   0,
+   "CLIP"
+  ],
+  [
+   4,
+   5,
+   0,
+   9,
+   0,
+   "MODEL"
+  ],
+  [
+   5,
+   6,
+   0,
+   9,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   6,
+   7,
+   0,
+   9,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   7,
+   8,
+   0,
+   9,
+   3,
+   "LATENT"
+  ],
+  [
+   8,
+   9,
+   0,
+   10,
+   0,
+   "LATENT"
+  ],
+  [
+   9,
+   4,
+   0,
+   10,
+   1,
+   "VAE"
+  ],
+  [
+   10,
+   10,
+   0,
+   11,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "1 · Models",
+   "bounding": [
+    0,
+    0,
+    780,
+    472
+   ],
+   "color": "#3f789e",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "2 · Sample",
+   "bounding": [
+    860,
+    0,
+    1300,
+    664
+   ],
+   "color": "#a1309b",
+   "font_size": 24,
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.45,
+   "offset": [
+    60,
+    120
+   ]
+  },
+  "workflowRendererVersion": "LG"
+ },
+ "version": 0.4
+}

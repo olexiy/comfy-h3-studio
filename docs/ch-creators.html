@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Разбор креаторов · Локальная студия H3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+:root{
+  --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
+  --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Onest", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 80px;display:grid;gap:56px}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(20px,3vw,26px);font-weight:500;margin-bottom:14px}
+h3{font-size:16px;font-weight:500}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.lead{font-size:18px;color:var(--muted);max-width:62ch;margin-top:14px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+section{display:grid;gap:18px;min-width:0}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.step .n{font:500 12px var(--mono);color:var(--accent)}
+.step .t{font:500 26px/1 var(--display)}
+.step .t small{font:400 13px var(--body);color:var(--muted)}
+.total{font:500 14px var(--mono);color:var(--muted)}
+.total b{color:var(--fg)}
+/* media */
+.strip{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+figure{margin:0;display:grid;gap:8px;min-width:0}
+figure img,figure video{width:100%;max-width:100%;height:auto;border-radius:8px;background:#000;display:block}
+figcaption{font-size:13px;color:var(--muted)}
+figcaption b{color:var(--fg);font-weight:600}
+.wide img{border-radius:8px}
+.tag{display:inline-block;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-right:6px;vertical-align:1px}
+.tag.good{color:var(--good)}.tag.warn{color:var(--warn)}.tag.bad{color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);white-space:nowrap}
+tr.win td{background:var(--accent-soft)}
+/* workflows */
+.wf{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .file{font:500 13px var(--mono);color:var(--accent);word-break:break-all}
+.card ul{margin:0;padding-left:18px;font-size:14px}
+.card .time{font:500 13px var(--mono);color:var(--muted)}
+.rules{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.rules li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.rules b{font-weight:600}
+pre{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font:13px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{font:500 13px var(--body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible,video:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.paths td:first-child{white-space:nowrap}
+@media (max-width:760px){.pipe,.strip,.wf{grid-template-columns:minmax(0,1fr)}}
+
+/* book navigation */
+.bookbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between;
+  font:500 13px var(--mono);border-bottom:1px solid var(--line);padding-bottom:12px}
+.bookbar a{text-decoration:none}
+.bookbar .where{color:var(--muted)}
+.pager{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.pager a{display:grid;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--fg)}
+.pager a:hover{border-color:var(--accent)}
+.pager .dir{font:500 12px var(--mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.pager .next{text-align:right;grid-column:2}
+/* contents */
+.toc{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.toc li{border-bottom:1px solid var(--line)}
+.toc a{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;gap:4px 14px;align-items:baseline;padding:14px 4px;text-decoration:none;color:var(--fg)}
+.toc a:hover .ct{color:var(--accent)}
+.toc .cn{font:500 13px var(--mono);color:var(--accent)}
+.toc .ct{font:500 18px/1.25 var(--display)}
+.toc .cd{grid-column:2;color:var(--muted);font-size:14px}
+.toc .st{grid-row:1;grid-column:3}
+.news{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.news li{display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:12px}
+.news time{font:500 13px var(--mono);color:var(--muted)}
+@media (max-width:760px){.toc a{grid-template-columns:2.4em minmax(0,1fr)}.toc .st{grid-row:auto;grid-column:2}
+  .pager{grid-template-columns:minmax(0,1fr)}.pager .next{grid-column:1}.news li{grid-template-columns:minmax(0,1fr);gap:0}}
+/* trend replications (chapter ch-trends + trend-<id>.html pages, built by build_book.py) */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tcard{display:grid;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--fg)}
+.tcard:hover{border-color:var(--accent)}
+.tcard .pair{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.tcard img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.tcard .ci{display:grid;gap:4px;padding:10px 12px}
+.tcard .cm{font:500 12px var(--mono);color:var(--muted)}
+.tr-steps{counter-reset:st;display:grid;gap:28px}
+.tr-steps>section{display:grid;gap:12px}
+.tr-steps>section>h2::before{counter-increment:st;content:counter(st) " · ";color:var(--accent)}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.duo figure{margin:0;display:grid;gap:6px}
+.duo img{width:100%;height:auto;border-radius:8px;display:block}
+.duo figcaption{font-size:13px;color:var(--muted)}
+/* public build: link instead of a creator's original */
+.olink{display:flex;align-items:center;justify-content:center;text-align:center;aspect-ratio:3/4;background:var(--panel,rgba(127,127,127,.08));color:var(--muted);font:500 13px/1.4 var(--mono);text-decoration:none}
+.olink.big{aspect-ratio:auto;min-height:180px;padding:24px;border:1px dashed var(--line);border-radius:10px;color:var(--accent);font-size:15px}
+.olink small{color:var(--muted);font-size:12px}
+/* contents parts + "start here" highlights (cover) */
+.toc li.part{border-bottom:0;padding:26px 4px 6px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hl{display:grid;gap:6px;align-content:start;text-decoration:none;color:var(--fg)}
+.hl img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
+.hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
+@media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+</style>
+<style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 10 из 14</span></nav>
+<header>
+  <div class="eyebrow">Глава 10 · Civitai · любимые авторы</div>
+  <h1>Разбор креаторов</h1>
+  <p class="lead">Разбираем работы авторов, которые нравятся: модель, стек LoRA, настройки и почерк. Потом повторяем рецепт у себя и показываем результат.</p>
+</header>
+
+<section aria-labelledby="cr-how">
+  <h2 id="cr-how">Как мы разбираем авторов</h2>
+  <p class="prose">У каждой картинки на Civitai есть данные генерации: модель, LoRA, число шагов, иногда промпт и весь граф ComfyUI. Мы читаем только эти данные, сами картинки не копируем: это чужая работа, ссылки ведут на оригинал. Дальше выделяем почерк автора, собираем список файлов, переносим рецепт в наш стиль workflow и показываем, что получилось у нас.</p>
+</section>
+
+<section aria-labelledby="cr-sleeps">
+  <h2 id="cr-sleeps">Sleeps_In_Sunbeams</h2>
+  <p class="prose"><a href="https://civitai.red/user/Sleeps_In_Sunbeams" target="_blank" rel="noopener">Профиль на Civitai</a>. За сентябрь–октябрь 2026 — 200 работ: 122 в OpenAI (gpt-image), 69 на <b>Krea 2 Turbo</b> (нашей модели), остальное Krea 2 и Flux. Самые любимые зрителями: сова в ночи (2,2 тыс.), «Reflections of riding the wave» (1,5 тыс.), девушка-киборг (1,2 тыс.).</p>
+
+  <ul class="rules prose">
+    <li><b>Почерк: короткий промпт + стек стилевых LoRA.</b> Промпт — одна строка настроения («Reflections of riding the wave») или вовсе не опубликован. Внешний вид делают 3–6 LoRA на Krea 2 Turbo, 8–15 шагов, cfg 1.</li>
+    <li><b>Любимая семья LoRA:</b> KreaFactory, KreaPhotoArt, KreaIllustrator, KreaLand, KreaWetbrush — один автор, общий триггер <code>Bradhamel art style</code>. Плюс плёнка <b>Ektachrome Fade Film</b>, <b>Detailer – beauty</b> для лиц и живописные LoRA (Impasto, NeoObscura, Eldritch).</li>
+    <li><b>Силы LoRA он не публикует.</b> Их придётся подбирать перебором. Для стека из 3 LoRA стартуем с 0,6 у каждой, для 5–6 — с 0,4–0,5.</li>
+  </ul>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Работа</th><th>Модель · шаги</th><th>Стек LoRA</th><th>Промпт</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://civitai.red/images/146130242" target="_blank" rel="noopener">Девушка-киборг</a></td><td>Krea 2 Turbo · 8 · 1248×1872</td><td>ta86_inkriot · Ektachrome Fade Film · NIJISIS</td><td>не опубликован</td></tr>
+      <tr><td><a href="https://civitai.red/images/145610283" target="_blank" rel="noopener">Сова</a></td><td>Krea 2 Turbo · 8</td><td>KreaFactory · Detailer beauty · Ektachrome · TextFusion</td><td>одно предложение-сцена</td></tr>
+      <tr><td><a href="https://civitai.red/images/145013337" target="_blank" rel="noopener">Волна</a></td><td>Krea 2 Turbo · 10</td><td>KreaIllustrator · Impasto · NeoObscura · KreaPhotoArt</td><td>«Reflections of riding the wave»</td></tr>
+      <tr><td><a href="https://civitai.red/images/145817419" target="_blank" rel="noopener">145817419</a></td><td>Krea 2 Turbo · 10</td><td>KreaFactory · Detailer beauty · Ektachrome · Eldritch · TextFusion</td><td>не опубликован</td></tr>
+      <tr><td><a href="https://civitai.red/images/146024108" target="_blank" rel="noopener">146024108</a></td><td>Krea 2 Turbo · 15</td><td>KreaWetbrush · KreaPhotoArt · V67 Bas-reliefs</td><td>не опубликован</td></tr>
+      <tr><td><a href="https://civitai.red/images/102502031" target="_blank" rel="noopener">102502031</a> (2025)</td><td>Juggernaut XL Ragnarok (SDXL) · апскейл до 2560×3712</td><td>Detail Tweaker XL · эмбеддинги · апскейлер Remacri</td><td>не опубликован</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Файлы для загрузки</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>LoRA (Krea 2)</th><th class="num">Размер</th><th>Триггер</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://civitai.red/models/2827717?modelVersionId=3190465" target="_blank" rel="noopener">ta86_inkriot</a> — чернильные контуры, cel-shading</td><td class="num">218 МБ</td><td><code>ta86_inkriot, graphic cel shading, bold black outlines</code></td></tr>
+      <tr><td><a href="https://civitai.red/models/2904145?modelVersionId=3284125" target="_blank" rel="noopener">Ektachrome Fade Film</a> — выцветшая плёнка</td><td class="num">218 МБ</td><td><code>ektachrome fade film</code></td></tr>
+      <tr><td><a href="https://civitai.red/models/2863875?modelVersionId=3302337" target="_blank" rel="noopener">NIJISIS</a></td><td class="num">436 МБ</td><td><code>@NIJISIS</code></td></tr>
+      <tr><td><a href="https://civitai.red/models/2765417?modelVersionId=3112670" target="_blank" rel="noopener">KreaFactory</a></td><td class="num">218 МБ</td><td><code>Bradhamel art style</code></td></tr>
+      <tr><td><a href="https://civitai.red/models/2877293?modelVersionId=3284663" target="_blank" rel="noopener">KreaPhotoArt</a></td><td class="num">218 МБ</td><td><code>Bradhamel art style</code></td></tr>
+      <tr><td><a href="https://civitai.red/models/2759107?modelVersionId=3104877" target="_blank" rel="noopener">KreaIllustrator</a></td><td class="num">218 МБ</td><td><code>Bradhamel art style</code></td></tr>
+      <tr><td><a href="https://civitai.red/models/2790112?modelVersionId=3144156" target="_blank" rel="noopener">Detailer – beauty for Krea2</a></td><td class="num">109 МБ</td><td>—</td></tr>
+      <tr><td><a href="https://civitai.red/models/2834955?modelVersionId=3199393" target="_blank" rel="noopener">Impasto Painting</a> · <a href="https://civitai.red/models/2861285?modelVersionId=3232205" target="_blank" rel="noopener">NeoObscura</a> · <a href="https://civitai.red/models/2955749?modelVersionId=3348066" target="_blank" rel="noopener">Eldritch Digital Painting</a></td><td class="num">126–327 МБ</td><td>NeoObscura: <code>illustration Image, Poster</code> · Eldritch: <code>Digital Painting</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Как сделать у нас</h3>
+  <ul class="rules prose">
+    <li><b>База:</b> Krea 2 Turbo int8, как в <code>01b</code>: 8–10 шагов, euler/simple, cfg 1, размер 1248×1872 (2:3).</li>
+    <li><b>Стек LoRA:</b> цепочка <code>LoraLoaderModelOnly</code>, у каждой своя ручка силы. Старт 0,6 / 0,6 / 0,6 для трёх LoRA, затем перебор ±0,2 на главной стилевой.</li>
+    <li><b>Промпт:</b> триггеры в начале, дальше одна-две строки сцены. Длинные описания этому стилю не нужны.</li>
+    <li><b>Workflow:</b> <code>01s_krea2_style_stack</code> в нашем стиле (одна нода с ручками) — появится в серии 8.</li>
+  </ul>
+
+  <h3>Что получилось у нас</h3>
+  <p class="prose" style="color:var(--muted)">Скоро: серия 8. Первые цели — «девушка-киборг» в его стеке и наш концепт: андроид в лёгкой юкате с карпами кои под шёлковым зонтиком, механическое плечо и нога, гэта.</p>
+</section>
+
+<nav class="pager" aria-label="Главы"><a href="ch-persona.html"><span class="dir">← назад</span>Свой персонаж и LoRA</a><a class="next" href="ch-trends.html"><span class="dir">дальше →</span>Повтор трендов</a></nav>
+</div>
+
+<script>
+document.querySelectorAll('button[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.copy), txt=el.textContent;
+    var done=function(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Копировать'},1500)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
+    try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
+  });
+});
+</script>
+</body>
+</html>
