@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Взрослый сегмент: что в тренде · Локальная студия H3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+:root{
+  --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
+  --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Onest", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 80px;display:grid;gap:56px}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(20px,3vw,26px);font-weight:500;margin-bottom:14px}
+h3{font-size:16px;font-weight:500}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.lead{font-size:18px;color:var(--muted);max-width:62ch;margin-top:14px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+section{display:grid;gap:18px;min-width:0}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.step .n{font:500 12px var(--mono);color:var(--accent)}
+.step .t{font:500 26px/1 var(--display)}
+.step .t small{font:400 13px var(--body);color:var(--muted)}
+.total{font:500 14px var(--mono);color:var(--muted)}
+.total b{color:var(--fg)}
+/* media */
+.strip{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+figure{margin:0;display:grid;gap:8px;min-width:0}
+figure img,figure video{width:100%;max-width:100%;height:auto;border-radius:8px;background:#000;display:block}
+figcaption{font-size:13px;color:var(--muted)}
+figcaption b{color:var(--fg);font-weight:600}
+.wide img{border-radius:8px}
+.tag{display:inline-block;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-right:6px;vertical-align:1px}
+.tag.good{color:var(--good)}.tag.warn{color:var(--warn)}.tag.bad{color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);white-space:nowrap}
+tr.win td{background:var(--accent-soft)}
+/* workflows */
+.wf{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .file{font:500 13px var(--mono);color:var(--accent);word-break:break-all}
+.card ul{margin:0;padding-left:18px;font-size:14px}
+.card .time{font:500 13px var(--mono);color:var(--muted)}
+.rules{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.rules li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.rules b{font-weight:600}
+pre{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font:13px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{font:500 13px var(--body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible,video:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.paths td:first-child{white-space:nowrap}
+@media (max-width:760px){.pipe,.strip,.wf{grid-template-columns:minmax(0,1fr)}}
+
+/* book navigation */
+.bookbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between;
+  font:500 13px var(--mono);border-bottom:1px solid var(--line);padding-bottom:12px}
+.bookbar a{text-decoration:none}
+.bookbar .where{color:var(--muted)}
+.pager{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.pager a{display:grid;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--fg)}
+.pager a:hover{border-color:var(--accent)}
+.pager .dir{font:500 12px var(--mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.pager .next{text-align:right;grid-column:2}
+/* contents */
+.toc{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.toc li{border-bottom:1px solid var(--line)}
+.toc a{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;gap:4px 14px;align-items:baseline;padding:14px 4px;text-decoration:none;color:var(--fg)}
+.toc a:hover .ct{color:var(--accent)}
+.toc .cn{font:500 13px var(--mono);color:var(--accent)}
+.toc .ct{font:500 18px/1.25 var(--display)}
+.toc .cd{grid-column:2;color:var(--muted);font-size:14px}
+.toc .st{grid-row:1;grid-column:3}
+.news{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.news li{display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:12px}
+.news time{font:500 13px var(--mono);color:var(--muted)}
+@media (max-width:760px){.toc a{grid-template-columns:2.4em minmax(0,1fr)}.toc .st{grid-row:auto;grid-column:2}
+  .pager{grid-template-columns:minmax(0,1fr)}.pager .next{grid-column:1}.news li{grid-template-columns:minmax(0,1fr);gap:0}}
+/* trend replications (chapter ch-trends + trend-<id>.html pages, built by build_book.py) */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tcard{display:grid;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--fg)}
+.tcard:hover{border-color:var(--accent)}
+.tcard .pair{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.tcard img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.tcard .ci{display:grid;gap:4px;padding:10px 12px}
+.tcard .cm{font:500 12px var(--mono);color:var(--muted)}
+.tr-steps{counter-reset:st;display:grid;gap:28px}
+.tr-steps>section{display:grid;gap:12px}
+.tr-steps>section>h2::before{counter-increment:st;content:counter(st) " · ";color:var(--accent)}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.duo figure{margin:0;display:grid;gap:6px}
+.duo img{width:100%;height:auto;border-radius:8px;display:block}
+.duo figcaption{font-size:13px;color:var(--muted)}
+/* public build: link instead of a creator's original */
+.olink{display:flex;align-items:center;justify-content:center;text-align:center;aspect-ratio:3/4;background:var(--panel,rgba(127,127,127,.08));color:var(--muted);font:500 13px/1.4 var(--mono);text-decoration:none}
+.olink.big{aspect-ratio:auto;min-height:180px;padding:24px;border:1px dashed var(--line);border-radius:10px;color:var(--accent);font-size:15px}
+.olink small{color:var(--muted);font-size:12px}
+/* contents parts + "start here" highlights (cover) */
+.toc li.part{border-bottom:0;padding:26px 4px 6px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hl{display:grid;gap:6px;align-content:start;text-decoration:none;color:var(--fg)}
+.hl img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
+.hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
+@media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+</style>
+<style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 13 из 16</span></nav>
+<header>
+  <div class="eyebrow">Глава 13 · серия 8 · 25.10.2026</div>
+  <h1>Взрослый сегмент: что в тренде</h1>
+  <p class="lead">Самые отлаженные конвейеры Civitai — во взрослом сегменте. Разбираем их по метаданным и повторяем одетыми, в той же эстетике.</p>
+</header>
+
+<section class="prose" aria-labelledby="ad-rules">
+  <h2 id="ad-rules">Как устроена глава</h2>
+  <p>На Civitai большая часть популярного контента — для взрослых, и учиться у этого сегмента полезно: там самые отлаженные конвейеры. Мы разбираем его так же, как остальные тренды, но с тремя правилами:</p>
+  <ul>
+    <li>изучаем <strong>метаданные</strong>: модели, LoRA, настройки, графы — промпты авторов не сохраняем;</li>
+    <li>оригинал показываем <strong>частично размытым</strong> — закрыто только то, что нельзя показывать (детектор NudeNet);</li>
+    <li>наши версии — <strong>одетые</strong>: та же модель, конвейер, LoRA и композиция, свой промпт.</li>
+  </ul>
+  <p>Всё, что намекает на несовершеннолетних, насилие или реальных людей, исключается целиком. Фильтр по тегам этого не ловит: из шести кандидатов, отобранных автоматически, три мы выкинули после визуальной проверки (школьная подача, известный персонаж-школьница).</p>
+</section>
+
+<section class="prose" aria-labelledby="ad-eco">
+  <h2 id="ad-eco">Что сейчас в тренде (октябрь 2026, топ-3000 постов месяца)</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Что</th><th>Цифры</th><th>Что это значит для нас</th></tr></thead>
+    <tbody>
+      <tr><td>Видео vs картинки</td><td>60 % постов — видео; MiniMax H3 один даёт 30 % постов и 34 % реакций; Wan 2.2 и LTXV 2.3 — по ~5 %</td><td>H3 у нас уже стоит — главный инструмент сегмента</td></tr>
+      <tr><td>Базы для картинок</td><td>Krea 2 13,5 %, Anima 10,2 %, Krea 2 Turbo 8,4 %, Illustrious 5,5 %, MOSS, NoobAI; Pony, SDXL, Qwen 2.1, Z-Image — меньше 0,1 %</td><td>фотореализм = Krea, аниме = Anima / Illustrious</td></tr>
+      <tr><td>Категории LoRA</td><td>слайдеры детализации 42 %, тело 36 %, стиль 35 %, реализм 26 %, скорость 14 %</td><td>сначала дешёвые слайдеры (Detail Slider 11 МБ), потом реализм</td></tr>
+      <tr><td>Самые частые LoRA</td><td>Realism Engine, Realistic Snapshot (обе у нас есть), SNOFS, H3-LTX VBVR, Detail Tweaker XL, Lenovo UltraReal MOSS</td><td>наш рецепт 01b совпадает с выбором топов</td></tr>
+      <tr><td>Конвейер</td><td>Krea Turbo: 8 шагов → латент ×1,5 → второй проход 0,4–0,55 → ColorMatch → детейлер → UltimateSDUpscale. Аниме: теги, 15–30 шагов, cfg 4–7, clip skip 2, hires 0,3–0,4</td><td>ControlNet, IP-Adapter, PuLID — 0 %: позу и лицо держат модель + LoRA</td></tr>
+      <tr><td>Темы</td><td>бельё / будуар 30 %, пышные фигуры 24 %, фитнес 18 % (+5 п.п. за неделю), фэнтези растёт</td><td>одетые версии этих тем работают и в SFW</td></tr>
+      <tr><td>Видео</td><td>H3: res_multistep 25 шагов или er_sde 8 шагов с turbo-LoRA, 24 fps, ~10 с; RIFE ×2 в 40 % графов; Wan 2.2 — 6 шагов с lightx2v</td><td>совпадает с нашими 03 / 04</td></tr>
+    </tbody>
+  </table></div>
+  <p>Полные таблицы по каждой базе, карточки креаторов и кандидаты — <code>claude-tools/sheets/trends/nsfw/</code>.</p>
+</section>
+
+<div class="cards">
+<a class="tcard" href="trend-145915766.html"><div class="pair"><span class="olink">оригинал<br>на Civitai</span><img src="media/trends_nsfw/145915766/copy.jpg" alt="наш результат" loading="lazy"></div><div class="ci"><span class="cm">montix · MOSS Image</span><strong>MOSS: вспышка в лоб и готика</strong><span class="tag good">готово</span></div></a>
+<a class="tcard" href="trend-145355444.html"><div class="pair"><span class="olink">оригинал<br>на Civitai</span><img src="media/trends_nsfw/145355444/copy.jpg" alt="наш результат" loading="lazy"></div><div class="ci"><span class="cm">just_a_prompt_guy · Krea 2 Turbo</span><strong>Krea 2 Turbo: полный конвейер топ-креатора</strong><span class="tag good">готово</span></div></a>
+<a class="tcard" href="trend-145090764.html"><div class="pair"><span class="olink">оригинал<br>на Civitai</span><img src="media/trends_nsfw/145090764/copy.jpg" alt="наш результат" loading="lazy"></div><div class="ci"><span class="cm">phinjo · Anima</span><strong>Anima Ri-mix: аниме 2.5D у машины</strong><span class="tag good">готово</span></div></a>
+</div>
+<nav class="pager" aria-label="Главы"><a href="ch-trends.html"><span class="dir">← назад</span>Повтор трендов</a><a class="next" href="ch-pitfalls.html"><span class="dir">дальше →</span>Грабли</a></nav>
+</div>
+
+<script>
+document.querySelectorAll('button[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.copy), txt=el.textContent;
+    var done=function(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Копировать'},1500)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
+    try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
+  });
+});
+</script>
+</body>
+</html>

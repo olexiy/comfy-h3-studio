@@ -1,0 +1,496 @@
+{
+ "id": "c77e0101-ff88-5ff0-b94c-b2719a27e892",
+ "revision": 0,
+ "last_node_id": 10,
+ "last_link_id": 9,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "MarkdownNote",
+   "pos": [
+    0,
+    0
+   ],
+   "size": [
+    520,
+    null
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "# S8 NSFW study · censored replication · Civitai 145090764\nClothed version in the same aesthetic (copy); settings from `sheets/trends/nsfw/candidates.md`; the creator's prompt is not used. Built by `claude-tools/tools/nsfw_rep.py`."
+   ]
+  },
+  {
+   "id": 2,
+   "type": "UNETLoader",
+   "pos": [
+    30,
+    76
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      3
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "riMixIllustriousAnima_riMixAnima.safetensors",
+    "default"
+   ]
+  },
+  {
+   "id": 3,
+   "type": "CLIPLoader",
+   "pos": [
+    30,
+    218
+   ],
+   "size": [
+    340,
+    106
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "CLIPLoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      1,
+      2
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "qwen_3_06b_base.safetensors",
+    "stable_diffusion",
+    "default"
+   ]
+  },
+  {
+   "id": 4,
+   "type": "VAELoader",
+   "pos": [
+    30,
+    384
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      8
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "qwen_image_vae.safetensors"
+   ]
+  },
+  {
+   "id": 5,
+   "type": "CLIPTextEncode",
+   "pos": [
+    510,
+    76
+   ],
+   "size": [
+    420,
+    300
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "title": "Prompt (ours, clothed)",
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      4
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "masterpiece, best quality, score_9, score_8, 1girl, solo, adult woman, from behind, looking back over shoulder, leaning on red car, car door, forest road, tall pine trees, overcast daylight, long black hair, denim jacket, red pleated skirt, black tights, ankle boots, red accents, detailed background, anime illustration"
+   ]
+  },
+  {
+   "id": 6,
+   "type": "CLIPTextEncode",
+   "pos": [
+    510,
+    436
+   ],
+   "size": [
+    340,
+    198
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "title": "Negative",
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "worst quality, low quality, lowres, bad anatomy, bad hands, extra fingers, watermark, signature, text, nsfw, nude"
+   ]
+  },
+  {
+   "id": 7,
+   "type": "EmptyLatentImage",
+   "pos": [
+    970,
+    76
+   ],
+   "size": [
+    340,
+    106
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "EmptyLatentImage"
+   },
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    1024,
+    1536,
+    1
+   ]
+  },
+  {
+   "id": 8,
+   "type": "KSampler",
+   "pos": [
+    970,
+    242
+   ],
+   "size": [
+    340,
+    268
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 3
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 4
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 5
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 6
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      7
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    42,
+    "fixed",
+    30,
+    3.0,
+    "er_sde",
+    "simple",
+    1.0
+   ]
+  },
+  {
+   "id": 9,
+   "type": "VAEDecode",
+   "pos": [
+    970,
+    570
+   ],
+   "size": [
+    340,
+    56
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 7
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      9
+     ],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": []
+  },
+  {
+   "id": 10,
+   "type": "SaveImage",
+   "pos": [
+    1350,
+    76
+   ],
+   "size": [
+    400,
+    500
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 9
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "S8/nsfw/145090764/copy_s42"
+   ]
+  }
+ ],
+ "links": [
+  [
+   1,
+   3,
+   0,
+   5,
+   0,
+   "CLIP"
+  ],
+  [
+   2,
+   3,
+   0,
+   6,
+   0,
+   "CLIP"
+  ],
+  [
+   3,
+   2,
+   0,
+   8,
+   0,
+   "MODEL"
+  ],
+  [
+   4,
+   5,
+   0,
+   8,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   5,
+   6,
+   0,
+   8,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   6,
+   7,
+   0,
+   8,
+   3,
+   "LATENT"
+  ],
+  [
+   7,
+   8,
+   0,
+   9,
+   0,
+   "LATENT"
+  ],
+  [
+   8,
+   4,
+   0,
+   9,
+   1,
+   "VAE"
+  ],
+  [
+   9,
+   9,
+   0,
+   10,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "1 · Models",
+   "bounding": [
+    0,
+    0,
+    400,
+    472
+   ],
+   "color": "#3f789e",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "2 · Sample",
+   "bounding": [
+    480,
+    0,
+    1300,
+    664
+   ],
+   "color": "#a1309b",
+   "font_size": 24,
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.45,
+   "offset": [
+    60,
+    120
+   ]
+  },
+  "workflowRendererVersion": "LG"
+ },
+ "version": 0.4
+}
