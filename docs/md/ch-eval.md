@@ -1,4 +1,4 @@
-# 18. Как мы оцениваем результат
+# 19. Как мы оцениваем результат
 
 > EN: Evaluation methods used in the book: Laplacian sharpness, ArcFace identity (thresholds 0.6 / 0.5 / 0.3), LAION aesthetic (matched a human ranking), CLIP (did not), OWLv2 + DINOv2 object match, centre PSNR, luma drift, corner diff, LUFS; crop sheets, blind A/B, hard test scenes.
 

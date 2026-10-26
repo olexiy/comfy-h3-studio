@@ -3,7 +3,7 @@
 ```yaml
 doc: agent-guide
 audience: autonomous coding/ops agents driving ComfyUI and cloud GPUs (not humans)
-version: 2026-10-26c
+version: 2026-10-26d
 companion: "Russian textbook for humans: llms.txt (map), book.json (chapter index), md/<slug>.md (each chapter), llms-full.txt (all chapters)"
 evidence_tags: {MEASURED: "run by us, numbers from our logs", SOURCE: "official template / docs / community, not re-measured", RULE: "derived decision rule"}
 baseline_box: {gpu: "RTX 5070 Ti 16 GB (Blackwell)", ram: "62 GB", os: "Windows 11", comfyui: "0.42.x", torch: "2.12+cu130", python: "3.13"}
@@ -248,6 +248,29 @@ HyperFrames (HeyGen, Apache-2.0) renders HTML compositions (GSAP timelines) to M
 - Music: ACE-Step 1.5 turbo on a rented RTX 4090 ≈ 4 s per 32 s track (`[Instrumental]`, set bpm); choose the in-point so the track's own ending lands on the last frame. [MEASURED]
 - Grade: `media-treatment --analyze` per shot first; `night-lift` on dark shots (crushed blacks 37 % → 0 %); grading adds ≈ 25 % render time. [MEASURED]
 - Explainers: real data over decoration — one seed, one prompt, one variable; numbers on screen must come from measurements; one idea per scene, 4-10 s per scene, takeaway card at the end. [RULE]
+
+## 9b. 3D game assets (game-art G0–G2, 2026-10-26)
+```yaml
+image_to_3d_local: {template: 3d_pixal3d_trellis2_image_to_model, switch: "PrimitiveBoolean true = TRELLIS.2, false = Pixal3D",
+  files: [diffusion_models/pixal3d_int8_convrot, diffusion_models/trellis_2_int8_convrot, vae/trellis_2_shape_vae_bf16, vae/trellis_2_texture_vae_bf16,
+          clip_vision/dino_v3_L_naf_fp32, geometry_estimation/moge_2_vitl_normal_fp16, background_removal/birefnet], repos: [Comfy-Org/Pixal3D, Comfy-Org/TRELLIS.2, Comfy-Org/MoGe, Comfy-Org/BiRefNet],
+  extra_model_paths: "add geometry_estimation + background_removal keys", licence: {pixal3d: MIT, trellis2: MIT, hunyuan3d_2x: "Tencent community licence, NOT valid in EU/UK/KR"},
+  api_quirk: "UI->API converters may drop socketless widgets: set Save3DAdvanced/Preview3DAdvanced viewport_state={} width=1024 height=1024, ImageCropToMask background='#000000'",
+  measured_16gb: {pixal3d_s: [99, 190], trellis2_s: [106, 571], peak_vram_gb: [13.3, 15.1], ram_gb: "<=51", raw_out: "700k tris, 4K PBR, 1000-2600 UV islands, 44-56 MB GLB, watertight"},
+  verdict: "Pixal3D default (follows the concept layout/colours); TRELLIS.2 re-interprets (symmetry, invented parts), fuller backs"}
+concept_for_3d: "Krea 2 Turbo 1024^2; whole object with margin, 3/4 view from slightly above (characters: front A-pose), plain flat light grey background, soft even shadowless light, no ground plane; stylised 2.5D style block + 1 subject line"
+multi_view: {template: 3d_pixal3d_multi_views, slots: "front = input camera; 'left' = camera at the OBJECT'S LEFT side (+90 deg orbit); back; 'right' (-90)", fov_deg: 20,
+  result: "AI-drawn views (Klein, Qwen) scramble hard-surface meshes; exact mesh renders with correct slots = right shape but blotchy texture; helps only objects with a large hidden side (mushroom back)",
+  ram_gb: "up to 60 of 62", qwen_note: "Qwen-Image 2.1 + a reference copies the reference pose: to repaint a render, feed the render alone"}
+game_budgets: {method: "one graph, diffusion once, N tail branches: DecimateMesh(target_face_count) -> MeshSmoothNormals -> UnwrapMesh -> BakeTextureFromVoxel(texture_size) + BakeNormalMapFromMesh + BakeAmbientOcclusion (high = RemeshMesh output) -> ApplyTextureToMesh -> Save3DAdvanced",
+  measured: {"20k_2K": "UV 429-478, 9.3-11.7 MB", "5k_1K": "UV 182-231, 2.8-3.5 MB", "1.5k_1K": "UV 64-89, 2.4-3.0 MB"}, seconds_per_asset_incl_generation: [115, 332],
+  rule: "props 5k+1K, close-up 20k+2K, far LOD 1.5k; painted curved surfaces need 2K even at 5k"}
+web_and_engine: {compress: "npx @gltf-transform/cli@4.5.1 webp in.glb out.glb --quality 88 (4-5x smaller)", draco_ktx2: "decoders load from gstatic -> blocked under strict CSP (claude.ai artifacts)",
+  viewer: "<model-viewer> 4.3.1 (jsdelivr ES module), environment-image=neutral, camera-orbit '25deg 72deg auto'; set display:block;height:auto;aspect-ratio or the host default 150px height wins",
+  artifact_hosting: "artifacts refuse .glb -> serve as *.glb.wasm (byte-exact; GLTFLoader detects GLB by magic)", godot: "4.7.2: --headless --path . --import, then --script check.gd lists tris + PBR maps"}
+```
+- Raw AI meshes are split at UV seams in glTF; weld by distance before counting holes/parts. [MEASURED]
+- Sources' "TRELLIS.2 needs >= 24 GB" refers to the 2025 release; the int8 ComfyUI build fits 16 GB. [MEASURED]
 
 ## 10. Russian ↔ English terms (to read the human chapters)
 кадр = still / frame · первый кадр = first frame (I2V) · ролик = clip · раскадровка = timed shot list · правка = edit · перенос по референсу = reference transfer · персонаж = persona / character · эталонное лицо = hero still · приметы = permanent marks (mole, scar) · утечка = leak / bleeding · сид = seed · шаги = steps · сила LoRA = LoRA strength · подпись = caption · датасет = dataset · замок (appearance/background lock) = lock line · дрейф = drift · кроп-лист = crop sheet · бок о бок = side-by-side · слепой A/B = blind A/B · локально = on the baseline box · в облаке / аренда = cloud_box (RunPod) · серия N = experiment series N · готово / пополняется / в работе = done / growing / in progress · ЗАМЕР / ИСТОЧНИК / ПРАВИЛО = MEASURED / SOURCE / RULE.
