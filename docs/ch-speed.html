@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Скорость и качество · Локальная студия H3</title>
+<title>Скорость и качество · Студия ComfyUI</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="alternate" type="text/markdown" href="md/ch-speed.md" title="Markdown для ИИ-агентов">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+/* Layout: textbook — one reading column, wide media strips, data tables in mono. Copper accent = the test persona's hair. */
 :root{
   --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
   --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
@@ -131,18 +133,72 @@ a{color:var(--accent)}
 .hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
 .hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
 @media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+/* textbook navigation (2026-10-26): chapter menu in the bar, «главное за минуту», «на этой странице», reading routes */
+.chmenu{position:relative;font:500 13px var(--mono)}
+.chmenu summary{cursor:pointer;color:var(--accent);list-style:none}
+.chmenu summary::-webkit-details-marker{display:none}
+.chmenu summary::after{content:" ▾"}
+.chmenu[open] summary::after{content:" ▴"}
+.chmenu ol{position:absolute;right:0;top:calc(100% + 8px);z-index:5;width:min(360px,calc(100vw - 32px));max-height:70vh;overflow:auto;
+  margin:0;padding:8px 0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.chmenu li a{display:flex;gap:10px;padding:6px 14px;text-decoration:none;color:var(--fg);font:400 14px/1.35 var(--body)}
+.chmenu li a:hover{background:var(--accent-soft)}
+.chmenu li a[aria-current]{color:var(--accent);font-weight:600}
+.chmenu .cn{font:500 12px var(--mono);color:var(--muted);min-width:1.8em}
+.chmenu li.mp{padding:10px 14px 4px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chintro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}
+.keybox{background:var(--accent-soft);border-radius:10px;padding:14px 18px}
+.keybox b,.onpage b{display:block;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.keybox ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.onpage{border:1px solid var(--line);border-radius:10px;padding:14px 18px;background:var(--panel)}
+.onpage ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.onpage a{text-decoration:none}.onpage a:hover{text-decoration:underline}
+.mdlink{font:500 12px var(--mono);color:var(--muted);margin:0}
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.route{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;align-items:start}
+.route img{width:120px;aspect-ratio:4/5;object-fit:cover;border-radius:8px}
+.route .rt{display:grid;gap:4px}
+.route .rt b{font:500 17px/1.2 var(--display)}
+.route .rt span{color:var(--muted);font-size:14px;line-height:1.4}
+.route ol{margin:6px 0 0;padding-left:20px;font-size:14px;display:grid;gap:2px}
+.agentbox{border:1px dashed var(--accent);border-radius:10px;padding:14px 18px;max-width:80ch}
+/* theory: diagrams, callouts, glossary, evidence tags */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:560px}
+.diagram svg text{font-family:var(--body);fill:var(--fg)}
+.diagram svg .muted{fill:var(--muted)}
+.diagram svg .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.diagram svg .hot{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.diagram svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+.diagram svg .ahead{fill:var(--muted)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;padding:12px 16px;max-width:72ch}
+.callout b:first-child{color:var(--accent)}
+.ev{display:inline-block;font:600 10px/1 var(--mono);letter-spacing:.04em;padding:3px 6px;border-radius:4px;vertical-align:2px;border:1px solid currentColor}
+.ev.m{color:var(--good)}.ev.s{color:var(--warn)}.ev.r{color:var(--accent)}
+.gloss{display:grid;gap:0;margin:0;border-top:1px solid var(--line);max-width:80ch}
+.gloss>div{display:grid;grid-template-columns:minmax(150px,13em) minmax(0,1fr);gap:4px 18px;padding:12px 4px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+.gloss>div:target{background:var(--accent-soft)}
+.gloss dt{font:600 15px var(--body)}
+.gloss dt small{display:block;font:400 12px var(--mono);color:var(--muted)}
+.gloss dd{margin:0;font-size:15px}
+.letters{display:flex;flex-wrap:wrap;gap:6px;font:500 13px var(--mono)}
+.letters a{padding:3px 8px;border:1px solid var(--line);border-radius:6px;text-decoration:none}
+@media (max-width:760px){.chintro,.routes{grid-template-columns:minmax(0,1fr)}.route{grid-template-columns:84px minmax(0,1fr)}.route img{width:84px}
+  .gloss>div{grid-template-columns:minmax(0,1fr)}.chmenu ol{position:fixed;left:16px;right:16px;top:56px;width:auto}}
+.cover-video{max-width:760px}
 </style>
 <style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
 
 <div class="wrap">
-<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 4 из 15</span></nav>
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть III · Видео · глава 10 из 23</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-ref.html"><span class="cn">08</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">09</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html" aria-current="page"><span class="cn">10</span>Скорость и качество</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">11</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">12</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">13</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">14</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">15</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">16</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">17</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · Справочник</li><li><a href="ch-eval.html"><span class="cn">18</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">19</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">20</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">21</span>Словарь</a></li><li><a href="ch-lab.html"><span class="cn">22</span>Серии экспериментов</a></li><li><a href="ch-agent.html"><span class="cn">23</span>Для вашего агента</a></li></ol></details></nav>
 <header>
-  <div class="eyebrow">Глава 4 · серия 1 · 24.10.2026</div>
+  <div class="eyebrow">Глава 10 · серия 1 · 24.10.2026</div>
   <h1>Скорость и качество</h1>
   <p class="lead">Что ускоряет H3 без потерь, что ломает качество и какой рецепт даёт лучшие руки и фактуру на трудной сцене.</p>
 </header>
+<div class="chintro"><aside class="keybox" aria-label="Главное за минуту"><b>Главное за минуту</b><ul><li>SageAttention — бесплатное ускорение почти вдвое: та же модель, другое ядро внимания.</li><li>Ускорение проверяют на трудной сцене (9 с, быстрые руки, предмет в руке), а не на спокойной.</li><li>Лучший рецепт качества H3 — 30 шагов без турбо, res_multistep, shift 12.</li></ul></aside><nav class="onpage" aria-label="На этой странице"><b>На этой странице</b><ol><li><a href="#sp-result">Первый замер: 163 → 64 секунды (на короткой сцене)</a></li><li><a href="#sp-table">Все варианты</a></li><li><a href="#sp-learn">Что казалось после первого замера</a></li><li><a href="#sp-ram">Куда уходит оперативная память</a></li><li><a href="#sp-sage">Что такое SageAttention</a></li><li><a href="#sp-how">Как включить SageAttention</a></li><li><a href="#sp-live">Как смотреть рендер вживую</a></li><li><a href="#sp-quality">Раунд качества: 30 шагов без турбо</a></li><li><a href="#sp-selfie">Селфи вместо штатива</a></li><li><a href="#sp-next">Уроки серии 1</a></li></ol></nav></div>
 
 <p class="prose" style="background:var(--accent-soft);border-radius:10px;padding:12px 14px"><b>Поправка 24.10.2026: рецепт C1 не годится.</b> На 5-секундной спокойной сцене он выглядел резче, но на 9 с с быстрыми движениями руки плавятся, разрешение местами падает, цвет плывёт, предметы морфятся. Наши метрики (резкость по 5 кадрам, дрейф лица) этого не видели. Турбо 4 шага, LoRA v1.1 и веса w6a8 отклонены. Рабочий рецепт остаётся прежним (глава «Видео»); проверяется только SageAttention — та же математика, другое ядро.</p>
 
@@ -184,7 +240,7 @@ a{color:var(--accent)}
 </section>
 
 <section aria-labelledby="sp-learn">
-  <h2 id="sp-learn">Что мы думали после первого замера</h2>
+  <h2 id="sp-learn">Что казалось после первого замера</h2>
   <ul class="rules prose">
     <li><b>SageAttention — бесплатное ускорение.</b> На RTX 50-й серии считает «внимание» в 4,8 раза быстрее (микротест), весь ролик на 41 % быстрее, кадры визуально не отличаются.</li>
     <li><b>Новые турбо-LoRA на коротком спокойном ролике выглядели лучше старой (на длинном — нет, см. поправку).</b> v1.1 и v1.3 (обе 768p) дают вдвое меньший дрейф лица и более спокойную камеру. Минус: тело и камера двигаются чуть скупее. Если нужна живость, это пишется в раскадровке.</li>
@@ -202,12 +258,12 @@ a{color:var(--accent)}
     <tbody>
       <tr><td>H3 на 5 с сверх фона</td><td class="num">≈ 27 ГБ</td><td>текстовый энкодер 32B (nvfp4, 16 ГБ) + видео-модель + VAE</td></tr>
       <tr><td>Windows + Claude + мелочи</td><td class="num">≈ 16 ГБ</td><td>фон без браузера</td></tr>
-      <tr><td>Chrome с десятками вкладок</td><td class="num">13–21 ГБ</td><td>включи «Экономию памяти» в настройках производительности</td></tr>
+      <tr><td>Chrome с десятками вкладок</td><td class="num">13–21 ГБ</td><td>включите «Экономию памяти» в настройках производительности</td></tr>
       <tr><td>WSL2 + Docker Desktop</td><td class="num">до ~30 ГБ</td><td>виртуальная машина; в диспетчере задач видна как маленький <span class="mono">vmmem</span>, а держит много</td></tr>
       <tr><td>ComfyUI Desktop + второй сервер</td><td class="num">×2</td><td>два ComfyUI с H3 одновременно не помещаются</td></tr>
     </tbody>
   </table></div>
-  <p class="prose"><b>Перед длинным рендером:</b> закрой Docker Desktop, выполни <code>wsl --shutdown</code>, закрой лишний браузер и второй ComfyUI. Проверка: диспетчер задач → Производительность → Память → «Доступно» должно быть ≥ 35 ГБ.</p>
+  <p class="prose"><b>Перед длинным рендером:</b> закройте Docker Desktop, выполните <code>wsl --shutdown</code>, закройте лишний браузер и второй ComfyUI. Проверка: диспетчер задач → Производительность → Память → «Доступно» должно быть ≥ 35 ГБ.</p>
 </section>
 
 <section aria-labelledby="sp-sage">
@@ -227,16 +283,16 @@ a{color:var(--accent)}
 
 <section aria-labelledby="sp-how">
   <h2 id="sp-how">Как включить SageAttention</h2>
-  <p class="prose">SageAttention ставится в Python-окружение ComfyUI двумя пакетами. Нужны версии под свой torch и CUDA: у нас torch 2.12 + CUDA 13.0, Python 3.13.</p>
+  <p class="prose">SageAttention ставится в Python-окружение ComfyUI двумя пакетами. Нужны версии под свой torch и CUDA; на тестовой машине — torch 2.12 + CUDA 13.0, Python 3.13.</p>
   <div class="copyrow"><h3>Установка (venv ComfyUI)</h3><button type="button" data-copy="sp-pip">Копировать</button></div>
   <pre id="sp-pip">python -m pip install --no-deps "triton-windows&gt;=3.8,&lt;3.9"
 python -m pip install --no-deps https://github.com/woct0rdho/SageAttention/releases/download/v2.2.0-windows.post6/sageattention-2.2.0+cu130torch2.10.0andhigher.post6-cp310-abi3-win_amd64.whl</pre>
-  <p class="prose">В workflow после загрузки модели (до узла shift) вставь ноду <span class="mono">MiniMaxH3MemoryEfficientSageAttentionPatch</span> — она встроена в ComfyUI. Модели и LoRA не меняй: турбо 8 шагов v1.0 на int8 остаются эталоном.</p>
+  <p class="prose">В workflow после загрузки модели (до узла shift) вставьте ноду <span class="mono">MiniMaxH3MemoryEfficientSageAttentionPatch</span> — она встроена в ComfyUI. Модели и LoRA не меняйте: турбо 8 шагов v1.0 на int8 остаются эталоном.</p>
 </section>
 
 <section aria-labelledby="sp-live">
   <h2 id="sp-live">Как смотреть рендер вживую</h2>
-  <p class="prose">ComfyUI шлёт прогресс и превью кадров только той вкладке, от имени которой поставлено задание. Чтобы видеть рендеры агента: открой <span class="mono">http://127.0.0.1:8189</span>, нажми F12 и выполни <code>app.api.clientId</code>, пришли строку агенту. Каждый вариант эксперимента лежит как обычный workflow в <span class="mono">claude/lab/S1/</span>, а в каждом готовом ролике записан граф, который его сделал.</p>
+  <p class="prose">ComfyUI шлёт прогресс и превью кадров только той вкладке, от имени которой поставлено задание. Чтобы видеть рендеры агента: откройте его сервер (у нас <span class="mono">http://127.0.0.1:8189</span>), нажмите F12, выполните <code>app.api.clientId</code> и передайте строку агенту — он поставит задания от имени этой вкладки. Каждый вариант эксперимента лежит как обычный workflow в <span class="mono">claude/lab/S1/</span>, а в каждом готовом ролике записан граф, который его сделал.</p>
 </section>
 
 <section aria-labelledby="sp-quality">
@@ -280,7 +336,8 @@ python -m pip install --no-deps https://github.com/woct0rdho/SageAttention/relea
   </ul>
 </section>
 
-<nav class="pager" aria-label="Главы"><a href="ch-video.html"><span class="dir">← назад</span>Видео на MiniMax H3</a><a class="next" href="ch-prompts.html"><span class="dir">дальше →</span>Промпты</a></nav>
+<p class="mdlink">Для ИИ-агентов: <a href="md/ch-speed.md">эта глава в Markdown</a> · <a href="llms.txt">llms.txt</a></p>
+<nav class="pager" aria-label="Главы"><a href="ch-video.html" rel="prev"><span class="dir">← назад</span>Видео на MiniMax H3</a><a class="next" href="ch-scout.html" rel="next"><span class="dir">дальше →</span>Сравнение моделей</a></nav>
 </div>
 
 <script>
@@ -291,6 +348,19 @@ document.querySelectorAll('button[data-copy]').forEach(function(b){
     var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
     try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
   });
+});
+// ←/→ = previous/next chapter (not while typing or selecting text); the chapter menu closes on an outside click or Esc
+document.addEventListener('keydown',function(e){
+  var t=e.target, m=document.querySelector('details.chmenu');
+  if(e.key==='Escape'&&m){m.open=false;return}
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||/INPUT|TEXTAREA|SELECT|VIDEO/.test(t.tagName)||t.isContentEditable)return;
+  if(String(getSelection())!=='')return;
+  var a=document.querySelector('.pager a[rel="'+(e.key==='ArrowLeft'?'prev':e.key==='ArrowRight'?'next':'')+'"]');
+  if(a)location.href=a.getAttribute('href');
+});
+document.addEventListener('click',function(e){
+  var m=document.querySelector('details.chmenu');
+  if(m&&m.open&&!m.contains(e.target))m.open=false;
 });
 </script>
 </body>

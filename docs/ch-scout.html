@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Сравнение моделей · Локальная студия H3</title>
+<title>Сравнение моделей · Студия ComfyUI</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="alternate" type="text/markdown" href="md/ch-scout.md" title="Markdown для ИИ-агентов">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+/* Layout: textbook — one reading column, wide media strips, data tables in mono. Copper accent = the test persona's hair. */
 :root{
   --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
   --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
@@ -131,23 +133,77 @@ a{color:var(--accent)}
 .hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
 .hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
 @media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+/* textbook navigation (2026-10-26): chapter menu in the bar, «главное за минуту», «на этой странице», reading routes */
+.chmenu{position:relative;font:500 13px var(--mono)}
+.chmenu summary{cursor:pointer;color:var(--accent);list-style:none}
+.chmenu summary::-webkit-details-marker{display:none}
+.chmenu summary::after{content:" ▾"}
+.chmenu[open] summary::after{content:" ▴"}
+.chmenu ol{position:absolute;right:0;top:calc(100% + 8px);z-index:5;width:min(360px,calc(100vw - 32px));max-height:70vh;overflow:auto;
+  margin:0;padding:8px 0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.chmenu li a{display:flex;gap:10px;padding:6px 14px;text-decoration:none;color:var(--fg);font:400 14px/1.35 var(--body)}
+.chmenu li a:hover{background:var(--accent-soft)}
+.chmenu li a[aria-current]{color:var(--accent);font-weight:600}
+.chmenu .cn{font:500 12px var(--mono);color:var(--muted);min-width:1.8em}
+.chmenu li.mp{padding:10px 14px 4px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chintro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}
+.keybox{background:var(--accent-soft);border-radius:10px;padding:14px 18px}
+.keybox b,.onpage b{display:block;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.keybox ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.onpage{border:1px solid var(--line);border-radius:10px;padding:14px 18px;background:var(--panel)}
+.onpage ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.onpage a{text-decoration:none}.onpage a:hover{text-decoration:underline}
+.mdlink{font:500 12px var(--mono);color:var(--muted);margin:0}
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.route{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;align-items:start}
+.route img{width:120px;aspect-ratio:4/5;object-fit:cover;border-radius:8px}
+.route .rt{display:grid;gap:4px}
+.route .rt b{font:500 17px/1.2 var(--display)}
+.route .rt span{color:var(--muted);font-size:14px;line-height:1.4}
+.route ol{margin:6px 0 0;padding-left:20px;font-size:14px;display:grid;gap:2px}
+.agentbox{border:1px dashed var(--accent);border-radius:10px;padding:14px 18px;max-width:80ch}
+/* theory: diagrams, callouts, glossary, evidence tags */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:560px}
+.diagram svg text{font-family:var(--body);fill:var(--fg)}
+.diagram svg .muted{fill:var(--muted)}
+.diagram svg .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.diagram svg .hot{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.diagram svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+.diagram svg .ahead{fill:var(--muted)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;padding:12px 16px;max-width:72ch}
+.callout b:first-child{color:var(--accent)}
+.ev{display:inline-block;font:600 10px/1 var(--mono);letter-spacing:.04em;padding:3px 6px;border-radius:4px;vertical-align:2px;border:1px solid currentColor}
+.ev.m{color:var(--good)}.ev.s{color:var(--warn)}.ev.r{color:var(--accent)}
+.gloss{display:grid;gap:0;margin:0;border-top:1px solid var(--line);max-width:80ch}
+.gloss>div{display:grid;grid-template-columns:minmax(150px,13em) minmax(0,1fr);gap:4px 18px;padding:12px 4px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+.gloss>div:target{background:var(--accent-soft)}
+.gloss dt{font:600 15px var(--body)}
+.gloss dt small{display:block;font:400 12px var(--mono);color:var(--muted)}
+.gloss dd{margin:0;font-size:15px}
+.letters{display:flex;flex-wrap:wrap;gap:6px;font:500 13px var(--mono)}
+.letters a{padding:3px 8px;border:1px solid var(--line);border-radius:6px;text-decoration:none}
+@media (max-width:760px){.chintro,.routes{grid-template-columns:minmax(0,1fr)}.route{grid-template-columns:84px minmax(0,1fr)}.route img{width:84px}
+  .gloss>div{grid-template-columns:minmax(0,1fr)}.chmenu ol{position:fixed;left:16px;right:16px;top:56px;width:auto}}
+.cover-video{max-width:760px}
 </style>
 <style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
 
 <div class="wrap">
-<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 7 из 15</span></nav>
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть IV · Модели · глава 11 из 23</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-ref.html"><span class="cn">08</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">09</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html"><span class="cn">10</span>Скорость и качество</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html" aria-current="page"><span class="cn">11</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">12</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">13</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">14</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">15</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">16</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">17</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · Справочник</li><li><a href="ch-eval.html"><span class="cn">18</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">19</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">20</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">21</span>Словарь</a></li><li><a href="ch-lab.html"><span class="cn">22</span>Серии экспериментов</a></li><li><a href="ch-agent.html"><span class="cn">23</span>Для вашего агента</a></li></ol></details></nav>
 <header>
-  <div class="eyebrow">Глава 7 · серия 2 · 24.10.2026</div>
+  <div class="eyebrow">Глава 11 · серия 2 · 24.10.2026</div>
   <h1>Сравнение моделей</h1>
   <p class="lead">Не победитель, а карта: какая модель для какой задачи. Реализм, рисованное, физика взаимодействия, скорость и видео.</p>
 </header>
+<div class="chintro"><aside class="keybox" aria-label="Главное за минуту"><b>Главное за минуту</b><ul><li>Krea 2 — реализм и физика рук; FLUX.3 Klein — «настоящий телефон»; MOSS — рисованное; Anima — аниме.</li><li>Рисуйте в родном размере 2 МП: появляются поры и отдельные веснушки.</li><li>Видео: идеи — на быстром LTX-2.5, финал — на H3 с тем же первым кадром.</li></ul></aside><nav class="onpage" aria-label="На этой странице"><b>На этой странице</b><ol><li><a href="#sc-why">Зачем сравнивать модели и как мы это делали</a></li><li><a href="#sc-profiles">Профили моделей</a></li><li><a href="#sc-2mp">Главная находка: рисовать в родном размере 2 МП</a></li><li><a href="#sc-physics">Физика: кто понимает, как вещи взаимодействуют</a></li><li><a href="#sc-art">Рисованное: девушка-киборг</a></li><li><a href="#sc-video">Видео: LTX-2.5 против H3</a></li></ol></nav></div>
 
 <section aria-labelledby="sc-why">
   <h2 id="sc-why">Зачем сравнивать модели и как мы это делали</h2>
   <p class="prose">Цель — не найти одного «победителя», а понять, <b>какая модель для какой задачи</b>. Девять одинаковых промптов (шесть реалистичных и три рисованных: девушка-киборг по мотивам работы Sleeps_In_Sunbeams, живописная девушка с драконом, аниме), по три сида каждый, на 1 МП и на 2 МП. Около пятисот картинок. Каждую модель запускали по её официальному шаблону ComfyUI, без LLM-улучшайзера промпта, чтобы сравнивать модели, а не переписчики.</p>
-  <p class="prose">Автоматическая оценка — скрипт <span class="mono">score.py</span>: резкость, резкость лица, «живость» кожи (высокие частоты на лице), оценка возраста против заявленного, эстетика LAION, соответствие промпту (CLIP). Проверка на твоих шести оценках: <b>эстетика LAION повторила твой порядок один в один</b>, а резкость и соответствие промпту с вкусом не связаны. «Физику» (руки, инструмент, предмет) не видит ни одна метрика, поэтому её смотрим глазами.</p>
+  <p class="prose">Автоматическая оценка — скрипт <span class="mono">score.py</span>: резкость, резкость лица, «живость» кожи (высокие частоты на лице), оценка возраста против заявленного, эстетика LAION, соответствие промпту (CLIP). Проверка на шести оценках человека-судьи: <b>эстетика LAION повторила его порядок один в один</b>, а резкость и соответствие промпту с вкусом не связаны. «Физику» (руки, инструмент, предмет) не видит ни одна метрика, поэтому её смотрим глазами.</p>
 </section>
 
 <section aria-labelledby="sc-profiles">
@@ -159,10 +215,10 @@ a{color:var(--accent)}
       <tr><td><b>FLUX.3 Klein</b></td><td>3 с · 7 с</td><td>самое «настоящее фото с телефона»: широкоугольное селфи с рукой, прищур, живая кожа, людные улицы</td><td>лица старше заявленного; лупу превращает в очки; ночные сцены слишком светлые</td><td>документальный реализм, правка по 10 референсам</td></tr>
       <tr><td><b>Qwen-Image 2.1</b></td><td>3 с · 6 с</td><td>самая быстрая; руки и инструменты правильно; на 2 МП появляются поры</td><td>«стоковый» вид, симметричные кадры; теряет мелкие детали (родинку)</td><td>быстрые черновики, текст и макеты, редактирование</td></tr>
       <tr><td><b>Z-Image Turbo</b></td><td>4 с · 9 с</td><td>естественный реализм, хорошее селфи; лицензия Apache; общие LoRA с Krea</td><td>три сида дают почти одну картинку; хочет промпты на 100–180 слов</td><td>чистая лицензия, повторяемость</td></tr>
-      <tr><td><b>MOSS-Image</b></td><td>32 с</td><td><b>твой фаворит для рисованного</b>: воздушный свет, нежные лица, каждый сид — своя композиция; статичный реализм тоже хорош</td><td>слабая физика — люди позируют в камеру, инструмент ничего не касается; 2 МП ничего не даёт</td><td>иллюстрация, beauty-портрет, текст и макеты</td></tr>
+      <tr><td><b>MOSS-Image</b></td><td>32 с</td><td><b>фаворит судьи для рисованного</b>: воздушный свет, нежные лица, каждый сид — своя композиция; статичный реализм тоже хорош</td><td>слабая физика — люди позируют в камеру, инструмент ничего не касается; 2 МП ничего не даёт</td><td>иллюстрация, beauty-портрет, текст и макеты</td></tr>
       <tr><td><b>Anima</b></td><td>14 с</td><td>самый «нарисованный» результат: киборг как аниме-иллюстрация, чистое аниме</td><td>реализм рисует в аниме-стиле (так задумано)</td><td>аниме, 2.5D, иллюстрация</td></tr>
-      <tr><td><b>SDXL Juggernaut</b></td><td>10 с</td><td>глянцевая студийная красота; тебе понравился: «ИИ-шный, но красивый»</td><td>читает только 77 токенов — длинный промпт теряет детали</td><td>глянцевый beauty-стиль, короткие промпты-теги</td></tr>
-      <tr><td>Kromoss</td><td>12–20 с</td><td>честное действие, никто не позирует</td><td>кадр без логики и пропорций, блёклая кожа (твоя оценка)</td><td>пока не берём</td></tr>
+      <tr><td><b>SDXL Juggernaut</b></td><td>10 с</td><td>глянцевая студийная красота; оценка судьи: «ИИ-шный, но красивый»</td><td>читает только 77 токенов — длинный промпт теряет детали</td><td>глянцевый beauty-стиль, короткие промпты-теги</td></tr>
+      <tr><td>Kromoss</td><td>12–20 с</td><td>честное действие, никто не позирует</td><td>кадр без логики и пропорций, блёклая кожа (оценка судьи)</td><td>пока не берём</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -176,7 +232,7 @@ a{color:var(--accent)}
 
 <section aria-labelledby="sc-physics">
   <h2 id="sc-physics">Физика: кто понимает, как вещи взаимодействуют</h2>
-  <p class="prose">Твоё замечание про MOSS подтвердилось на всех сидах: часовщик позирует в камеру, пинцет висит в воздухе. Krea, Qwen и FLUX.3 работают руками по-настоящему.</p>
+  <p class="prose">Замечание судьи про MOSS подтвердилось на всех сидах: часовщик позирует в камеру, пинцет висит в воздухе. Krea, Qwen и FLUX.3 работают руками по-настоящему.</p>
   <figure><img src="media/s2-hands-4models.jpg" alt="Часовщик у четырёх моделей" loading="lazy"><figcaption><b>Ряды:</b> Krea · MOSS · Qwen · FLUX.3.</figcaption></figure>
 </section>
 
@@ -200,7 +256,8 @@ a{color:var(--accent)}
   <figure><img src="media/s2-ltx-phone-prompts.jpg" alt="Руки и телефон при трёх промптах" loading="lazy"><figcaption><b>Руки крупно, 3,5–8 с.</b> 1-й ряд — абзац (телефона нет), 2-й — три действия по таймингу, 3-й — явное состояние предмета.</figcaption></figure>
 </section>
 
-<nav class="pager" aria-label="Главы"><a href="ch-workflows.html"><span class="dir">← назад</span>Workflow в ComfyUI</a><a class="next" href="ch-models.html"><span class="dir">дальше →</span>Какие модели существуют</a></nav>
+<p class="mdlink">Для ИИ-агентов: <a href="md/ch-scout.md">эта глава в Markdown</a> · <a href="llms.txt">llms.txt</a></p>
+<nav class="pager" aria-label="Главы"><a href="ch-speed.html" rel="prev"><span class="dir">← назад</span>Скорость и качество</a><a class="next" href="ch-models.html" rel="next"><span class="dir">дальше →</span>Какие модели существуют</a></nav>
 </div>
 
 <script>
@@ -211,6 +268,19 @@ document.querySelectorAll('button[data-copy]').forEach(function(b){
     var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
     try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
   });
+});
+// ←/→ = previous/next chapter (not while typing or selecting text); the chapter menu closes on an outside click or Esc
+document.addEventListener('keydown',function(e){
+  var t=e.target, m=document.querySelector('details.chmenu');
+  if(e.key==='Escape'&&m){m.open=false;return}
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||/INPUT|TEXTAREA|SELECT|VIDEO/.test(t.tagName)||t.isContentEditable)return;
+  if(String(getSelection())!=='')return;
+  var a=document.querySelector('.pager a[rel="'+(e.key==='ArrowLeft'?'prev':e.key==='ArrowRight'?'next':'')+'"]');
+  if(a)location.href=a.getAttribute('href');
+});
+document.addEventListener('click',function(e){
+  var m=document.querySelector('details.chmenu');
+  if(m&&m.open&&!m.contains(e.target))m.open=false;
 });
 </script>
 </body>

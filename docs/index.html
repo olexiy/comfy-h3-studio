@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Локальная студия H3</title>
+<title>Студия ComfyUI</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+/* Layout: textbook — one reading column, wide media strips, data tables in mono. Copper accent = the test persona's hair. */
 :root{
   --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
   --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
@@ -131,6 +132,59 @@ a{color:var(--accent)}
 .hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
 .hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
 @media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+/* textbook navigation (2026-10-26): chapter menu in the bar, «главное за минуту», «на этой странице», reading routes */
+.chmenu{position:relative;font:500 13px var(--mono)}
+.chmenu summary{cursor:pointer;color:var(--accent);list-style:none}
+.chmenu summary::-webkit-details-marker{display:none}
+.chmenu summary::after{content:" ▾"}
+.chmenu[open] summary::after{content:" ▴"}
+.chmenu ol{position:absolute;right:0;top:calc(100% + 8px);z-index:5;width:min(360px,calc(100vw - 32px));max-height:70vh;overflow:auto;
+  margin:0;padding:8px 0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.chmenu li a{display:flex;gap:10px;padding:6px 14px;text-decoration:none;color:var(--fg);font:400 14px/1.35 var(--body)}
+.chmenu li a:hover{background:var(--accent-soft)}
+.chmenu li a[aria-current]{color:var(--accent);font-weight:600}
+.chmenu .cn{font:500 12px var(--mono);color:var(--muted);min-width:1.8em}
+.chmenu li.mp{padding:10px 14px 4px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chintro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}
+.keybox{background:var(--accent-soft);border-radius:10px;padding:14px 18px}
+.keybox b,.onpage b{display:block;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.keybox ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.onpage{border:1px solid var(--line);border-radius:10px;padding:14px 18px;background:var(--panel)}
+.onpage ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.onpage a{text-decoration:none}.onpage a:hover{text-decoration:underline}
+.mdlink{font:500 12px var(--mono);color:var(--muted);margin:0}
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.route{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;align-items:start}
+.route img{width:120px;aspect-ratio:4/5;object-fit:cover;border-radius:8px}
+.route .rt{display:grid;gap:4px}
+.route .rt b{font:500 17px/1.2 var(--display)}
+.route .rt span{color:var(--muted);font-size:14px;line-height:1.4}
+.route ol{margin:6px 0 0;padding-left:20px;font-size:14px;display:grid;gap:2px}
+.agentbox{border:1px dashed var(--accent);border-radius:10px;padding:14px 18px;max-width:80ch}
+/* theory: diagrams, callouts, glossary, evidence tags */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:560px}
+.diagram svg text{font-family:var(--body);fill:var(--fg)}
+.diagram svg .muted{fill:var(--muted)}
+.diagram svg .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.diagram svg .hot{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.diagram svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+.diagram svg .ahead{fill:var(--muted)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;padding:12px 16px;max-width:72ch}
+.callout b:first-child{color:var(--accent)}
+.ev{display:inline-block;font:600 10px/1 var(--mono);letter-spacing:.04em;padding:3px 6px;border-radius:4px;vertical-align:2px;border:1px solid currentColor}
+.ev.m{color:var(--good)}.ev.s{color:var(--warn)}.ev.r{color:var(--accent)}
+.gloss{display:grid;gap:0;margin:0;border-top:1px solid var(--line);max-width:80ch}
+.gloss>div{display:grid;grid-template-columns:minmax(150px,13em) minmax(0,1fr);gap:4px 18px;padding:12px 4px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+.gloss>div:target{background:var(--accent-soft)}
+.gloss dt{font:600 15px var(--body)}
+.gloss dt small{display:block;font:400 12px var(--mono);color:var(--muted)}
+.gloss dd{margin:0;font-size:15px}
+.letters{display:flex;flex-wrap:wrap;gap:6px;font:500 13px var(--mono)}
+.letters a{padding:3px 8px;border:1px solid var(--line);border-radius:6px;text-decoration:none}
+@media (max-width:760px){.chintro,.routes{grid-template-columns:minmax(0,1fr)}.route{grid-template-columns:84px minmax(0,1fr)}.route img{width:84px}
+  .gloss>div{grid-template-columns:minmax(0,1fr)}.chmenu ol{position:fixed;left:16px;right:16px;top:56px;width:auto}}
+.cover-video{max-width:760px}
 </style>
 <style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
 </head>
@@ -138,61 +192,78 @@ a{color:var(--accent)}
 
 <div class="wrap">
 <header>
-  <div class="eyebrow">Учебник · ComfyUI дома · RTX 5070 Ti 16 ГБ · 62 ГБ RAM</div>
-  <h1>Локальная студия H3</h1>
-  <p class="lead">Фото и видео с ИИ на домашнем компьютере: от промпта к фотореалистичному кадру и от кадра к ролику со звуком. Каждая глава написана по результатам наших экспериментов, с цифрами, примерами и готовыми workflow.</p>
+  <div class="eyebrow">Учебник · фото и видео с ИИ · для людей и ИИ-агентов</div>
+  <h1>Студия ComfyUI</h1>
+  <p class="lead">Как делать фотореалистичные кадры, править их, держать одно лицо персонажа и оживлять кадр в ролик со звуком — в ComfyUI, на компьютере с одной видеокартой на 16 ГБ и в арендованном облаке. От теории до готовых workflow, и каждый вывод измерен.</p>
 </header>
+
+<figure class="cover-video">
+  <video src="media/explainer-pipeline.mp4" poster="media/explainer-pipeline-poster.jpg" controls playsinline preload="none"></video>
+  <figcaption><b>Книга за 34 секунды:</b> от промпта до ролика со звуком на одной видеокарте.</figcaption>
+</figure>
 
 <section aria-labelledby="start">
   <h2 id="start">С чего начать</h2>
-  <div class="hls"><a class="hl" href="ch-persona.html"><img src="media/s3-hero.jpg" alt="" loading="lazy"><span class="ht">Свой персонаж</span><span class="hd">Марен Холт: одно лицо в каждом кадре и LoRA на RunPod</span></a><a class="hl" href="ch-trends.html"><img src="media/trends/146084006/v1_s42.jpg" alt="" loading="lazy"><span class="ht">Повтор трендов</span><span class="hd">Пост с Civitai → разбор → копия и два своих сюжета</span></a><a class="hl" href="ch-video.html"><img src="media/s1-selfie-poster.jpg" alt="" loading="lazy"><span class="ht">Видео на H3</span><span class="hd">Как оживить кадр в ролик со звуком и не потерять руки</span></a></div>
-</section>
-
-<section aria-labelledby="news">
-  <h2 id="news">Что нового</h2>
-  <ul class="news prose">
-<li><time>25.10.2026</time><span>Две новые главы: «Датасеты для LoRA» (откуда креаторы берут данные, правила отбора и подписей, бесплатные датасеты с лицензиями).</span></li>
-<li><time>25.10.2026</time><span>Страницы трендов по новому правилу: максимально похожая копия + два своих сюжета в той же эстетике (морской конёк вместо медузы, лиса вместо кота-плаката…). Три поста повторены точно — с LoRA креатора, скачанной по ключу. Второй проход «как у топов» проверен: качество то же, на 18 % быстрее. Оглавление разбито на части.</span></li>
-<li><time>25.10.2026</time><span>RunPod: первая LoRA Марен (v1 с приметами, но с утечкой; v2 без утечки, но без примет — дальше v3) и проверка полной H3: наши квантованные веса не хуже полных.</span></li>
-<li><time>25.10.2026</time><span>Новый раздел «Для вашего агента»: всё, что нужно ИИ-агенту, в машинно-удобном виде (agent-guide.md, llms.txt).</span></li>
-</ul>
+  <p class="prose">Четыре маршрута по книге. Главы можно читать и подряд: каждая начинается с блока «главное за минуту», а в конце есть ссылка на следующую (или клавиша →).</p>
+  <div class="routes"><div class="route"><img src="media/h3-best-still-krea.jpg" alt="" loading="lazy"><div class="rt"><b>С нуля</b><span>Ничего не знаю про генеративные модели и ComfyUI.</span><ol><li><a href="ch-intro.html">Как устроен учебник</a></li><li><a href="ch-theory.html">Как работают генеративные модели</a></li><li><a href="ch-comfy.html">ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-stills.html">Кадр: фото на Krea 2</a></li><li><a href="ch-video.html">Видео на MiniMax H3</a></li></ol></div></div><div class="route"><img src="media/s1-selfie-poster.jpg" alt="" loading="lazy"><div class="rt"><b>Хочу видео</b><span>Кадр есть, нужен ролик со звуком и монтаж.</span><ol><li><a href="ch-video.html">Видео на MiniMax H3</a></li><li><a href="ch-speed.html">Скорость и качество</a></li><li><a href="ch-prompts.html">Промпты</a></li><li><a href="ch-editing.html">Монтаж с ИИ</a></li></ol></div></div><div class="route"><img src="media/s3-hero.jpg" alt="" loading="lazy"><div class="rt"><b>Свой персонаж</b><span>Одно вымышленное лицо в каждом кадре и ролике.</span><ol><li><a href="ch-persona.html">Свой персонаж и LoRA</a></li><li><a href="ch-ref.html">Перенос по референсу</a></li><li><a href="ch-datasets.html">Датасеты для LoRA</a></li><li><a href="ch-fix.html">Правка кадра</a></li></ol></div></div><div class="route"><img src="media/trends/146084006/v1_s42.jpg" alt="" loading="lazy"><div class="rt"><b>Повторить чужую работу</b><span>Увидел пост на Civitai — хочу так же.</span><ol><li><a href="ch-creators.html">Разбор креаторов</a></li><li><a href="ch-trends.html">Повтор трендов</a></li><li><a href="ch-scout.html">Сравнение моделей</a></li><li><a href="ch-workflows.html">Workflow в ComfyUI</a></li></ol></div></div></div>
+  <div class="agentbox"><b>Вы ИИ-агент?</b> Начните с <a href="llms.txt">llms.txt</a>: там карта книги и ссылки на <a href="agent-guide.md">agent-guide.md</a> (точные файлы, настройки и процедуры с метками [MEASURED] / [SOURCE] / [RULE]), <a href="book.json">book.json</a> (оглавление с разделами) и <a href="llms-full.txt">llms-full.txt</a> (вся книга одним текстом). Каждая глава есть в Markdown: <code>md/&lt;глава&gt;.md</code>.</div>
 </section>
 
 <section aria-labelledby="toc">
   <h2 id="toc">Оглавление</h2>
   <ol class="toc">
-<li class="part">Часть I · Основы: от кадра к ролику</li><li><a href="ch-studio.html"><span class="cn">01</span><span class="ct">Студия: железо и файлы</span><span class="st tag warn">пополняется</span><span class="cd">Что стоит на компьютере, где лежат модели и workflow, когда арендовать GPU в облаке.</span></a></li>
-<li><a href="ch-stills.html"><span class="cn">02</span><span class="ct">Кадр: фото на Krea 2</span><span class="st tag warn">пополняется</span><span class="cd">Krea 2 против MOSS, как убрать «ИИ-лицо», как получить нужную фигуру.</span></a></li>
-<li><a href="ch-video.html"><span class="cn">03</span><span class="ct">Видео на MiniMax H3</span><span class="st tag warn">пополняется</span><span class="cd">Пайплайн фото → видео → 48 fps, настройки, длина роликов и склейка, Eros Max.</span></a></li>
-<li><a href="ch-speed.html"><span class="cn">04</span><span class="ct">Скорость и качество</span><span class="st tag good">готово</span><span class="cd">SageAttention ×2 быстрее, рецепт качества 30 шагов без турбо, что ломает руки, SeedVR2, FILM, селфи-камера.</span></a></li>
-<li><a href="ch-prompts.html"><span class="cn">05</span><span class="ct">Промпты</span><span class="st tag warn">пополняется</span><span class="cd">Шаблоны для фото и для видео-раскадровки, готовые к копированию.</span></a></li>
-<li><a href="ch-workflows.html"><span class="cn">06</span><span class="ct">Workflow в ComfyUI</span><span class="st tag warn">пополняется</span><span class="cd">Какие workflow лежат в Desktop, что делает каждый и сколько он считает.</span></a></li>
-<li class="part">Часть II · Модели</li><li><a href="ch-scout.html"><span class="cn">07</span><span class="ct">Сравнение моделей</span><span class="st tag good">готово</span><span class="cd">Девять моделей фото и две видео на одинаковых промптах: сильные и слабые стороны, для чего какая. 2 МП, физика, LTX против H3.</span></a></li>
-<li><a href="ch-models.html"><span class="cn">08</span><span class="ct">Какие модели существуют</span><span class="st tag warn">пополняется</span><span class="cd">Открытые модели фото и видео против нашей пары Krea 2 + H3. Обновится в серии 2.</span></a></li>
-<li class="part">Часть III · Свои работы: персонаж, креаторы, тренды</li><li><a href="ch-persona.html"><span class="cn">09</span><span class="ct">Свой персонаж и LoRA</span><span class="st tag warn">пополняется</span><span class="cd">Hero-лицо, лист ракурсов, перенос в 75 сцен, первый кадр для H3, первая LoRA (v1/v2) на RunPod.</span></a></li>
-<li><a href="ch-datasets.html"><span class="cn">10</span><span class="ct">Датасеты для LoRA</span><span class="st tag warn">пополняется</span><span class="cd">Откуда креаторы берут данные, правила отбора и подписей, наш рецепт и бесплатные датасеты с лицензиями.</span></a></li>
-<li><a href="ch-creators.html"><span class="cn">11</span><span class="ct">Разбор креаторов</span><span class="st tag warn">пополняется</span><span class="cd">Работы любимых авторов: из чего они сделаны, какие файлы скачать, как повторить, что вышло у нас.</span></a></li>
-<li><a href="ch-trends.html"><span class="cn">12</span><span class="ct">Повтор трендов</span><span class="st tag warn">пополняется</span><span class="cd">Берём популярный пост, достаём из него модель, LoRA и настройки, собираем workflow и показываем наш результат рядом с оригиналом.</span></a></li>
-<li class="part">Часть IV · Справочник</li><li><a href="ch-pitfalls.html"><span class="cn">13</span><span class="ct">Грабли</span><span class="st tag warn">пополняется</span><span class="cd">На что мы уже наступили и как это обойти.</span></a></li>
-<li><a href="ch-lab.html"><span class="cn">14</span><span class="ct">План исследований</span><span class="st tag warn">пополняется</span><span class="cd">Какие эксперименты сделаны, какие идут, какие впереди.</span></a></li>
-<li><a href="ch-agent.html"><span class="cn">15</span><span class="ct">Для вашего агента</span><span class="st tag warn">пополняется</span><span class="cd">Раздел для ИИ-агентов (на английском): точные файлы моделей, настройки, шаблоны промптов, API ComfyUI, RunPod, ловушки. Файлы agent-guide.md и llms.txt.</span></a></li>
+<li class="part">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span><span class="ct">Как устроен учебник</span><span class="st tag good">готово</span><span class="cd">Для кого книга, на каком железе всё измерено, как читать таблицы и метки доказательности, что такое «серия».</span></a></li>
+<li><a href="ch-theory.html"><span class="cn">02</span><span class="ct">Как работают генеративные модели</span><span class="st tag good">готово</span><span class="cd">Шум → картинка: диффузия и flow matching, латентное пространство и VAE, текстовый энкодер, трансформер и внимание, шаги, сэмплер, CFG, shift, турбо, LoRA, квантизация.</span></a></li>
+<li><a href="ch-comfy.html"><span class="cn">03</span><span class="ct">ComfyUI: граф, ноды, workflow</span><span class="st tag good">готово</span><span class="cd">Что такое нода и связь, минимальный граф text-to-image, где лежат модели, кастомные ноды, подграфы, workflow внутри PNG и MP4, запуск из скрипта.</span></a></li>
+<li><a href="ch-studio.html"><span class="cn">04</span><span class="ct">Железо, файлы и облако</span><span class="st tag warn">пополняется</span><span class="cd">Тестовый компьютер и его пределы, где что лежит, когда выгоднее арендовать GPU и как это делать безопасно.</span></a></li>
+<li class="part">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span><span class="ct">Кадр: фото на Krea 2</span><span class="st tag warn">пополняется</span><span class="cd">Krea 2 против MOSS, как убрать «ИИ-лицо», как управлять фигурой словами.</span></a></li>
+<li><a href="ch-prompts.html"><span class="cn">06</span><span class="ct">Промпты</span><span class="st tag warn">в работе</span><span class="cd">Шаблоны для фото и для видео-раскадровки, готовые к копированию. Лаборатория промптов (серия 7) идёт сейчас.</span></a></li>
+<li><a href="ch-fix.html"><span class="cn">07</span><span class="ct">Правка кадра</span><span class="st tag good">готово</span><span class="cd">Убрать, перекрасить, свет, фон, одежда, рука, outpaint, замена головы, апскейл 4K: пять инструментов на одних картинках.</span></a></li>
+<li><a href="ch-ref.html"><span class="cn">08</span><span class="ct">Перенос по референсу</span><span class="st tag good">готово</span><span class="cd">Это лицо, эта сумка, этот стиль — в новый кадр: шесть способов на 14 референсах, плюс видео без «плывущей» родинки.</span></a></li>
+<li class="part">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">09</span><span class="ct">Видео на MiniMax H3</span><span class="st tag warn">пополняется</span><span class="cd">Пайплайн фото → видео → 48 fps, настройки, длина роликов и склейка, Eros Max.</span></a></li>
+<li><a href="ch-speed.html"><span class="cn">10</span><span class="ct">Скорость и качество</span><span class="st tag good">готово</span><span class="cd">SageAttention ×2 быстрее, рецепт качества 30 шагов без турбо, что ломает руки, SeedVR2, FILM, селфи-камера.</span></a></li>
+<li class="part">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">11</span><span class="ct">Сравнение моделей</span><span class="st tag good">готово</span><span class="cd">Девять моделей фото и две видео на одинаковых промптах: сильные и слабые стороны, для чего какая. 2 МП, физика, LTX против H3.</span></a></li>
+<li><a href="ch-models.html"><span class="cn">12</span><span class="ct">Какие модели существуют</span><span class="st tag warn">пополняется</span><span class="cd">Открытые модели фото и видео на октябрь 2026: что умеют, лицензии, рейтинги, где имеет смысл тестировать.</span></a></li>
+<li class="part">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">13</span><span class="ct">Свой персонаж и LoRA</span><span class="st tag warn">пополняется</span><span class="cd">Эталонное лицо, лист ракурсов, перенос в сцены, первый кадр для видео, LoRA v1 → v3 на RunPod: утечка примет и как её убрал DOP.</span></a></li>
+<li><a href="ch-datasets.html"><span class="cn">14</span><span class="ct">Датасеты для LoRA</span><span class="st tag warn">пополняется</span><span class="cd">Откуда креаторы берут данные, правила отбора и подписей, наш рецепт и бесплатные датасеты с лицензиями.</span></a></li>
+<li class="part">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">15</span><span class="ct">Разбор креаторов</span><span class="st tag warn">пополняется</span><span class="cd">Работы заметных авторов: из чего они сделаны, какие файлы скачать, как повторить, что вышло у нас.</span></a></li>
+<li><a href="ch-trends.html"><span class="cn">16</span><span class="ct">Повтор трендов</span><span class="st tag warn">пополняется</span><span class="cd">Берём популярный пост, достаём из него модель, LoRA и настройки, собираем workflow и показываем наш результат рядом с оригиналом.</span></a></li>
+<li class="part">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">17</span><span class="ct">Монтаж с ИИ</span><span class="st tag good">готово</span><span class="cd">HyperFrames: вертикальный ролик с музыкой, заставка-петля для стрима, объясняющий ролик о LoRA. Своя музыка на ACE-Step, громкость и цвет по замерам.</span></a></li>
+<li class="part">Часть VIII · Справочник</li><li><a href="ch-eval.html"><span class="cn">18</span><span class="ct">Как мы оцениваем результат</span><span class="st tag good">готово</span><span class="cd">Что меряют резкость, ArcFace, LAION, CLIP, DINOv2, громкость; где метрики врут и почему судья — человек с кроп-листом.</span></a></li>
+<li><a href="ch-workflows.html"><span class="cn">19</span><span class="ct">Workflow в ComfyUI</span><span class="st tag warn">пополняется</span><span class="cd">Какие workflow собраны, что делает каждый и сколько он считает.</span></a></li>
+<li><a href="ch-pitfalls.html"><span class="cn">20</span><span class="ct">Грабли</span><span class="st tag warn">пополняется</span><span class="cd">На что мы уже наступили и как это обойти.</span></a></li>
+<li><a href="ch-glossary.html"><span class="cn">21</span><span class="ct">Словарь</span><span class="st tag warn">пополняется</span><span class="cd">Больше пятидесяти терминов от ArcFace до VAE: коротко, с английским названием и ссылкой на главу.</span></a></li>
+<li><a href="ch-lab.html"><span class="cn">22</span><span class="ct">Серии экспериментов</span><span class="st tag warn">пополняется</span><span class="cd">Как ИИ-агент ведёт исследование сериями, какие серии сделаны, какие идут, какие впереди.</span></a></li>
+<li><a href="ch-agent.html"><span class="cn">23</span><span class="ct">Для вашего агента</span><span class="st tag warn">пополняется</span><span class="cd">Раздел для ИИ-агентов (на английском): точные файлы моделей, настройки, шаблоны промптов, API ComfyUI, RunPod, правила монтажа, ловушки. Файлы agent-guide.md, llms.txt, book.json.</span></a></li>
 </ol>
 </section>
 
 <section aria-labelledby="rules">
   <h2 id="rules">Главные правила</h2>
+  <p class="prose">Восемь выводов, которые чаще всего экономят время. Подробности и замеры — в главах по ссылкам.</p>
   <ul class="rules prose">
-    <li><b>Реализм кадра определяют модель и промпт.</b> Дополнительные проходы добавляют резкость и разрешение, а LoRA реализма дают глянец. Хочешь «как с телефона», бери простой вариант.</li>
-    <li><b>Для картинок теги работают не хуже прозы.</b> <code>photo \(medium\)</code>, <code>crisp detailed instagram photograph</code>, субъект, поза, одежда, место, <code>bokeh</code> через запятую. «Instagram photograph» даёт глянец, «amateur phone photo» сырой бытовой вид.</li>
-    <li><b>Для видео нужна раскадровка по секундам.</b> С коротким промптом лицо плывёт и действия теряются. Обязательны блоки appearance lock и background lock.</li>
+    <li><b>Реализм кадра определяют модель и промпт.</b> Дополнительные проходы добавляют резкость и разрешение, а LoRA реализма — глянец. Нужен вид «как с телефона» — берите простой рецепт (<a href="ch-stills.html">глава «Кадр»</a>).</li>
+    <li><b>Для картинок теги работают не хуже прозы.</b> <code>photo \(medium\)</code>, <code>crisp detailed instagram photograph</code>, субъект, поза, одежда, место, <code>bokeh</code> через запятую. «Instagram photograph» даёт глянец, «amateur phone photo» — сырой бытовой вид.</li>
+    <li><b>Для видео нужна раскадровка по секундам.</b> С коротким промптом лицо плывёт и действия теряются. Обязательны строки appearance lock и background lock (<a href="ch-prompts.html">шаблон</a>).</li>
     <li><b>Разрешение видео важнее числа шагов.</b> 768×960 с турбо лучше, чем 640×800 без турбо на 20 шагах.</li>
     <li><b>Стороны кадра кратны 32.</b> 576×720 не работает, 640×800, 768×960 и 896×1120 работают.</li>
-    <li><b>Узкое место — оперативная память, а не видеокарта.</b> H3 берёт ≈ 27 ГБ RAM сверх фона на 5-секундный ролик. Перед длинным рендером закрой Docker/WSL и лишний браузер (глава 4).</li>
-    <li><b>Ускорение проверяй на трудной сцене и глазами.</b> Турбо 4 шага давал 64 с вместо 163 с на спокойном ролике, но на быстрых руках плавит пальцы и морфит предметы (глава 4).</li>
-    <li><b>Пиши возраст явно</b> (25+, late-20s). Модели по умолчанию делают лица моложе заданного.</li>
+    <li><b>Узкое место видео — оперативная память, а не видеокарта.</b> H3 берёт ≈ 27 ГБ RAM сверх фона на 5-секундный ролик. Перед длинным рендером закройте Docker/WSL и лишний браузер (<a href="ch-speed.html#sp-ram">глава «Скорость»</a>).</li>
+    <li><b>Ускорение проверяйте на трудной сцене и глазами.</b> Турбо на 4 шага давал 64 с вместо 163 с на спокойном ролике, но на быстрых руках плавит пальцы и морфит предметы.</li>
+    <li><b>Пишите возраст и черты лица явно.</b> Модели по умолчанию делают лица моложе заданного; возраст лучше закреплять строением лица, а не цифрой (<a href="ch-persona.html">глава «Персонаж»</a>).</li>
   </ul>
 </section>
 
+
+<section aria-labelledby="news">
+  <h2 id="news">Что нового</h2>
+  <ul class="news prose">
+<li><time>26.10.2026</time><span>Книга стала учебником: новые главы «Как устроен учебник», «Как работают генеративные модели», «ComfyUI: граф, ноды, workflow», «Как мы оцениваем результат» и «Словарь»; восемь частей вместо пяти, меню глав и «главное за минуту» на каждой странице, переход между главами клавишами ← →. Для ИИ-агентов — каждая глава в Markdown, llms-full.txt и book.json. LoRA персонажа v3 добавлена в главу «Свой персонаж».</span></li>
+<li><time>26.10.2026</time><span>Серия 6: новая глава «Перенос по референсу». Одно чистое фото + Qwen-Image 2.1 держит лицо лучше нашей LoRA (0,81 против 0,55), но копирует позу; Klein — для новых поз и ракурсов; палитру и свет переносит только Krea style reference. В видео H3 Ref2V по трём фото Марен держит родинку на месте. Четыре новых workflow 10_ref_*.</span></li>
+<li><time>26.10.2026</time><span>Серия 5: новая глава «Правка кадра» — пять инструментов (Krea General/Identity Edit V2, Qwen-Edit 2511, Qwen-Image 2.1, BFS) на одних и тех же картинках. Победитель почти везде — Qwen-Image 2.1; свет — Krea General Edit; апскейл — SeedVR2 7B sharp. Четыре новых workflow 09_edit_*.</span></li>
+<li><time>26.10.2026</time><span>Серия 10 закрыта: новая глава «Монтаж с ИИ» — вертикальный ролик 9:16 с музыкой ACE-Step и приглушением под голос, бесшовная заставка для стрима с отсчётом, объясняющий ролик «Что делает LoRA» (сила 0 → 1,25 на одном сиде), замеры громкости и цвета.</span></li>
+<li><time>25.10.2026</time><span>Две новые главы: «Датасеты для LoRA» (откуда креаторы берут данные, правила отбора и подписей, бесплатные датасеты с лицензиями).</span></li>
+</ul>
+</section>
 
 </div>
 
@@ -204,6 +275,19 @@ document.querySelectorAll('button[data-copy]').forEach(function(b){
     var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
     try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
   });
+});
+// ←/→ = previous/next chapter (not while typing or selecting text); the chapter menu closes on an outside click or Esc
+document.addEventListener('keydown',function(e){
+  var t=e.target, m=document.querySelector('details.chmenu');
+  if(e.key==='Escape'&&m){m.open=false;return}
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||/INPUT|TEXTAREA|SELECT|VIDEO/.test(t.tagName)||t.isContentEditable)return;
+  if(String(getSelection())!=='')return;
+  var a=document.querySelector('.pager a[rel="'+(e.key==='ArrowLeft'?'prev':e.key==='ArrowRight'?'next':'')+'"]');
+  if(a)location.href=a.getAttribute('href');
+});
+document.addEventListener('click',function(e){
+  var m=document.querySelector('details.chmenu');
+  if(m&&m.open&&!m.contains(e.target))m.open=false;
 });
 </script>
 </body>

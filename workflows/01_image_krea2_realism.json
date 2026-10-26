@@ -27,7 +27,7 @@
    "inputs": [],
    "outputs": [],
    "widgets_values": [
-    "# 01 · Krea 2 — realism recipe (2 passes + face + upscale)\n**Use:** write the **prompt** on the node → Run → `H3test/krea2_*.png`. ≈ 55–110 s.\nRecipe of Civitai *just_a_prompt_guy* with the series-0 \"AI face\" fixes: Realism Engine **0.5** + Realistic Snapshot 0.9,\npass 1 8 steps euler_ancestral/sgm_uniform → latent ×1.5 hi-res pass (4 steps, denoise 0.54) + ColorMatch →\nFaceDetailer (1440 px, denoise 0.5) → Ultimate SD Upscale ×1.9 (OmniSR, denoise **0.22**).\n\n| Field | Meaning |\n|---|---|\n| width / height | base size; **896×1120 (4:5) for video stills**, 1000×1600 for tall photos |\n| realism strength | Realism Engine LoRA; 0.5 tested best, 0.7 = glossy \"AI face\" |\n| face detail | FaceDetailer pass (fixes small faces) |\n| upscale ×1.9 | USDU to ≈ 2.5–2.9 K; off = hi-res size, faster |\n\n**Prompt tips:** booru-style tags work as well as prose (`photo \\(medium\\), crisp detailed instagram photograph` = glossy,\n`amateur phone photo` = raw). Body shape needs **strong**, concrete build words\nplus a body–pose relation — soft words (large, full, curvy hourglass) are ignored at cfg 1.\nWrite the age explicitly (25+, late-20s, mature facial features). For video stills use a 4:5 size (896×1120).\n\n**Measured:** RTX 5070 Ti 16 GB, ComfyUI 0.42.4 · 1000×1600 → 2856×4560: **88–106 s** · 896×1120 → 2552×3192: **54–57 s** · peak VRAM 15.6–15.9 GB, RAM ≈ 45 GB"
+    "# 01 · Krea 2 — realism recipe (2 passes + face + upscale)\n**Use:** write the **prompt** on the node → Run → `H3test/krea2_*.png`. ≈ 55–110 s.\nRecipe of Civitai *just_a_prompt_guy* with the series-0 \"AI face\" fixes: Realism Engine **0.5** + Realistic Snapshot 0.9,\npass 1 8 steps euler_ancestral/sgm_uniform → latent ×1.5 hi-res pass (4 steps, denoise 0.54) + ColorMatch →\nFaceDetailer (1440 px, denoise 0.5) → Ultimate SD Upscale ×1.9 (OmniSR, denoise **0.22**).\n\n| Field | Meaning |\n|---|---|\n| width / height | base size; **896×1120 (4:5) for video stills**, 1000×1600 for tall photos |\n| realism strength | Realism Engine LoRA; 0.5 tested best, 0.7 = glossy \"AI face\" |\n| face detail | FaceDetailer pass (fixes small faces) |\n| upscale ×1.9 | USDU to ≈ 2.5–2.9 K; off = hi-res size, faster |\n\n**Prompt tips:** booru-style tags work as well as prose (`photo \\(medium\\), crisp detailed instagram photograph` = glossy,\n`amateur phone photo` = raw). Body shape needs **strong** words (`slightly chubby body, curvy, thick, huge breasts, wide hips,\nbig round butt, thick thighs`) plus a body–pose relation — soft words (large, full, curvy hourglass) are ignored at cfg 1.\nWrite the age explicitly (25+, late-20s, mature facial features). For video stills use a 4:5 size (896×1120).\n\n**Measured:** RTX 5070 Ti 16 GB, ComfyUI 0.42.4 · 1000×1600 → 2856×4560: **88–106 s** · 896×1120 → 2552×3192: **54–57 s** · peak VRAM 15.6–15.9 GB, RAM ≈ 45 GB"
    ]
   },
   {
@@ -69,7 +69,7 @@
   },
   {
    "id": 23,
-   "type": "7029fe63-d1a6-421d-90da-44df28ba5d29",
+   "type": "70126f3d-a5f9-4f61-97ac-22a48776335f",
    "title": "Krea 2 · realism still",
    "pos": [
     480,
@@ -196,7 +196,7 @@
  "definitions": {
   "subgraphs": [
    {
-    "id": "7029fe63-d1a6-421d-90da-44df28ba5d29",
+    "id": "70126f3d-a5f9-4f61-97ac-22a48776335f",
     "version": 1,
     "state": {
      "lastGroupId": 4,
@@ -227,7 +227,7 @@
     },
     "inputs": [
      {
-      "id": "06e695eb-8911-4e46-9743-b06d2bbde7da",
+      "id": "f663cc90-bb93-4086-b1cf-4c2e81ca284c",
       "name": "text",
       "type": "STRING",
       "linkIds": [
@@ -240,7 +240,7 @@
       ]
      },
      {
-      "id": "404f722a-632f-4fbb-a9c0-dc46f3aeb5e7",
+      "id": "bd72a20c-e649-41d9-bac6-190a9de83dd4",
       "name": "width",
       "type": "INT",
       "linkIds": [
@@ -253,7 +253,7 @@
       ]
      },
      {
-      "id": "6e287711-dff6-42be-8a09-fbc97c0a003d",
+      "id": "04848890-f2de-4a60-8e59-aca470302cb0",
       "name": "height",
       "type": "INT",
       "linkIds": [
@@ -266,7 +266,7 @@
       ]
      },
      {
-      "id": "2831ef59-ddf9-4d48-8221-f0a75b8f8b41",
+      "id": "1468a13d-f7f8-496b-92f1-d45ef672c93b",
       "name": "noise_seed",
       "type": "INT",
       "linkIds": [
@@ -282,7 +282,7 @@
       ]
      },
      {
-      "id": "42b58090-51a0-4598-88e1-dda52cd5b7ff",
+      "id": "7904ce89-7b8a-46d9-9cf7-29f0a45b07c7",
       "name": "strength_model",
       "type": "FLOAT",
       "linkIds": [
@@ -296,7 +296,7 @@
       ]
      },
      {
-      "id": "49bd8acd-2d6a-4386-947a-ddbca88d3725",
+      "id": "873e7bb6-61c6-4c96-9d15-5e5a329c65de",
       "name": "switch",
       "type": "BOOLEAN",
       "linkIds": [
@@ -309,7 +309,7 @@
       ]
      },
      {
-      "id": "a39c1db9-cc15-43f1-b1a7-92c0d5ca03c1",
+      "id": "7acf46c3-6dae-4a22-8053-13ff9d3ae52e",
       "name": "switch_1",
       "type": "BOOLEAN",
       "linkIds": [
@@ -324,7 +324,7 @@
     ],
     "outputs": [
      {
-      "id": "9e8f031f-ff48-468a-8bfc-eb4461677149",
+      "id": "047e734f-cab7-45a4-afda-8b392263384a",
       "name": "IMAGE",
       "type": "IMAGE",
       "linkIds": [

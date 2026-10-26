@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Свой персонаж и LoRA · Локальная студия H3</title>
+<title>Свой персонаж и LoRA · Студия ComfyUI</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="alternate" type="text/markdown" href="md/ch-persona.md" title="Markdown для ИИ-агентов">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+/* Layout: textbook — one reading column, wide media strips, data tables in mono. Copper accent = the test persona's hair. */
 :root{
   --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
   --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
@@ -131,26 +133,80 @@ a{color:var(--accent)}
 .hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
 .hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
 @media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+/* textbook navigation (2026-10-26): chapter menu in the bar, «главное за минуту», «на этой странице», reading routes */
+.chmenu{position:relative;font:500 13px var(--mono)}
+.chmenu summary{cursor:pointer;color:var(--accent);list-style:none}
+.chmenu summary::-webkit-details-marker{display:none}
+.chmenu summary::after{content:" ▾"}
+.chmenu[open] summary::after{content:" ▴"}
+.chmenu ol{position:absolute;right:0;top:calc(100% + 8px);z-index:5;width:min(360px,calc(100vw - 32px));max-height:70vh;overflow:auto;
+  margin:0;padding:8px 0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.chmenu li a{display:flex;gap:10px;padding:6px 14px;text-decoration:none;color:var(--fg);font:400 14px/1.35 var(--body)}
+.chmenu li a:hover{background:var(--accent-soft)}
+.chmenu li a[aria-current]{color:var(--accent);font-weight:600}
+.chmenu .cn{font:500 12px var(--mono);color:var(--muted);min-width:1.8em}
+.chmenu li.mp{padding:10px 14px 4px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chintro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}
+.keybox{background:var(--accent-soft);border-radius:10px;padding:14px 18px}
+.keybox b,.onpage b{display:block;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.keybox ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.onpage{border:1px solid var(--line);border-radius:10px;padding:14px 18px;background:var(--panel)}
+.onpage ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.onpage a{text-decoration:none}.onpage a:hover{text-decoration:underline}
+.mdlink{font:500 12px var(--mono);color:var(--muted);margin:0}
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.route{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;align-items:start}
+.route img{width:120px;aspect-ratio:4/5;object-fit:cover;border-radius:8px}
+.route .rt{display:grid;gap:4px}
+.route .rt b{font:500 17px/1.2 var(--display)}
+.route .rt span{color:var(--muted);font-size:14px;line-height:1.4}
+.route ol{margin:6px 0 0;padding-left:20px;font-size:14px;display:grid;gap:2px}
+.agentbox{border:1px dashed var(--accent);border-radius:10px;padding:14px 18px;max-width:80ch}
+/* theory: diagrams, callouts, glossary, evidence tags */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:560px}
+.diagram svg text{font-family:var(--body);fill:var(--fg)}
+.diagram svg .muted{fill:var(--muted)}
+.diagram svg .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.diagram svg .hot{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.diagram svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+.diagram svg .ahead{fill:var(--muted)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;padding:12px 16px;max-width:72ch}
+.callout b:first-child{color:var(--accent)}
+.ev{display:inline-block;font:600 10px/1 var(--mono);letter-spacing:.04em;padding:3px 6px;border-radius:4px;vertical-align:2px;border:1px solid currentColor}
+.ev.m{color:var(--good)}.ev.s{color:var(--warn)}.ev.r{color:var(--accent)}
+.gloss{display:grid;gap:0;margin:0;border-top:1px solid var(--line);max-width:80ch}
+.gloss>div{display:grid;grid-template-columns:minmax(150px,13em) minmax(0,1fr);gap:4px 18px;padding:12px 4px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+.gloss>div:target{background:var(--accent-soft)}
+.gloss dt{font:600 15px var(--body)}
+.gloss dt small{display:block;font:400 12px var(--mono);color:var(--muted)}
+.gloss dd{margin:0;font-size:15px}
+.letters{display:flex;flex-wrap:wrap;gap:6px;font:500 13px var(--mono)}
+.letters a{padding:3px 8px;border:1px solid var(--line);border-radius:6px;text-decoration:none}
+@media (max-width:760px){.chintro,.routes{grid-template-columns:minmax(0,1fr)}.route{grid-template-columns:84px minmax(0,1fr)}.route img{width:84px}
+  .gloss>div{grid-template-columns:minmax(0,1fr)}.chmenu ol{position:fixed;left:16px;right:16px;top:56px;width:auto}}
+.cover-video{max-width:760px}
 </style>
 <style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
 
 <div class="wrap">
-<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 9 из 15</span></nav>
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть V · Персонаж и LoRA · глава 13 из 23</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-ref.html"><span class="cn">08</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">09</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html"><span class="cn">10</span>Скорость и качество</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">11</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">12</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html" aria-current="page"><span class="cn">13</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">14</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">15</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">16</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">17</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · Справочник</li><li><a href="ch-eval.html"><span class="cn">18</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">19</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">20</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">21</span>Словарь</a></li><li><a href="ch-lab.html"><span class="cn">22</span>Серии экспериментов</a></li><li><a href="ch-agent.html"><span class="cn">23</span>Для вашего агента</a></li></ol></details></nav>
 <header>
-  <div class="eyebrow">Глава 9 · серия 3 · 25.10.2026</div>
+  <div class="eyebrow">Глава 13 · серии 3 и 13 · 25.10.2026</div>
   <h1>Свой персонаж и LoRA</h1>
-  <p class="lead">Как сделать вымышленного персонажа, который узнаётся в каждом кадре и ролике: что сработало в серии 3 и что впереди.</p>
+  <p class="lead">Как сделать вымышленного персонажа, который узнаётся в каждом кадре и ролике. На примере Марен Холт — от первого лица до LoRA, которая держит родинку и шрам.</p>
 </header>
+<div class="chintro"><aside class="keybox" aria-label="Главное за минуту"><b>Главное за минуту</b><ul><li>Возраст закрепляют строением лица и ролью, а не цифрой; LoRA реализма молодят лицо.</li><li>LoRA учит лицо первым, мелкие приметы — последними: им нужно 4000 шагов и резкие крупные планы.</li><li>Если во всех подписях «a woman», приметы «утекают» на всех женщин; лечит DOP, а не набор чужих фото.</li><li>Триггер — как имя («Maren Holt»): бессмысленное слово модель печатает текстом.</li></ul></aside><nav class="onpage" aria-label="На этой странице"><b>На этой странице</b><ol><li><a href="#ps-hero">Эталонное лицо: как получить приметы и правильный возраст</a></li><li><a href="#ps-sheet">Лист ракурсов на Qwen-Image-Edit 2511</a></li><li><a href="#ps-restage">Перенос в новые сцены: заготовка датасета</a></li><li><a href="#ps-ff">Первый кадр для видео: шесть вариантов, один сценарий</a></li><li><a href="#ps-lora1">LoRA v1 и v2: приметы против утечки</a></li><li><a href="#ps-lora3">LoRA v3: DOP вместо чужих фото — приметы на месте, утечки нет</a></li><li><a href="#lora">Рецепт целиком: от лица до LoRA</a></li></ol></nav></div>
 
 <section aria-labelledby="ps-hero">
   <h2 id="ps-hero">Эталонное лицо: как получить приметы и правильный возраст</h2>
-  <p class="prose">Персона серии 3 — вымышленная Марен Холт, 29 лет, архитектор из Мюнхена: медно-рыжие волосы, зелёные глаза, веснушки и две постоянные приметы — маленькая родинка под глазом и тонкий светлый шрам у брови. Hero-кадр рисовали на Krea 2 Turbo (<code>01b</code>, 2 МП) с формулой «слой личности + слой кадра». Четыре версии промпта, около 70 сидов.</p>
+  <p class="prose">Персона серии 3 — вымышленная Марен Холт, 29 лет, архитектор из Мюнхена: медно-рыжие волосы, зелёные глаза, веснушки и две постоянные приметы — маленькая родинка под глазом и тонкий светлый шрам у брови. Эталонный (hero) кадр рисовали на Krea 2 Turbo (<code>01b</code>, 2 МП) с формулой «слой личности + слой кадра». Четыре версии промпта, около 70 сидов.</p>
   <div class="tbl"><table>
     <thead><tr><th>Версия</th><th>Что меняли</th><th>Результат</th></tr></thead>
     <tbody>
-      <tr><td>v1</td><td>боковой свет 45°, «без ретуши»</td><td>приметы не появились ни на одном сиде; глубокие несимметричные складки у рта (твоё замечание)</td></tr>
+      <tr><td>v1</td><td>боковой свет 45°, «без ретуши»</td><td>приметы не появились ни на одном сиде; глубокие несимметричные складки у рта — лицо старше на 10 лет</td></tr>
       <tr><td>v2 / v3</td><td>приметы описаны конкретно, свет «бабочка» спереди, без «fine lines»</td><td>складки ушли, лицо ровное, но приметы всё ещё не рисуются</td></tr>
       <tr><td>v2 + LoRA</td><td>те же слова + LoRA реализма из <code>01b</code></td><td><b>приметы на каждом сиде</b>, но лицо выглядит на 17–20 лет</td></tr>
       <tr class="win"><td><b>v4</b></td><td>возраст закреплён строением лица: «defined cheekbones, mature composed look», профессия; приметы описаны мельче</td><td>приметы на месте, возраст читается как 28–30. Hero = v4, сид 3001</td></tr>
@@ -198,13 +254,13 @@ a{color:var(--accent)}
     <li><b>Фон в сценарии = фон на кадре.</b> Если перечислять новые предметы, H3 перерисовывает фон.</li>
     <li><b>Рука у лица — можно</b>, если рука целиком в кадре с самого начала.</li>
     <li><b>«Улыбка с сомкнутыми губами»</b> убирает слишком большие зубы.</li>
-    <li>H3 иногда копирует родинку на вторую щёку (A, C). Кандидат на исправление LoRA персоны (серия 12).</li>
+    <li>H3 иногда копирует родинку на вторую щёку (A, C). Решение нашлось позже: Reference-to-Video по трём видам лица (<a href="ch-ref.html#rf-video">глава «Референс»</a>).</li>
   </ul>
 </section>
 
 <section aria-labelledby="ps-lora1">
-  <h2 id="ps-lora1">Первая LoRA Марен (RunPod, 25.10)</h2>
-  <p class="prose">50 отобранных кадров, подписи «mrnholt, a woman. &lt;текст сцены&gt;», ai-toolkit, Krea 2 Raw, rank 32, lr 1e-4, 2500 шагов. RTX PRO 6000 (96 ГБ) на RunPod: около часа и ~$4. Проверка — на Turbo, как в обычной работе.</p>
+  <h2 id="ps-lora1">LoRA v1 и v2: приметы против утечки</h2>
+  <p class="prose">50 отобранных кадров, подписи «mrnholt, a woman. &lt;текст сцены&gt;», ai-toolkit, Krea 2 Raw, rank 32, lr 1e-4, 2500 шагов. Арендованная RTX PRO 6000 (96 ГБ): около часа и ~$4. Проверка — на Turbo, как в обычной работе.</p>
   <div class="tbl"><table>
     <thead><tr><th>Версия</th><th>Похожесть (ArcFace)</th><th>Утечка на чужую женщину</th><th>Приметы</th></tr></thead>
     <tbody>
@@ -212,23 +268,52 @@ a{color:var(--accent)}
       <tr><td>v2 (+47 кадров других женщин без триггера), сила 1,0</td><td class="num">0,60</td><td class="num">0,24</td><td>утечки нет — но и у Марен приметы пропали</td></tr>
     </tbody>
   </table></div>
-  <figure><img src="media/s12-v1-local.jpg" alt="LoRA v1 на нашей Turbo" loading="lazy"><figcaption><b>LoRA v1 на нашем компьютере</b> (Turbo int8, 8 шагов). Нижний ряд — с LoRA реализма из <code>01b</code>. Последний столбец — промпт без триггера.</figcaption></figure>
+  <figure><img src="media/s12-v1-local.jpg" alt="LoRA v1 на нашей Turbo" loading="lazy"><figcaption><b>LoRA v1 на локальной машине</b> (Turbo int8, 8 шагов). Нижний ряд — с LoRA реализма из <code>01b</code>. Последний столбец — промпт без триггера.</figcaption></figure>
   <figure><img src="media/s12-v1-marks-leak.jpg" alt="Приметы и утечка v1" loading="lazy"><figcaption><b>v1 крупно:</b> сверху у Марен есть шрам и родинка; снизу та же метка у брюнетки, которую мы не просили — это утечка.</figcaption></figure>
   <figure><img src="media/s12-v2.jpg" alt="LoRA v2" loading="lazy"><figcaption><b>v2 с регуляризацией:</b> брюнетка осталась собой, но у Марен нет примет.</figcaption></figure>
   <ul class="rules prose">
     <li><b>Лицо учится первым</b> (рыжие волосы и веснушки к шагу 1000), <b>мелкие приметы — последними</b> (только к 2500).</li>
     <li><b>Утечка:</b> если во всех подписях «a woman» и на всех кадрах шрам, модель решает, что шрам бывает у всех женщин. Лечится кадрами других женщин в тех же сценах без триггера (регуляризация), но тогда нужно больше шагов.</li>
     <li>Непонятное слово-триггер Krea иногда <b>печатает текстом</b> — на обложке книги появилось «mrnholt».</li>
-    <li>Дальше v3: данные v2, ~4000 шагов или lr 2e-4.</li>
+    <li>Почему v2 потеряла приметы, выяснилось в коде ai-toolkit: набор регуляризации забирает <b>каждый второй шаг</b>, и персонажу досталась половина обучения. Решение — v3 ниже.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ps-lora3">
+  <h2 id="ps-lora3">LoRA v3: DOP вместо чужих фото — приметы на месте, утечки нет</h2>
+  <p class="prose">Так же делают авторы LoRA на Civitai: никакого набора чужих женщин, вместо него режим <a href="ch-glossary.html#dop">DOP</a> (Differential Output Preservation) — при каждом шаге модель сверяет, что промпт <i>без</i> триггера даёт то же, что и без LoRA. Триггер — имя «Maren Holt» вместо «mrnholt». 53 картинки (47 сцен + эталон + 5 ракурсов), rank 32, lr 1e-4, <b>4000 шагов</b>, сохранение каждые 250. Арендованная PRO 6000: ≈ 3,3 часа, ≈ $9.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Версия · сила</th><th class="num">Портрет</th><th class="num">Полный рост</th><th class="num">Среднее</th><th class="num">Утечка</th><th>Приметы</th></tr></thead>
+    <tbody>
+      <tr><td>v1 · 0,8</td><td class="num">0,67</td><td class="num">0,45</td><td class="num">0,58</td><td class="num">0,37</td><td>есть, но и у чужой брюнетки</td></tr>
+      <tr><td>v2 · 0,8</td><td class="num">0,65</td><td class="num">0,46</td><td class="num">0,51</td><td class="num">0,22</td><td>пропали</td></tr>
+      <tr><td>v3, 2500 шагов · 0,8</td><td class="num">0,75</td><td class="num">0,55</td><td class="num">0,62</td><td class="num">0,16</td><td>есть</td></tr>
+      <tr class="win"><td><b>v3, 4000 шагов · 0,8</b></td><td class="num"><b>0,79</b></td><td class="num">0,54</td><td class="num"><b>0,65</b></td><td class="num"><b>0,15</b></td><td><b>шрам и родинка, правильная сторона</b></td></tr>
+      <tr><td>v3, 4000 шагов · 1,0</td><td class="num">0,76</td><td class="num">0,47</td><td class="num">0,60</td><td class="num">0,15</td><td>есть</td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose" style="color:var(--muted);font-size:14px">ArcFace к эталону; среднее по пяти сценам (портрет, трамвай, причал в полный рост, бар, кухня), все версии перерисованы в одном прогоне на локальном стеке Turbo; «утечка» — сходство с Марен у брюнетки из промпта без триггера (меньше = лучше).</p>
+  <figure class="wide"><img src="media/s13-v3-compare.jpg" alt="Эталон и шесть сцен: v1, v2, v3 3000, v3 4000 на силе 0,8 и 1,0" loading="lazy">
+    <figcaption><b>Сверху эталон, ниже ряды v1 · v2 · v3-3000 · v3-4000 (0,8) · v3-4000 (1,0).</b> Последний столбец — промпт без триггера: у v1 брюнетка получает чужие приметы, у v2 на обложке книги напечатан триггер «mrnholt», у v3 она остаётся собой.</figcaption></figure>
+  <figure class="wide"><img src="media/s13-v3-fullbody.jpg" alt="Марен в полный рост и в вертикальном кадре, шесть сцен по два сида" loading="lazy">
+    <figcaption><b>Полный рост и 9:16 на v3</b> — то, что не давалось ни одной модели правки: лицо, волосы и телосложение держатся во всех сценах, ≈ 4 с на кадр.</figcaption></figure>
+  <figure>
+    <video src="media/s13-day-off.mp4" poster="media/s13-day-off-poster.jpg" controls playsinline preload="none" style="max-width:520px"></video>
+    <figcaption><b>«Выходной Марен», 37 с.</b> Четыре ролика H3 по 9,4 с из кадров LoRA v3 (≈ 7,5 мин каждый на PRO 6000), смонтированы кодом в HyperFrames (<a href="ch-editing.html">глава «Монтаж»</a>). Лицо и обе приметы держатся во всех клипах; мелкие ляпы — бокал переходит из руки в руку.</figcaption>
+  </figure>
+  <ul class="rules prose">
+    <li><b>Рецепт для персонажа с мелкими приметами:</b> без набора регуляризации, DOP включён, триггер-имя, ≥ 4000 шагов, проверка на промпте без триггера и на кроп-листе, а не только по среднему ArcFace (все чекпойнты v3 — в пределах 0,59–0,65) <span class="ev m">ЗАМЕР</span>.</li>
+    <li><b>Сила 0,8 лучше 1,0</b>: среднее и полный рост выше, на глаз одинаково.</li>
+    <li><b>Для отдельных кадров есть путь проще:</b> одна чистая фотография + Qwen-Image 2.1 даёт сходство 0,81 без обучения, но копирует позу (<a href="ch-ref.html">глава «Референс»</a>). LoRA нужна для серий кадров, полного роста и видео.</li>
   </ul>
 </section>
 
 <section aria-labelledby="lora">
-  <h2 id="lora">Дальше: своя LoRA</h2>
+  <h2 id="lora">Рецепт целиком: от лица до LoRA</h2>
   <div class="pipe">
-    <div class="step"><span class="n">1 · эталонное лицо</span><span class="t">готово <small>серия 3</small></span><span>Hero v4 + лист ракурсов. Осталось: обратный поиск по картинке, что лицо не совпадает с реальным человеком (делаешь ты).</span></div>
-    <div class="step"><span class="n">2 · датасет</span><span class="t">~30 → 50 <small>кадров</small></span><span>Qwen-Edit 2511 работает. Сравнение с Krea 2 Identity Edit V2 (ноды <code>comfyui-krea2edit</code> поставлены 25.10) идёт сейчас. Отбор по ArcFace ≥ 0,5 и глазами.</span></div>
-    <div class="step"><span class="n">3 · обучение</span><span class="t">2–3 ч <small>на 5070 Ti, оценка</small></span><span>ostris ai-toolkit, Krea 2 <b>Raw</b>, rank 32, LR 1e-4, 2000 шагов, qfloat8 + offload. Или RunPod (серия 12).</span></div>
+    <div class="step"><span class="n">1 · эталонное лицо</span><span class="t">1 кадр <small>+ 5 ракурсов</small></span><span>Krea 2 + LoRA реализма, свет спереди, все приметы видны. Обратный поиск по картинке — что лицо не совпадает с реальным человеком (делает человек).</span></div>
+    <div class="step"><span class="n">2 · датасет</span><span class="t">50 <small>кадров</small></span><span>сцены через Krea Identity Edit V2 и Qwen-Edit 2511, отбор по ArcFace ≥ 0,5 и глазами (<a href="ch-datasets.html#ds-pipe">глава «Датасеты»</a>)</span></div>
+    <div class="step"><span class="n">3 · обучение</span><span class="t">≈ 3,3 ч <small>≈ $9 в облаке</small></span><span>ai-toolkit, Krea 2 <b>Raw</b>, rank 32, lr 1e-4, 4000 шагов, DOP; использовать на Turbo с силой 0,8</span></div>
   </div>
   <div class="tbl"><table>
     <thead><tr><th>Датасет</th><th>Норма</th><th>Зачем</th></tr></thead>
@@ -245,10 +330,10 @@ a{color:var(--accent)}
     <li><b>Видео:</b> кадр с персоной идёт первым кадром в <code>03</code>, H3 держит лицо из него (см. правила выше).</li>
     <li><b>Лицензии:</b> Identity Edit V2 только для некоммерческого использования. Krea 2 разрешает коммерцию при выручке до $1 млн. У H3 открытые веса не распространяются на ЕС.</li>
   </ul>
-  <p class="prose" style="color:var(--muted);font-size:14px">Подробно: <span class="mono">learning/persona-lora-plan.md</span> и журнал серии 3 в <span class="mono">learning/comfy-experiments.md</span>. Новый workflow для правок персоны: <span class="mono">01e_edit_qwen2511_persona</span>.</p>
 </section>
 
-<nav class="pager" aria-label="Главы"><a href="ch-models.html"><span class="dir">← назад</span>Какие модели существуют</a><a class="next" href="ch-datasets.html"><span class="dir">дальше →</span>Датасеты для LoRA</a></nav>
+<p class="mdlink">Для ИИ-агентов: <a href="md/ch-persona.md">эта глава в Markdown</a> · <a href="llms.txt">llms.txt</a></p>
+<nav class="pager" aria-label="Главы"><a href="ch-models.html" rel="prev"><span class="dir">← назад</span>Какие модели существуют</a><a class="next" href="ch-datasets.html" rel="next"><span class="dir">дальше →</span>Датасеты для LoRA</a></nav>
 </div>
 
 <script>
@@ -259,6 +344,19 @@ document.querySelectorAll('button[data-copy]').forEach(function(b){
     var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
     try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
   });
+});
+// ←/→ = previous/next chapter (not while typing or selecting text); the chapter menu closes on an outside click or Esc
+document.addEventListener('keydown',function(e){
+  var t=e.target, m=document.querySelector('details.chmenu');
+  if(e.key==='Escape'&&m){m.open=false;return}
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||/INPUT|TEXTAREA|SELECT|VIDEO/.test(t.tagName)||t.isContentEditable)return;
+  if(String(getSelection())!=='')return;
+  var a=document.querySelector('.pager a[rel="'+(e.key==='ArrowLeft'?'prev':e.key==='ArrowRight'?'next':'')+'"]');
+  if(a)location.href=a.getAttribute('href');
+});
+document.addEventListener('click',function(e){
+  var m=document.querySelector('details.chmenu');
+  if(m&&m.open&&!m.contains(e.target))m.open=false;
 });
 </script>
 </body>
