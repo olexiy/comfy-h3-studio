@@ -3,7 +3,7 @@
 ```yaml
 doc: agent-guide
 audience: autonomous coding/ops agents driving ComfyUI and cloud GPUs (not humans)
-version: 2026-10-26b
+version: 2026-10-26c
 companion: "Russian textbook for humans: llms.txt (map), book.json (chapter index), md/<slug>.md (each chapter), llms-full.txt (all chapters)"
 evidence_tags: {MEASURED: "run by us, numbers from our logs", SOURCE: "official template / docs / community, not re-measured", RULE: "derived decision rule"}
 baseline_box: {gpu: "RTX 5070 Ti 16 GB (Blackwell)", ram: "62 GB", os: "Windows 11", comfyui: "0.42.x", torch: "2.12+cu130", python: "3.13"}
@@ -15,7 +15,7 @@ content_policy: "all examples SFW, depicted adults stated 25+"
 - Sections are independent; each bullet = one fact or rule. Prefer MEASURED over SOURCE when they conflict.
 - File names below are exact (copy them). Node names are ComfyUI class_type names.
 - Numbers are for the baseline box unless a section says `cloud_box`.
-- Section map: 1 API · 2 model recipes · 3 prompting · 4 first frame for video · 5 persona + LoRA · 5b editing · 5c reference transfer · 6 evaluation · 7 RunPod · 7b Civitai replication · 8 Windows pitfalls · 9 editing video with HyperFrames · 10 RU↔EN terms · 11 open questions.
+- Section map: 1 API · 2 model recipes · 3 prompting · 3b prompt grammar (measured) · 4 first frame for video · 5 persona + LoRA · 5b editing · 5c reference transfer · 6 evaluation · 7 RunPod · 7b Civitai replication · 8 Windows pitfalls · 9 editing video with HyperFrames · 10 RU↔EN terms · 11 open questions.
 - Human chapters with figures and full tables (Russian) are linked from `llms.txt`; cite them by `md/<slug>.md#` heading when you answer a human.
 
 ## 1. Driving ComfyUI headless (API)
@@ -95,6 +95,18 @@ overall_soundscape: <diegetic sounds>.   non_diegetic_music: None.
 negative: morphing face, identity drift, wide toothy grin, extra fingers, warped hands, flicker, text, subtitles, watermark, music.
 ```
 - H3: no mood words (warm, dim, cosy) anywhere incl. the music line → colour drift; hand-body contact mid-clip, calm hold at the end (finger melt happens in the last second); "smiles softly with closed lips" avoids big teeth. [MEASURED]
+
+## 3b. Prompt grammar (series 7, 2026-10-26, measured)
+```yaml
+prompt_lab: {stills: "3 subjects x 8-10 phrasings x Krea 2 Turbo + Qwen-Image 2.1 Turbo x 3 seeds = 156", video: "1 first frame x 7 H3 prompt variants x 2 seeds", box: "RunPod RTX 5090, 1.7 h, $2.09",
+  scoring: [Laplacian sharpness, skin plasticity, age estimate, LAION aesthetic, CLIP, ArcFace vs first frame over 21 frames, by-eye sheets]}
+```
+- Krea 2 Turbo and Qwen-Image 2.1 Turbo (Qwen3-VL encoders) follow **content, not style labels**: "instagram photograph", "amateur phone photo", "motion blur / sensor noise / JPEG" barely change the frame → add grain/noise in post. Tags = prose (CLIP score 18.6 vs 18.5 Krea, 19.2 vs 18.9 Qwen). Age as a number = age in words (estimate within ±3 y). [MEASURED]
+- Length is the knob: 12 words = model defaults (own outfit/type; Krea +7 y older, Qwen glam studio look); ~60 words follows the description; 120+ words renders every detail and is sharpest (Krea sharpness 126 → 171 → 202, Qwen 212 → 334 → 483). [MEASURED]
+- Still template: `Natural photo of [age]-year-old [person, hair, 1-2 face details] [place], [action]. [She/He] wears [outfit]. [Shot size, lens, angle], [light]. [Mood] mood.` + 4-5 detail sentences (background, object, texture, palette, "natural skin texture, no retouching"). [RULE]
+- H3, 5 s: ArcFace mean (2 seeds) 1 action 0.79/0.76 · 2 actions 0.74/0.71 · 3 actions 0.66/0.72 (min 0.35) → **≤ 2 timed actions per 5 s** when the face matters; dropping the locks or the negative list costs a little (0.70/0.70); sound detail does not affect the picture; a plain paragraph gives gentler motion and 15-25 % sharper frames but vaguer actions. [MEASURED]
+- References: Qwen 2.1 "the woman from image 1 wearing the jacket from image 2" + what must stay + the pose in words; Klein `<ref_image_N>`; H3 Ref2V `<Picture 1-3>` "identity references only, not the first frame or the framing". [RULE]
+- Not covered: CLIP-encoder models (SDXL) where tags/weights behave differently; 9 s clips; body wording under loose clothing. [SOURCE: scope note]
 
 ## 4. First frame for image→video (H3)
 - Never crop the still: `ImageScaleToTotalPixels(lanczos, megapixels 0.70, resolution_steps 32)` → `GetImageSize` → H3 width/height. Cropping/resizing mismatch made H3 repaint the background in the first second. [MEASURED]
@@ -242,5 +254,5 @@ HyperFrames (HeyGen, Apache-2.0) renders HTML compositions (GSAP timelines) to M
 
 ## 11. Open questions (not yet measured)
 - Resolved 2026-10-25: the leak — regularisation sets halve the subject's steps in ai-toolkit; DOP + name-like trigger + 4000 steps fixed both leak and marks (section 5, result v3).
-- 9:16 vs 4:5 first frames; H3 Ref2V on the 16 GB baseline box (tested only on cloud_box, section 5c); H3 LoRA from still images; H3 15-30 s clips on a 96 GB card; prompt lab (series 7, running): tags vs prose, length, age wording, shot-list density.
+- 9:16 vs 4:5 first frames; H3 Ref2V on the 16 GB baseline box (tested only on cloud_box, section 5c); H3 LoRA from still images; H3 15-30 s clips on a 96 GB card; prompt lab follow-ups: 9 s clips, CLIP-encoder models.
 - Resolved 2026-10-25: H3 full precision vs quantised → no visible gap (section 2, minimax_h3.precision_test).

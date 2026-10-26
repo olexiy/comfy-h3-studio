@@ -194,24 +194,26 @@ a{color:var(--accent)}
 <div class="wrap">
 <nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть II · Кадр · глава 6 из 23</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html" aria-current="page"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-ref.html"><span class="cn">08</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">09</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html"><span class="cn">10</span>Скорость и качество</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">11</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">12</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">13</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">14</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">15</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">16</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">17</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · Справочник</li><li><a href="ch-eval.html"><span class="cn">18</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">19</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">20</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">21</span>Словарь</a></li><li><a href="ch-lab.html"><span class="cn">22</span>Серии экспериментов</a></li><li><a href="ch-agent.html"><span class="cn">23</span>Для вашего агента</a></li></ol></details></nav>
 <header>
-  <div class="eyebrow">Глава 6 · шаблоны · серия 7 идёт</div>
+  <div class="eyebrow">Глава 6 · серия 7 · 26.10.2026</div>
   <h1>Промпты</h1>
-  <p class="lead">Рабочие шаблоны промптов для кадра и для видео. Скопируйте, замените субъект и сцену.</p>
+  <p class="lead">Проверенные правила вместо советов из сети: 156 кадров на Krea 2 и Qwen 2.1 и 14 клипов H3 на одних и тех же сюжетах. И шаблоны, которые можно копировать.</p>
 </header>
-<div class="chintro"><aside class="keybox" aria-label="Главное за минуту"><b>Главное за минуту</b><ul><li>Для видео — раскадровка по секундам и строки-«замки» внешности и фона.</li><li>Для картинок теги работают не хуже прозы; важна конкретика: 3–5 предметов в сцене, свет, ракурс.</li><li>Возраст и черты лица пишите явно: модели молодят лица по умолчанию.</li></ul></aside><nav class="onpage" aria-label="На этой странице"><b>На этой странице</b><ol><li><a href="#pr-how">Как устроен хороший промпт</a></li><li><a href="#prompts">Шаблоны промптов</a></li><li><a href="#pr-lab">Лаборатория промптов (серия 7)</a></li></ol></nav></div>
+<div class="chintro"><aside class="keybox" aria-label="Главное за минуту"><b>Главное за минуту</b><ul><li>Стилевые ярлыки (instagram, phone photo, шум) почти не меняют кадр — работает содержание.</li><li>120+ слов — все детали и самый резкий кадр; 12 слов — настройки модели по умолчанию.</li><li>H3: не больше двух действий на 5 с, если лицо важно; «замки» и список «не делать» оставлять.</li><li>Теги и связный текст работают одинаково на Krea 2 и Qwen 2.1.</li></ul></aside><nav class="onpage" aria-label="На этой странице"><b>На этой странице</b><ol><li><a href="#pr-how">Как устроен хороший промпт</a></li><li><a href="#prompts">Шаблоны из первых серий</a></li><li><a href="#pr-lab">Лаборатория промптов (серия 7)</a></li><li><a href="#pr-words">Стилевые ярлыки почти ничего не делают ЗАМЕР</a></li><li><a href="#pr-length">Длина решает больше, чем стиль ЗАМЕР</a></li><li><a href="#pr-video">Видео: сколько действий влезает в 5 секунд ЗАМЕР</a></li><li><a href="#pr-templates">Три шаблона по итогам серии 7</a></li><li><a href="#pr-limits">Что не проверено</a></li></ol></nav></div>
 
 <section aria-labelledby="pr-how">
   <h2 id="pr-how">Как устроен хороший промпт</h2>
   <ul class="rules prose">
-    <li><b>Для кадра:</b> кто (возраст, лицо, волосы, телосложение) → что делает (поза, руки) → во что одет (по предметам) → где (3–5 конкретных предметов фона) → свет → камера и фактура. Современные энкодеры понимают и теги, и прозу (<a href="ch-theory.html#th-text">почему</a>).</li>
-    <li><b>Для видео:</b> раскадровка по секундам, одно действие на 1,5–2,5 с, в каждой строке — какая рука и где предмет; строки-«замки» внешности, фона и света; звук отдельной строкой; никаких слов настроения (warm, cosy) — от них уплывает цвет.</li>
+    <li><b>Для кадра:</b> кто (возраст, лицо, волосы) → где → что делает → во что одет → камера и ракурс → свет → настроение, затем 4–5 предложений деталей (фон, предмет, фактура, палитра). Решают <b>содержание и длина</b>: 120+ слов — все детали на месте, 12 слов — модель выбирает за вас. Теги и связный текст работают одинаково (<a href="#pr-length">замеры серии 7</a>).</li>
+    <li><b>Стилевые ярлыки почти ничего не делают</b> на Krea 2 и Qwen 2.1: «instagram photograph», «amateur phone photo», «шум, смаз, JPEG» дают почти тот же кадр (<a href="#pr-words">серия 7</a>). Сырой вид — зерном после генерации.</li>
+    <li><b>Для видео:</b> раскадровка по секундам, <b>не больше двух действий на 5 секунд</b>, в каждой строке — какая рука и где предмет; строки-«замки» внешности и фона и список «не делать» оставляйте; никаких слов настроения (warm, cosy) — от них уплывает цвет.</li>
     <li><b>Для постоянного персонажа:</b> «слой личности» (короткое неизменное описание) + «слой кадра» (переписывается целиком). Промпты ничего не помнят: «снова», «та же» не работают.</li>
     <li><b>У турбо-моделей negative prompt не действует</b> (cfg 1): всё нужное пишите в позитив (<a href="ch-theory.html#th-cfg">почему</a>).</li>
   </ul>
 </section>
 
 <section aria-labelledby="prompts">
-  <h2 id="prompts">Шаблоны промптов</h2>
+  <h2 id="prompts">Шаблоны из первых серий</h2>
+  <p class="prose" style="color:var(--muted);font-size:14px">Шаблоны серии 0, с кнопкой копирования. Ярлыки вроде «crisp detailed instagram photograph» в них можно убрать: по замерам серии 7 они почти не влияют на кадр, работают описание субъекта и сцены.</p>
   <div class="copyrow"><h3>Видео: раскадровка на 5 секунд (победитель V13)</h3><button type="button" data-copy="p-video">Копировать</button></div>
   <pre id="p-video">integrated_multimodal_description: [Shot 1] &lt;Picture 1&gt; is the first frame. Whole clip is 5 seconds. Live-action. Static medium shot of a fictional 28-year-old woman sitting on a black metal mesh bench inside a glass bus shelter in daylight.
 Appearance lock: long wavy copper-red hair, freckles, mature adult face, light everyday makeup, untucked white linen blouse with rolled sleeves, dark-blue high-waisted jeans, small silver pendant, silver hoop earrings, black bag on the bench. Keep face, outfit and proportions exactly as in &lt;Picture 1&gt;.
@@ -239,7 +241,83 @@ slight phone-camera noise, natural skin texture, unretouched.</pre>
 
 <section aria-labelledby="pr-lab">
   <h2 id="pr-lab">Лаборатория промптов (серия 7)</h2>
-  <p class="prose"><span class="tag warn">идёт</span> Серия 7 проверяет на одних и тех же сценах: теги или проза, короткий или длинный промпт, как задавать возраст, сколько действий выдерживает раскадровка видео. Результаты появятся здесь, а шаблоны выше обновятся по её итогам.</p>
+  <p class="prose">Советов «как писать промпт» в сети много, проверенных — мало. Мы проверили их сами. Для фото взяли три сюжета (женщина в кафе, мужчина на вечерней улице, женщина с велосипедом в осеннем парке) и описали каждый в 8–10 формулировках: связный текст, теги, 12 слов, 120+ слов, «instagram photograph», «amateur phone photo», слова про шум и смаз, возраст словами вместо числа, описание фигуры. Каждый вариант — на <b>Krea 2 Turbo</b> и <b>Qwen-Image 2.1 Turbo</b>, по три одинаковых сида: всего 156 кадров. Для видео — один первый кадр и семь вариантов промпта на <b>MiniMax H3</b>, по два сида. Считали в облаке на RTX 5090: 1,7 часа, <b>$2,09</b>.</p>
+  <p class="prose">Оценка: резкость, «пластиковость» кожи, оценка возраста по лицу, эстетика (LAION), совпадение с описанием (CLIP), для видео — сходство лица с первым кадром (ArcFace) по 21 кадру. И, как всегда, листы, которые смотрели глазами.</p>
+</section>
+
+<section aria-labelledby="pr-words">
+  <h2 id="pr-words">Стилевые ярлыки почти ничего не делают <span class="ev m">ЗАМЕР</span></h2>
+  <figure><img src="media/s7-style-words.jpg" alt="Пять формулировок одного кадра на Krea 2" loading="lazy"><figcaption><b>Один сид, пять формулировок.</b> «Instagram photograph», «Amateur phone photo», «лёгкий смаз, шум, JPEG» и теги вместо текста дают почти тот же кадр. Модели с текстовым энкодером Qwen3-VL (Krea 2, Qwen 2.1) слушают <i>содержание</i>: кто, где, что делает, во что одет, какой свет. Ярлык стиля без описания почти не работает.</figcaption></figure>
+  <ul class="rules prose">
+    <li><b>Теги и связный текст работают одинаково</b> на обеих моделях: совпадение с описанием 18,6 против 18,5 (Krea), 19,2 против 18,9 (Qwen). Пишите так, как вам удобнее. <span class="ev m">ЗАМЕР</span></li>
+    <li><b>Слова про шум, смаз и JPEG не портят кадр</b> — модели их почти игнорируют. Нужен «сырой» вид — добавляйте зерно и шум после генерации (серия 4, глава «Против ИИ-вида» в работе). <span class="ev m">ЗАМЕР</span></li>
+    <li><b>Возраст числом («28-year-old») и словами («late-20s, mature facial features»)</b> дают одинаковый результат: ошибка оценки возраста в пределах ±3 лет в обоих случаях. <span class="ev m">ЗАМЕР</span></li>
+  </ul>
+</section>
+
+<section aria-labelledby="pr-length">
+  <h2 id="pr-length">Длина решает больше, чем стиль <span class="ev m">ЗАМЕР</span></h2>
+  <figure><img src="media/s7-length.jpg" alt="12, 54 и 116 слов на Krea и Qwen" loading="lazy"><figcaption><b>Короткий промпт = настройки модели по умолчанию.</b> На 12 словах модели сами выбирают одежду и типаж: Krea делает людей старше (+7 лет по оценке возраста), Qwen 2.1 рисует «модель из журнала» с макияжем и студийным светом. На 120+ словах обе модели выполняют каждую деталь: мятный велосипед с плетёной корзиной, фонарь, падающие листья, официанта и скутеры за окном.</figcaption></figure>
+  <figure><img src="media/s7-street.jpg" alt="Улица: обычный, длинный, короткий промпт" loading="lazy"><figcaption><b>Улица в сумерках.</b> Длинный промпт добавил отражения в лужах, багет в пакете, фахверк и велосипедиста. У Qwen 2.1 картинка в целом резче, у Krea — мягче, ближе к плёнке.</figcaption></figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Вариант</th><th>Krea: резкость / эстетика</th><th>Qwen 2.1: резкость / эстетика</th><th>Что видно</th></tr></thead>
+    <tbody>
+      <tr><td>12 слов</td><td>126 / 5,91</td><td>212 / 6,22</td><td>своя одежда и типаж; Krea старит, Qwen гламурит</td></tr>
+      <tr><td>~60 слов (база)</td><td>171 / 5,88</td><td>334 / 6,04</td><td>описание выполнено</td></tr>
+      <tr class="win"><td>120+ слов</td><td>202 / 6,04</td><td>483 / 6,06</td><td>все детали на месте, кадр резче всех</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="pr-video">
+  <h2 id="pr-video">Видео: сколько действий влезает в 5 секунд <span class="ev m">ЗАМЕР</span></h2>
+  <figure><video src="media/s7-h3-side.mp4" controls muted playsinline preload="none"></video><figcaption><b>Один первый кадр, три промпта.</b> Слева одно действие на 5 с, в центре три, справа тот же сюжет простым абзацем без раскадровки.</figcaption></figure>
+  <figure><img src="media/s7-h3-frames.jpg" alt="Семь вариантов промпта H3 по кадрам" loading="lazy"><figcaption><b>Семь вариантов, кадры через 0,9 с.</b> H3 выполняет даже три действия за 5 секунд (прядь, взгляд на улицу, подмигивание). Но чем больше движения, тем сильнее «плывёт» лицо.</figcaption></figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Вариант промпта (5 с)</th><th>Сходство лица, 2 сида</th><th>Минимум</th><th>Вывод</th></tr></thead>
+    <tbody>
+      <tr class="win"><td>1 действие</td><td>0,79 / 0,76</td><td>0,68 / 0,53</td><td>самое стабильное лицо</td></tr>
+      <tr><td>2 действия (база)</td><td>0,74 / 0,71</td><td>0,41 / 0,42</td><td>хороший баланс</td></tr>
+      <tr><td>3 действия</td><td>0,66 / 0,72</td><td>0,35 / 0,40</td><td>всё выполнено, лицо гуляет</td></tr>
+      <tr><td>без фиксации внешности и фона</td><td>0,70 / 0,70</td><td>0,51 / 0,36</td><td>чуть хуже базы</td></tr>
+      <tr><td>без списка «не делать»</td><td>0,70 / 0,70</td><td>0,43 / 0,42</td><td>чуть хуже базы</td></tr>
+      <tr><td>звук одной строкой</td><td>0,73 / 0,72</td><td>0,42 / 0,41</td><td>на картинку не влияет</td></tr>
+      <tr><td>простой абзац</td><td>0,68 / 0,70</td><td>0,39 / 0,43</td><td>движения мягче, кадр на 15–25 % резче, действия размыты</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="rules prose">
+    <li><b>Не больше двух действий на 5 секунд,</b> если лицо важно. Нужно больше событий — режьте на отдельные клипы (<a href="ch-editing.html">глава «Монтаж с ИИ»</a>). <span class="ev r">ПРАВИЛО</span></li>
+    <li><b>Строки фиксации и список «не делать» оставляйте:</b> они стоят 40 слов и дают небольшой, но стабильный плюс к сходству. <span class="ev m">ЗАМЕР</span></li>
+    <li><b>Звук описывайте ради звука.</b> На картинку подробность звука не влияет. <span class="ev m">ЗАМЕР</span></li>
+    <li><b>Спокойный «атмосферный» клип</b> можно писать простым абзацем: движения мягче, кадр резче. Для точного сценария нужна раскадровка с таймкодами. <span class="ev m">ЗАМЕР</span></li>
+  </ul>
+</section>
+
+<section aria-labelledby="pr-templates">
+  <h2 id="pr-templates">Три шаблона по итогам серии 7</h2>
+  <p class="prose"><b>Фото (Krea 2, Qwen 2.1).</b> Порядок: кто → где → что делает → одежда → камера → свет → настроение, затем 4–5 предложений деталей.</p>
+  <pre class="prose"><code>Natural photo of [age]-year-old [person, hair, 1–2 face details] [place], [action]. [She/He] wears [outfit].
+[Shot size, lens, angle], [light]. [Mood] mood.
+[Background detail.] [Object detail.] [Texture detail.] [Colour palette.] [Skin: natural texture, no retouching.]</code></pre>
+  <p class="prose"><b>Видео (MiniMax H3, 5 с).</b></p>
+  <pre class="prose"><code>integrated_multimodal_description: [Shot 1] &lt;Picture 1&gt; is the first frame. Whole clip is 5 seconds. Live-action. [Shot] of [who] [where].
+Appearance lock: [hair, face, marks, outfit]. Keep face, outfit and proportions exactly as in &lt;Picture 1&gt;.
+Background lock: [3–4 background anchors]; background stays consistent.
+[Shot 2] 0s-2.5s: [action 1 with the hand that does it].
+[Shot 3] 2.5s-5s: [action 2].
+camera: [static / handheld], no zoom, no cuts.
+overall_soundscape: [3–5 sounds]. non_diegetic_music: None.
+negative: morphing face, identity drift, extra fingers, warped hands, flicker, text, subtitles, watermark, music, talking.</code></pre>
+  <p class="prose"><b>Референсы.</b> Qwen 2.1: «the woman from image 1 wearing the jacket from image 2», назовите, что должно остаться («same face, hair and outfit»), и опишите позу словами. Klein: те же фразы с <code>&lt;ref_image_0&gt;</code>. H3 Ref2V: <code>&lt;Picture 1&gt;</code>–<code>&lt;Picture 3&gt;</code> — «identity references only, not the first frame or the framing». Подробности — в главе <a href="ch-ref.html">«Перенос по референсу»</a>.</p>
+</section>
+
+<section aria-labelledby="pr-limits">
+  <h2 id="pr-limits">Что не проверено</h2>
+  <ul class="rules prose">
+    <li><b>Описание фигуры под плащом</b> почти ничего не изменило: одежда всё закрывала. Нужен повтор в облегающей одежде.</li>
+    <li>Видео — один сюжет, два сида, 5 секунд. На 9-секундных клипах эффект плотности действий может быть сильнее.</li>
+    <li>Ярлыки стиля проверены на моделях с энкодером Qwen3-VL. У SDXL и других моделей с CLIP-энкодером теги и «trigger words» работают иначе.</li>
+  </ul>
 </section>
 
 <p class="mdlink">Для ИИ-агентов: <a href="md/ch-prompts.md">эта глава в Markdown</a> · <a href="llms.txt">llms.txt</a></p>
