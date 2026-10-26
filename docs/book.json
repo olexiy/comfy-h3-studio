@@ -1,7 +1,7 @@
 {
  "title": "Студия ComfyUI",
  "language": "ru",
- "version": "2026-10-26b",
+ "version": "2026-10-26c",
  "site": "https://olexiy.github.io/comfy-h3-studio/",
  "agent_guide": "agent-guide.md",
  "evidence_tags": {
@@ -203,8 +203,8 @@
    "slug": "ch-prompts",
    "title": "Промпты",
    "part": "Часть II · Кадр",
-   "status": "wip",
-   "en": "Copy-paste prompt templates: H3 timed shot-list with appearance/background locks, tag-style and prose-style still prompts; slot for the prompt-engineering lab (series 7, running).",
+   "status": "done",
+   "en": "Prompt lab (series 7, 156 stills on Krea 2 / Qwen-Image 2.1, 14 H3 clips): content and length beat style labels, tags = prose, 120+ words give full control, ≤ 2 actions per 5 s keep H3 faces stable; copy-paste templates for stills, H3 and references.",
    "html": "ch-prompts.html",
    "md": "md/ch-prompts.md",
    "sections": [
@@ -214,11 +214,31 @@
     },
     {
      "id": "prompts",
-     "title": "Шаблоны промптов"
+     "title": "Шаблоны из первых серий"
     },
     {
      "id": "pr-lab",
      "title": "Лаборатория промптов (серия 7)"
+    },
+    {
+     "id": "pr-words",
+     "title": "Стилевые ярлыки почти ничего не делают ЗАМЕР"
+    },
+    {
+     "id": "pr-length",
+     "title": "Длина решает больше, чем стиль ЗАМЕР"
+    },
+    {
+     "id": "pr-video",
+     "title": "Видео: сколько действий влезает в 5 секунд ЗАМЕР"
+    },
+    {
+     "id": "pr-templates",
+     "title": "Три шаблона по итогам серии 7"
+    },
+    {
+     "id": "pr-limits",
+     "title": "Что не проверено"
     }
    ]
   },

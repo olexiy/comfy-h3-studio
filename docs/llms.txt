@@ -4,7 +4,7 @@
 > (RTX 5070 Ti, 62 GB RAM, Windows 11) plus rented cloud GPUs: Krea 2, Qwen-Image 2.1, FLUX.3 Klein, MiniMax H3,
 > LTX-2.5, editing and reference transfer, a fictional persona LoRA, HyperFrames editing. Human chapters are in
 > Russian; the agent guide is English. Facts carry evidence tags: [MEASURED] (run by the authors), [SOURCE]
-> (docs/community), [RULE] (derived decision). Version 2026-10-26b.
+> (docs/community), [RULE] (derived decision). Version 2026-10-26c.
 
 ## Start here (agents)
 - [agent-guide.md](agent-guide.md): English, dense — exact model files and settings, ComfyUI API driving, prompt templates, persona LoRA pipeline, evaluation metrics, RunPod procedure, editing rules, Windows pitfalls.
@@ -17,7 +17,7 @@
 - [03 ComfyUI: граф, ноды, workflow](md/ch-comfy.md): ComfyUI basics: nodes, typed links (MODEL, CLIP, VAE, LATENT, CONDITIONING, IMAGE), the minimal text-to-image graph, model folders, custom nodes, subgraphs and our one-node workflow style, workflows embedded in PNG/MP4, the HTTP API (/prompt, /history, /object_info, /free), caching and the queue.
 - [04 Железо, файлы и облако](md/ch-studio.md): Hardware and cloud: local box limits, folder layout of ComfyUI Desktop, local vs RunPod vs hosted API cost/time table, platform comparison, safe rented-GPU routine, full-precision H3 on a 96 GB card vs the quantised local stack.
 - [05 Кадр: фото на Krea 2](md/ch-stills.md): Photoreal stills on Krea 2 Turbo: simple one-pass vs the two-pass author recipe vs MOSS, fixing the 'AI face' (realism LoRA 0.5, upscale denoise 0.22, mature-feature words), strong body words at cfg 1.
-- [06 Промпты](md/ch-prompts.md): Copy-paste prompt templates: H3 timed shot-list with appearance/background locks, tag-style and prose-style still prompts; slot for the prompt-engineering lab (series 7, running).
+- [06 Промпты](md/ch-prompts.md): Prompt lab (series 7, 156 stills on Krea 2 / Qwen-Image 2.1, 14 H3 clips): content and length beat style labels, tags = prose, 120+ words give full control, ≤ 2 actions per 5 s keep H3 faces stable; copy-paste templates for stills, H3 and references.
 - [07 Правка кадра](md/ch-fix.md): Image editing toolkit, 150 edits on 9 stills: Qwen-Image 2.1 Turbo is the default editor (remove, background, outfit, sign text, hand, outpaint via new canvas), Krea 2 General Edit V2 for relight, BFS head swap as last resort, SeedVR2 7B sharp for 4K.
 - [08 Перенос по референсу](md/ch-ref.md): Reference transfer on 14 references: Qwen-Image 2.1 + one photo gives the best likeness (ArcFace 0.81, beats a 4000-step LoRA) but copies pose; FLUX.3 Klein for new poses/viewpoints; Krea style-reference LoRA is the only palette/light transfer; H3 Reference-to-Video with three canonical views keeps a persona's mole in place.
 - [09 Видео на MiniMax H3](md/ch-video.md): MiniMax H3 image-to-video with audio: still → video → 48 fps pipeline, settings sweep (resolution beats steps, shift), length limits (≈ 12 s locally, frames 17k+5), chaining 5 s hops with guide frames, community finetune Eros Max vs official.
