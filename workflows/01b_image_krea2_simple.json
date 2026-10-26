@@ -27,7 +27,7 @@
    "inputs": [],
    "outputs": [],
    "widgets_values": [
-    "# 01b · Krea 2 — fast & natural (one pass)\n**Use:** write the **prompt** on the node → set size → Run → `H3test/krea2_simple_*.png`. 13–32 s.\nOne pass, 8 steps, euler/beta, cfg 1, `qwen_image_vae` — the most natural \"phone photo\" look.\n**realism LoRAs** toggle adds Realism Engine 0.5 + Realistic Snapshot 0.9 (glossier).\n\n**Prompt tips:** booru-style tags work as well as prose (`photo \\(medium\\), crisp detailed instagram photograph` = glossy,\n`amateur phone photo` = raw). Body shape needs **strong**, concrete build words\nplus a body–pose relation — soft words (large, full, curvy hourglass) are ignored at cfg 1.\nWrite the age explicitly (25+, late-20s, mature facial features). For video stills use a 4:5 size (896×1120).\n\n**Measured:** RTX 5070 Ti 16 GB, ComfyUI 0.42.4 · 1000×1600, 8 steps: **13–14 s** warm (32 s incl. first model load) · peak VRAM 15.2 GB"
+    "# 01b · Krea 2 — fast & natural (one pass)\n**Use:** write the **prompt** on the node → set size → Run → `H3test/krea2_simple_*.png`. ≈ 14 s at 2 MP (6 s at 1 MP).\n**Default 1280×1600 = 2 MP** (series 2: Krea 2 is trained up to 2048², 2 MP shows real pores and freckles; 896×1120 stays as a fast draft size).\nOne pass, 8 steps, euler/beta, cfg 1, `qwen_image_vae` — the most natural \"phone photo\" look.\n**realism LoRAs** toggle adds Realism Engine 0.5 + Realistic Snapshot 0.9 (glossier).\n\n**Prompt tips:** booru-style tags work as well as prose (`photo \\(medium\\), crisp detailed instagram photograph` = glossy,\n`amateur phone photo` = raw). Body shape needs **strong** words (`slightly chubby body, curvy, thick, huge breasts, wide hips,\nbig round butt, thick thighs`) plus a body–pose relation — soft words (large, full, curvy hourglass) are ignored at cfg 1.\nWrite the age explicitly (25+, late-20s, mature facial features). For video stills use a 4:5 size (896×1120).\n\n**Measured:** RTX 5070 Ti 16 GB, ComfyUI 0.42.4 · 1000×1600, 8 steps: **13–14 s** warm (32 s incl. first model load) · peak VRAM 15.2 GB"
    ]
   },
   {
@@ -69,7 +69,7 @@
   },
   {
    "id": 15,
-   "type": "614e6bd3-b30d-47e4-b07c-d4740697b586",
+   "type": "5d38750d-71db-4e14-9d4b-227b40b99fbf",
    "title": "Krea 2 · fast still",
    "pos": [
     480,
@@ -93,7 +93,7 @@
      "link": null
     },
     {
-     "label": "width (4:5 for video: 896)",
+     "label": "width (2 MP default; 896 = fast draft)",
      "name": "width",
      "type": "INT",
      "widget": {
@@ -102,7 +102,7 @@
      "link": null
     },
     {
-     "label": "height (4:5 for video: 1120)",
+     "label": "height (2 MP default; 1120 = fast draft)",
      "name": "height",
      "type": "INT",
      "widget": {
@@ -143,8 +143,8 @@
    },
    "widgets_values": [
     "Photograph of a late-20s adult woman with long, wavy copper-red hair and fair skin with freckles, sitting on a black metal bench in a glass bus shelter on a sunny day. She has green eyes, a small nose and light natural makeup, and smiles softly. She wears an untucked white linen blouse with rolled sleeves, dark-blue high-waisted jeans, a small silver pendant and silver hoop earrings; a black bag lies next to her. Behind her is a red brick shop with a striped awning and a yellow curb. Natural daylight, amateur phone photo.",
-    896,
-    1120,
+    1280,
+    1600,
     20261023,
     false
    ]
@@ -176,7 +176,7 @@
  "definitions": {
   "subgraphs": [
    {
-    "id": "614e6bd3-b30d-47e4-b07c-d4740697b586",
+    "id": "5d38750d-71db-4e14-9d4b-227b40b99fbf",
     "version": 1,
     "state": {
      "lastGroupId": 2,
@@ -207,7 +207,7 @@
     },
     "inputs": [
      {
-      "id": "72be6b5e-8145-485c-a989-459aa5b9fdb3",
+      "id": "abb1c5e0-825d-4239-b2ec-adb5d9502cf7",
       "name": "text",
       "type": "STRING",
       "linkIds": [
@@ -220,33 +220,33 @@
       ]
      },
      {
-      "id": "a30f0691-c372-4ff4-86e3-0d08b9df9fec",
+      "id": "c8b7e849-1c33-4a05-abfc-3cdb3890147b",
       "name": "width",
       "type": "INT",
       "linkIds": [
        20
       ],
-      "label": "width (4:5 for video: 896)",
+      "label": "width (2 MP default; 896 = fast draft)",
       "pos": [
        390,
        96
       ]
      },
      {
-      "id": "a57561cd-7208-41bb-803a-48b21203fa26",
+      "id": "ef0425f2-ec89-49d3-9e5e-dd7ae9de5c71",
       "name": "height",
       "type": "INT",
       "linkIds": [
        21
       ],
-      "label": "height (4:5 for video: 1120)",
+      "label": "height (2 MP default; 1120 = fast draft)",
       "pos": [
        390,
        96
       ]
      },
      {
-      "id": "1605fe5a-04d4-4c96-a343-cd3fff8e6d10",
+      "id": "85ab3b6b-766e-4624-8629-4cfaab7e61af",
       "name": "seed",
       "type": "INT",
       "linkIds": [
@@ -259,7 +259,7 @@
       ]
      },
      {
-      "id": "f65d6952-63fb-445d-889b-d00095f6fa37",
+      "id": "74a18130-06ec-4a18-9f9f-3a09b109d27e",
       "name": "switch",
       "type": "BOOLEAN",
       "linkIds": [
@@ -275,7 +275,7 @@
     ],
     "outputs": [
      {
-      "id": "aa21bcf3-f8ef-49bf-aa2d-f99ae343bc6a",
+      "id": "2de98593-0967-458e-baa6-d0a1887d5774",
       "name": "IMAGE",
       "type": "IMAGE",
       "linkIds": [
@@ -740,8 +740,8 @@
        }
       ],
       "widgets_values": [
-       896,
-       1120,
+       1280,
+       1600,
        1
       ]
      },

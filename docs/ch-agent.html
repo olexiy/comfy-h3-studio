@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Для вашего агента · Локальная студия H3</title>
+<title>Для вашего агента · Студия ComfyUI</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="alternate" type="text/markdown" href="md/ch-agent.md" title="Markdown для ИИ-агентов">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+/* Layout: textbook — one reading column, wide media strips, data tables in mono. Copper accent = the test persona's hair. */
 :root{
   --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
   --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
@@ -131,28 +133,86 @@ a{color:var(--accent)}
 .hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
 .hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
 @media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+/* textbook navigation (2026-10-26): chapter menu in the bar, «главное за минуту», «на этой странице», reading routes */
+.chmenu{position:relative;font:500 13px var(--mono)}
+.chmenu summary{cursor:pointer;color:var(--accent);list-style:none}
+.chmenu summary::-webkit-details-marker{display:none}
+.chmenu summary::after{content:" ▾"}
+.chmenu[open] summary::after{content:" ▴"}
+.chmenu ol{position:absolute;right:0;top:calc(100% + 8px);z-index:5;width:min(360px,calc(100vw - 32px));max-height:70vh;overflow:auto;
+  margin:0;padding:8px 0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.chmenu li a{display:flex;gap:10px;padding:6px 14px;text-decoration:none;color:var(--fg);font:400 14px/1.35 var(--body)}
+.chmenu li a:hover{background:var(--accent-soft)}
+.chmenu li a[aria-current]{color:var(--accent);font-weight:600}
+.chmenu .cn{font:500 12px var(--mono);color:var(--muted);min-width:1.8em}
+.chmenu li.mp{padding:10px 14px 4px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chintro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}
+.keybox{background:var(--accent-soft);border-radius:10px;padding:14px 18px}
+.keybox b,.onpage b{display:block;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.keybox ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.onpage{border:1px solid var(--line);border-radius:10px;padding:14px 18px;background:var(--panel)}
+.onpage ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.onpage a{text-decoration:none}.onpage a:hover{text-decoration:underline}
+.mdlink{font:500 12px var(--mono);color:var(--muted);margin:0}
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.route{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;align-items:start}
+.route img{width:120px;aspect-ratio:4/5;object-fit:cover;border-radius:8px}
+.route .rt{display:grid;gap:4px}
+.route .rt b{font:500 17px/1.2 var(--display)}
+.route .rt span{color:var(--muted);font-size:14px;line-height:1.4}
+.route ol{margin:6px 0 0;padding-left:20px;font-size:14px;display:grid;gap:2px}
+.agentbox{border:1px dashed var(--accent);border-radius:10px;padding:14px 18px;max-width:80ch}
+/* theory: diagrams, callouts, glossary, evidence tags */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:560px}
+.diagram svg text{font-family:var(--body);fill:var(--fg)}
+.diagram svg .muted{fill:var(--muted)}
+.diagram svg .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.diagram svg .hot{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.diagram svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+.diagram svg .ahead{fill:var(--muted)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;padding:12px 16px;max-width:72ch}
+.callout b:first-child{color:var(--accent)}
+.ev{display:inline-block;font:600 10px/1 var(--mono);letter-spacing:.04em;padding:3px 6px;border-radius:4px;vertical-align:2px;border:1px solid currentColor}
+.ev.m{color:var(--good)}.ev.s{color:var(--warn)}.ev.r{color:var(--accent)}
+.gloss{display:grid;gap:0;margin:0;border-top:1px solid var(--line);max-width:80ch}
+.gloss>div{display:grid;grid-template-columns:minmax(150px,13em) minmax(0,1fr);gap:4px 18px;padding:12px 4px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+.gloss>div:target{background:var(--accent-soft)}
+.gloss dt{font:600 15px var(--body)}
+.gloss dt small{display:block;font:400 12px var(--mono);color:var(--muted)}
+.gloss dd{margin:0;font-size:15px}
+.letters{display:flex;flex-wrap:wrap;gap:6px;font:500 13px var(--mono)}
+.letters a{padding:3px 8px;border:1px solid var(--line);border-radius:6px;text-decoration:none}
+@media (max-width:760px){.chintro,.routes{grid-template-columns:minmax(0,1fr)}.route{grid-template-columns:84px minmax(0,1fr)}.route img{width:84px}
+  .gloss>div{grid-template-columns:minmax(0,1fr)}.chmenu ol{position:fixed;left:16px;right:16px;top:56px;width:auto}}
+.cover-video{max-width:760px}
 </style>
 <style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
 
 <div class="wrap">
-<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 15 из 15</span></nav>
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть VIII · Справочник · глава 23 из 23</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-ref.html"><span class="cn">08</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">09</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html"><span class="cn">10</span>Скорость и качество</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">11</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">12</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">13</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">14</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">15</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">16</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">17</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · Справочник</li><li><a href="ch-eval.html"><span class="cn">18</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">19</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">20</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">21</span>Словарь</a></li><li><a href="ch-lab.html"><span class="cn">22</span>Серии экспериментов</a></li><li><a href="ch-agent.html" aria-current="page"><span class="cn">23</span>Для вашего агента</a></li></ol></details></nav>
 <header>
-  <div class="eyebrow">Глава 15 · for AI agents · machine-readable</div>
+  <div class="eyebrow">Глава 23 · for AI agents · machine-readable</div>
   <h1>Для вашего агента</h1>
   <p class="lead">Written for AI agents, not people: everything an agent needs to reproduce this studio — exact files, settings, procedures, pitfalls.</p>
 </header>
 
+
 <section aria-labelledby="ag">
-  <h2 id="ag">For your agent — machine-readable guide</h2>
-  <p class="prose">This section is written for AI agents, not people. Plain files: <a href="agent-guide.md">agent-guide.md</a> · <a href="llms.txt">llms.txt</a>. Version 2026-10-25. The block below is the same markdown, unrendered, so it can be copied or parsed losslessly.</p>
-  <pre id="agent-guide" data-format="markdown" data-version="2026-10-25"># AGENT GUIDE — home ComfyUI studio (Krea 2 · Qwen-Image-Edit · MiniMax H3 · LTX-2.5) + RunPod
+  <h2 id="ag">Machine-readable guide</h2>
+  <p class="prose">This section is written for AI agents, not people. Plain files: <a href="agent-guide.md">agent-guide.md</a> ·
+  <a href="llms.txt">llms.txt</a> · <a href="llms-full.txt">llms-full.txt</a> (whole book as text) · <a href="book.json">book.json</a>
+  (chapter index) · every chapter as Markdown in <code>md/&lt;chapter&gt;.md</code>. Version 2026-10-26b.
+  The block below is the same markdown, unrendered, so it can be copied or parsed losslessly.</p>
+  <pre id="agent-guide" data-format="markdown" data-version="2026-10-26b"># AGENT GUIDE — ComfyUI photo &amp; video studio on a 16 GB GPU (Krea 2 · Qwen-Image 2.1 · FLUX.3 Klein · MiniMax H3 · LTX-2.5) + RunPod
 
 ```yaml
 doc: agent-guide
 audience: autonomous coding/ops agents driving ComfyUI and cloud GPUs (not humans)
-version: 2026-10-25
+version: 2026-10-26b
+companion: &quot;Russian textbook for humans: llms.txt (map), book.json (chapter index), md/&lt;slug&gt;.md (each chapter), llms-full.txt (all chapters)&quot;
 evidence_tags: {MEASURED: &quot;run by us, numbers from our logs&quot;, SOURCE: &quot;official template / docs / community, not re-measured&quot;, RULE: &quot;derived decision rule&quot;}
 baseline_box: {gpu: &quot;RTX 5070 Ti 16 GB (Blackwell)&quot;, ram: &quot;62 GB&quot;, os: &quot;Windows 11&quot;, comfyui: &quot;0.42.x&quot;, torch: &quot;2.12+cu130&quot;, python: &quot;3.13&quot;}
 cloud_box: {provider: RunPod, gpu: &quot;RTX PRO 6000 Blackwell Server Edition 96 GB&quot;, price_usd_h: 2.49, cloud: SECURE, region: IE}
@@ -163,6 +223,8 @@ content_policy: &quot;all examples SFW, depicted adults stated 25+&quot;
 - Sections are independent; each bullet = one fact or rule. Prefer MEASURED over SOURCE when they conflict.
 - File names below are exact (copy them). Node names are ComfyUI class_type names.
 - Numbers are for the baseline box unless a section says `cloud_box`.
+- Section map: 1 API · 2 model recipes · 3 prompting · 4 first frame for video · 5 persona + LoRA · 5b editing · 5c reference transfer · 6 evaluation · 7 RunPod · 7b Civitai replication · 8 Windows pitfalls · 9 editing video with HyperFrames · 10 RU↔EN terms · 11 open questions.
+- Human chapters with figures and full tables (Russian) are linked from `llms.txt`; cite them by `md/&lt;slug&gt;.md#` heading when you answer a human.
 
 ## 1. Driving ComfyUI headless (API)
 - Run a second headless instance next to the desktop app: `main.py --listen 127.0.0.1 --port 8189 --extra-model-paths-config &lt;yaml&gt; --input-directory &lt;dir&gt; --output-directory &lt;dir&gt; --disable-auto-launch --reserve-vram 1.5`. Never run two H3 jobs on two instances at once — free RAM falls to ~3 GB and both runs double in time. [MEASURED] Check `GET :8188/queue` before queueing.
@@ -281,6 +343,47 @@ config:
 - Weights without an HF token: `Comfy-Org/Krea-2` → `diffusion_models/krea2_raw_bf16.safetensors` (26.3 GB, not gated; its 430 keys match ai-toolkit&#x27;s SingleStreamDiT exactly). `krea/Krea-2-Raw` is gated. Text encoder `Qwen/Qwen3-VL-4B-Instruct` and VAE `Qwen/Qwen-Image` download automatically. [MEASURED]
 - Speed `cloud_box`: ≈ 0.8 s/step at 512, ≈ 2.4 s/step at 1024, ≈ 55 min per 2500 steps + ≈ 2.7 min per sample round (5 images); VRAM 31.6 GB. ai-toolkit Krea 2 LoRAs load in ComfyUI `LoraLoaderModelOnly` unchanged. [MEASURED]
 - Inference: Turbo, strength 0.8 (1.0-1.2 raises identity but also the leak). [MEASURED]
+- **Result v3 (DOP, no reg set, trigger &quot;Maren Holt&quot;, 53 images = 47 scenes + hero + 5 canonical views, rank 32, lr 1e-4, EMA 0.99, 4000 steps, buckets 512+1024, cloud_box ≈ 2.9 s/step ≈ 3.3 h ≈ $9):** ArcFace mean over 5 scenes 0.65 (portrait 0.79, full-body pier 0.54), no-trigger leak 0.15, mole + scar on the correct side; v1 0.58 / leak 0.37, v2 (reg set) 0.51 / 0.22, marks gone. Checkpoints 2500-4000 all score 0.59-0.65 → choose on the leak prompt + a contact sheet, not on the mean. Strength 0.8 &gt; 1.0 (0.65 vs 0.60). Full body and 9:16 stills work with the LoRA (≈ 4 s/image), which no edit model achieved. [MEASURED]
+- For single stills a LoRA is not the best likeness tool: one clean photo + Qwen-Image 2.1 reaches ArcFace 0.81 vs 0.55 for this LoRA on the same scenes (section 5c). Use the LoRA for series, full body and video first frames. [MEASURED]
+
+## 5b. Image editing toolkit (series 5, 2026-10-26)
+```yaml
+editing_test: {images: 9 own SFW stills, seeds: 2, edits: 150, box: cloud_box, cost_usd: 2.45, scoring: [ArcFace vs source, centre PSNR, full-res crop sheets]}
+default_editor: qwen_image_2.1_turbo   # winner on remove, background, outfit, sign text, hand fix, outpaint
+qwen_image_2_1_edit: {unet: qwen_image_2.1_turbo_int8_convrot, clip: qwen3vl_8b_int8_convrot (type qwen_image), vae: qwen_image_2.1_vae_bf16,
+  encode: &quot;TextEncodeQwenImage21 (prompt, negative_prompt &#x27;&#x27;, resolution 1024, images.image_1 = canvas, images.image_2 = extra ref) -&gt; positive, negative, latent&quot;,
+  model_patch: QwenImage21Cache, sampler: &quot;SamplerCustomAdvanced + CFGGuider cfg 1 + ManualSigmas &#x27;1.0, 0.978453, 0.95418, 0.926626, 0.89508, 0.845148, 0.704534, 0.414568, 0&#x27; + euler&quot;,
+  outpaint: &quot;EmptyLatentImage at the target size instead of the encoder latent; source stays image_1&quot;, time_s: {cloud_box: 3-10, baseline_box: 11}}
+krea2_general_edit_v2: {lora: krea2_general_edit_v2_r128 @1.0 on krea2_turbo_int8, nodes: [Krea2EditModelPatch, Krea2EditGroundedEncode], steps: 8, cfg: 1,
+  ref_boost: 4, grounding_px: 768, fit_mode: fit, target_latent: wired, best_for: relight, time_s: {cloud_box: 8-13, baseline_box: 30}}
+qwen_image_edit_2511: {steps: 40, cfg: 4, shift: 3.1, time_s: {cloud_box: 50}, note: &quot;FluxKontextImageScale re-sizes to ~1 MP Kontext sizes -&gt; framing shifts; repaints faces on relight&quot;}
+bfs_head_swap: {best: &quot;bfs_head_v1.1_qwen_2.1 @1.0 on the Turbo checkpoint (ArcFace to head 0.72-0.75 vs 0.69-0.71 on base + turbo LoRA)&quot;, prompt: official &quot;head_swap: start with &lt;image1&gt; ...&quot;, resolution: 0}
+upscale_4k: {best: &quot;SeedVR2 7B sharp int8, multiplier 2.4, color_correction lab&quot;, avoid: [&quot;SeedVR2 3B (crackled skin)&quot;, &quot;USDU + Krea denoise 0.22 (re-renders details, shifts)&quot;], safe_fast: OmniSR_X4}
+```
+- Winner per fix (2 seeds each, by eye + metric): remove → Qwen 2.1 (Krea Turbo left a distant object; Krea Raw 20 steps cfg 3 also clean) · recolour → all pass · relight → Krea General (2511 repaints the person) · background swap → Qwen 2.1 (ArcFace 0.95-0.96; Krea keeps leftovers of the old scene) · outfit → Qwen 2.1 (Krea pinned to the source crop draws a giant collar; Identity Edit dropped a mole) · sign text → Qwen 2.1 (exact on both seeds) · hand → Qwen 2.1 on the whole frame. [MEASURED]
+- Grey-pad outpaint (&quot;Extend the image beyond its boundaries using outpainting. The original caption is: …&quot;) filled the pads in 2 of 6 model × aspect cases; the target-size-canvas route on Qwen 2.1 worked for 16:9 and 9:16. [MEASURED]
+- Crop → edit → feathered paste for local fixes gave the model too much freedom (2511 drew an extra tool); edit the whole frame instead. [MEASURED]
+- Krea Identity Edit V2 as a person-swap copies objects from the reference&#x27;s background (a tram) and the reference&#x27;s neutral expression. [MEASURED]
+- Never load Krea General Edit V2 and Identity Edit V2 both at 1.0 (noise; ≈ 0.6 each if a graph needs both). [SOURCE]
+- Identity checks need eyes too: ArcFace 0.64 still passed an output that lost the persona&#x27;s mole. [MEASURED]
+
+## 5c. Reference transfer (series 6, 2026-10-26)
+```yaml
+reference_test: {refs: 14 own SFW (object x2, garment x2, face x2, character x2, style x3, place, pose, palette), scenes_per_ref: 3, seeds: 2, box: cloud_box, cost_usd: 6.53,
+  scoring: [insightface ArcFace vs ref, OWLv2 crop + DINOv2 vs ref crop, CLIP image sim, by-eye crop sheets]}
+qwen_image_2_1_refs: {encode: &quot;TextEncodeQwenImage21 images.image_1..3 = references, resolution 1024&quot;, canvas: &quot;EmptyLatentImage 1024x1280 (new scene)&quot;, prompt: &quot;name refs &#x27;the woman from image 1&#x27;, &#x27;the bag from image 2&#x27;&quot;,
+  wins: [face_from_one_photo, garment, art_style, multi_ref], arcface: {maren: 0.81, red_portrait: 0.92, persona_lora_4000_steps: 0.55}, habit: &quot;copies the reference&#x27;s pose and camera; prompt / ref resolution / second pass do not fix it&quot;}
+flux3_klein_refs: {node: &quot;ReferenceMultiLatent resolution resize 1 MP, images.image0..&quot;, prompt_tokens: &quot;&lt;ref_image_0&gt;, &lt;ref_image_1&gt;&quot;, latent: EmptyFlux2LatentImage, steps: 16, cfg: 1,
+  wins: [new_pose, new_viewpoint, pose_transfer], note: &quot;details looser; also runs with the Krea fp8 Qwen3-VL-4B encoder (type flux3)&quot;}
+krea2_style_reference: {lora: &quot;Comfy-Org/Krea-2 loras/krea2_style_reference.safetensors @1.0 on krea2_turbo&quot;, ref: &quot;TextEncodeQwenImageEditPlus image1 + FluxKontextMultiReferenceLatentMethod index_timestep_zero&quot;, sampling: &quot;ModelSamplingFlux 1.15/0.5, 8 steps euler simple cfg 1&quot;, prompt: content only, wins: [palette_light]}
+krea2_general_edit_products: {source: product shot 1 MP, target_latent: new 4:5 canvas, ref_boost: 2, grounding_px: 768, wins: [object]}
+qwen_image_edit_2511: {result: last or near-last on every reference type, time_s: {cloud_box: 45}}
+h3_ref2v_persona: {node: MiniMaxH3ReferenceToVideo, model: minimax_h3_ref2va_pruned_int8_convrot, refs: &quot;hero + 3/4 + profile on the mark side as &lt;Picture 1-3&gt;&quot;, steps: 20, sampler: res_multistep,
+  arcface_mean: {i2v_from_lora_still: [0.40, 0.56], ref2v: [0.69, 0.67], ref2v_plus_lora_first_frame: [0.46, 0.65], ref2v_plus_first_frame_from_refs: 0.55}, time_s: {cloud_box_9s_768x960: 340}}
+```
+- Palette and place metrics rewarded copies: Qwen 2.1 / 2511 pasted the reference street behind new subjects (high colour-histogram score) and returned the reference viewpoint for &quot;opposite corner&quot; (DINOv2 0.97). Judge on sheets. [MEASURED]
+- A persona first frame from a LoRA plus Ref2V identity refs = two identities; the face re-forms mid-clip (ArcFace min 0.12). Make the first frame from the same refs or skip it. [MEASURED]
+- Gated HF repos on rented GPUs: user stores a read token as a platform secret (RunPod `{{ RUNPOD_SECRET_hf_token }}` → `HF_TOKEN`); never move 10+ GB over a home uplink, it also starves result downloads. [MEASURED]
 
 ## 6. Evaluation harness (what metrics mean)
 - Identity: insightface buffalo_l ArcFace cosine of the largest face vs the reference. ≥ 0.6 ≈ same person; 0.5-0.6 usable; &lt; 0.3 different. Blind to profiles (≈ 0) and fooled by animal faces (picked a dog). Faces &lt; 100 px are unreliable. [MEASURED]
@@ -317,7 +420,7 @@ runpodctl pod list ; runpodctl pod delete &lt;pod_id&gt; ; runpodctl me   # veri
 - Posts made in ComfyUI list LoRAs by file name only (`meta.additionalResources`); find the version with `GET /api/v1/models?query=&lt;name&gt;`; some (private/renamed) cannot be found. [MEASURED]
 - The `prompt` field is one text node; trace `ComfySwitchNode`/`StringConcatenate` inputs in `meta.comfy` to get the effective conditioning text (hidden style suffixes, LLM prompt expanders that may be on or off). [MEASURED]
 - Posts from the Civitai on-site generator (meta keys `workflow`, `ecosystem`) do not reproduce pixel-exact with the same seed in ComfyUI — compare style, not pixels. [MEASURED]
-- Page format: 1 closest copy + 2 own-subject renders in the same aesthetic (keep style sentences, LoRAs, sampler; swap the subject). [USER RULE]
+- Page format: 1 closest copy + 2 own-subject renders in the same aesthetic (keep style sentences, LoRAs, sampler; swap the subject). [RULE]
 - Diagnosis: right subject + wrong medium in the no-LoRA render = the look is a style LoRA (adding ta86_myw4y made post 146084006 near-identical); don&#x27;t rewrite the prompt. [MEASURED]
 - Krea 2 Turbo two-pass used by half of top graphs (8 steps ≈ 1 MP → `LatentUpscaleBy` ×1.5 nearest-exact → 4 steps euler/simple denoise 0.4): same quality as one pass at 1280×1600, 18 % faster, one pass cleaner on small text — a speed knob, not a quality gain. [MEASURED]
 - Expected outcome (6 posts, 2026-10-25): prompt-only artist-style posts and posts whose model + LoRAs are already local replicate on the first render (14–40 s per image on a 16 GB card); posts whose look comes from a creator LoRA/finetune need that file — the no-LoRA render is still useful as a &quot;what the LoRA adds&quot; baseline. Cap size at ≈ 2.4 MP keeping aspect; published sizes are often upscaled. [MEASURED]
@@ -330,14 +433,30 @@ runpodctl pod list ; runpodctl pod delete &lt;pod_id&gt; ; runpodctl me   # veri
 - One downloader per file (two writers on one `.part` corrupted a 7 GB file); verify HF LFS sha256. [MEASURED]
 - Builders that regenerate all workflows when called without arguments will overwrite a human&#x27;s edited files — build one target per call. [MEASURED]
 
-## 9. Open questions (not yet measured)
-- Resolved 2026-10-25: regularisation set (47 same-scene images of other women, `is_reg: true`, reg_weight 1.0) cut the no-trigger leak from 0.48 to 0.24 ArcFace and removed leaked marks, at equal identity (0.60) — but at 2500 steps the persona&#x27;s small marks disappeared too (reg slows learning). Open: how many steps / which lr bring the marks back with reg on (try 4000 steps or lr 2e-4).
-- 9:16 vs 4:5 first frames; H3 Ref2V with persona references; H3 LoRA from still images; H3 15-30 s clips on a 96 GB card.
+## 9. Editing video with HyperFrames (series 10, 2026-10-26)
+HyperFrames (HeyGen, Apache-2.0) renders HTML compositions (GSAP timelines) to MP4 with headless Chrome + FFmpeg, CPU only, 20-100 s per clip. CLI pinned per project (`npx --yes hyperframes@0.8.200 …`).
+- Work loop: brief → shot/scene list in a generator script (`make_*.py` writes `index.html` + `compositions/*.html`); never hand-edit the HTML. Registry first (`npx hyperframes catalog --json`) for captions, lower thirds, follow cards, backgrounds, transitions. `check` → fix every error and unintended warning → `snapshot --at &lt;t&gt;` at seams and scene midpoints → render → measure. [RULE]
+- Cutting: plain cuts (~98 %); cut on the music bar grid (100 BPM = 2.4 s bar); social 9:16 shots 1-2.4 s, landscape 4-9 s; J-cut sound leads picture by 0.25-0.4 s; nothing static for ≥ 3 s. [RULE]
+- Picture: frame 0 is the thumbnail (title or key image already visible); pre-scale AI footage with ffmpeg lanczos to the needed size (4:5 → 9:16 cover = 1536×1920) and choose a per-shot `object-position`; never upscale 2× in the browser. 9:16 safe band: text only between y = 168 and 1330 px, caption bottom ≈ 600 px from the bottom. [MEASURED + RULE]
+- Type: ≥ 28 px on a 1080 short side, ≤ 4-5 words per caption line, last line on screen ≥ 2 s; animate x/y/scale/opacity only (`check` rejects tweening layout properties); nested timelines → sub-compositions. [SOURCE]
+- Sound: social −14…−16 LUFS integrated, true peak ≤ −1 dBTP, measured on every render (`ffmpeg -af ebur128=peak=true`); pre-normalise sources with ffmpeg; duck a music bed to ≈ 0.27 under a voice (media-use `audio-duck.mjs`). `&lt;hf-audio-group&gt;` buses sum at unity; a bus compressor with the default −24 dB threshold eats 3-8 dB → threshold 6-10 dB under the measured peaks. [MEASURED]
+- Loops: whole bars; every layer equal at t = 0 and at the end; registry backgrounds hard-code 4-6 s durations → write the mount length into the copy; verify with a frame-0 vs last-frame pixel diff (achieved 0.01/255). [MEASURED]
+- Music: ACE-Step 1.5 turbo on a rented RTX 4090 ≈ 4 s per 32 s track (`[Instrumental]`, set bpm); choose the in-point so the track&#x27;s own ending lands on the last frame. [MEASURED]
+- Grade: `media-treatment --analyze` per shot first; `night-lift` on dark shots (crushed blacks 37 % → 0 %); grading adds ≈ 25 % render time. [MEASURED]
+- Explainers: real data over decoration — one seed, one prompt, one variable; numbers on screen must come from measurements; one idea per scene, 4-10 s per scene, takeaway card at the end. [RULE]
+
+## 10. Russian ↔ English terms (to read the human chapters)
+кадр = still / frame · первый кадр = first frame (I2V) · ролик = clip · раскадровка = timed shot list · правка = edit · перенос по референсу = reference transfer · персонаж = persona / character · эталонное лицо = hero still · приметы = permanent marks (mole, scar) · утечка = leak / bleeding · сид = seed · шаги = steps · сила LoRA = LoRA strength · подпись = caption · датасет = dataset · замок (appearance/background lock) = lock line · дрейф = drift · кроп-лист = crop sheet · бок о бок = side-by-side · слепой A/B = blind A/B · локально = on the baseline box · в облаке / аренда = cloud_box (RunPod) · серия N = experiment series N · готово / пополняется / в работе = done / growing / in progress · ЗАМЕР / ИСТОЧНИК / ПРАВИЛО = MEASURED / SOURCE / RULE.
+
+## 11. Open questions (not yet measured)
+- Resolved 2026-10-25: the leak — regularisation sets halve the subject&#x27;s steps in ai-toolkit; DOP + name-like trigger + 4000 steps fixed both leak and marks (section 5, result v3).
+- 9:16 vs 4:5 first frames; H3 Ref2V on the 16 GB baseline box (tested only on cloud_box, section 5c); H3 LoRA from still images; H3 15-30 s clips on a 96 GB card; prompt lab (series 7, running): tags vs prose, length, age wording, shot-list density.
 - Resolved 2026-10-25: H3 full precision vs quantised → no visible gap (section 2, minimax_h3.precision_test).
 </pre>
 </section>
 
-<nav class="pager" aria-label="Главы"><a href="ch-lab.html"><span class="dir">← назад</span>План исследований</a></nav>
+<p class="mdlink">Для ИИ-агентов: <a href="md/ch-agent.md">эта глава в Markdown</a> · <a href="llms.txt">llms.txt</a></p>
+<nav class="pager" aria-label="Главы"><a href="ch-lab.html" rel="prev"><span class="dir">← назад</span>Серии экспериментов</a></nav>
 </div>
 
 <script>
@@ -348,6 +467,19 @@ document.querySelectorAll('button[data-copy]').forEach(function(b){
     var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
     try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
   });
+});
+// ←/→ = previous/next chapter (not while typing or selecting text); the chapter menu closes on an outside click or Esc
+document.addEventListener('keydown',function(e){
+  var t=e.target, m=document.querySelector('details.chmenu');
+  if(e.key==='Escape'&&m){m.open=false;return}
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||/INPUT|TEXTAREA|SELECT|VIDEO/.test(t.tagName)||t.isContentEditable)return;
+  if(String(getSelection())!=='')return;
+  var a=document.querySelector('.pager a[rel="'+(e.key==='ArrowLeft'?'prev':e.key==='ArrowRight'?'next':'')+'"]');
+  if(a)location.href=a.getAttribute('href');
+});
+document.addEventListener('click',function(e){
+  var m=document.querySelector('details.chmenu');
+  if(m&&m.open&&!m.contains(e.target))m.open=false;
 });
 </script>
 </body>

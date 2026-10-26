@@ -7,7 +7,7 @@ A local ComfyUI pipeline for photoreal image-to-video on a single 16 GB consumer
 Ready-to-drop ComfyUI workflows, the Python tooling used to generate and benchmark them, and the measured
 results.
 
-- **Textbook (Russian, 14 chapters, with videos and comparison sheets):** https://olexiy.github.io/comfy-h3-studio/ — studio setup, Krea 2 stills, MiniMax H3 video, speed vs quality, model comparison, a fictional persona + LoRA trained on RunPod, Civitai creator breakdowns and trend replications, pitfalls, and a machine-readable guide for AI agents ([`docs/agent-guide.md`](docs/agent-guide.md), [`docs/llms.txt`](docs/llms.txt)).
+- **Textbook (Russian, 23 chapters, for people and AI agents):** https://olexiy.github.io/comfy-h3-studio/ — theory (how diffusion / flow-matching models, VAE, text encoders, CFG, LoRA and quantisation work), ComfyUI basics, hardware and cloud, Krea 2 stills, image editing, reference transfer, MiniMax H3 video, speed vs quality, model comparison, a fictional persona + LoRA trained on RunPod, LoRA datasets, Civitai creator breakdowns and trend replications, editing video with HyperFrames, evaluation methods, glossary. Two short explainer videos. **For agents:** [`docs/llms.txt`](docs/llms.txt) (map), [`docs/agent-guide.md`](docs/agent-guide.md) (English, exact files and settings with [MEASURED]/[SOURCE]/[RULE] tags), [`docs/book.json`](docs/book.json), [`docs/llms-full.txt`](docs/llms-full.txt), every chapter as Markdown in [`docs/md/`](docs/md/).
 - **Workflows:** [`workflows/`](workflows/) · **Tools:** [`tools/`](tools/) · **Shot-list prompts:** [`prompts/`](prompts/)
 
 > **Model licence first.** This repo ships no weights. MiniMax H3's open-weights licence
@@ -25,7 +25,7 @@ Custom nodes: [KJNodes](https://github.com/kijai/ComfyUI-KJNodes), [UltimateSDUp
 
 ## Workflows
 
-All five use the same layout: on the canvas only the input (image / video), **one subgraph node with the
+All workflows use the same layout: on the canvas only the input (image / video), **one subgraph node with the
 fields you actually change plus on/off toggles**, and the save node. The technical graph lives inside the
 subgraph (double-click its title; the breadcrumb brings you back). Toggles drive lazy `ComfySwitchNode`s, so a
 switched-off branch never runs.
@@ -34,9 +34,19 @@ switched-off branch never runs.
 |---|---|---|---|
 | `01_image_krea2_realism` | Krea 2 Turbo + Realism Engine 0.5 + Realistic Snapshot 0.9, 2 passes, ColorMatch, face detailer, Ultimate SD Upscale ×1.9 | prompt, width/height (896×1120 for video), seed, realism strength · **face detail**, **upscale ×1.9** | 896×1120 → 2552×3192: **54–57 s** · 1000×1600 → 2856×4560: 88–106 s |
 | `01b_image_krea2_simple` | Krea 2 Turbo, one pass, 8 steps euler/beta — the most natural "phone photo" look | prompt, size, seed · **realism LoRAs** (glossier) | 1000×1600: **13–14 s** warm |
-| `03_video_h3_i2v` | MiniMax H3 i2v, turbo LoRA 8 steps, shift 8, timed shot-list, audio. First frame scaled to a pixel budget (`ImageScaleToTotalPixels` 0.70 MP, steps of 32 → `GetImageSize`), **never cropped**; output frame 0 (= the input still) and 1 frame of audio are cut | prompt, size (MP), frames, seed, shift · **Eros Max**, **keep first-frame light**, **sound** + volume (dB), **48 fps** | 768×960 · 5 s: **160–184 s** · 9 s 434 s · 12 s 694 s |
+| `03_video_h3_i2v` | MiniMax H3 i2v; default = quality recipe (no turbo, 30 steps, res_multistep, shift 12), turbo strength + steps are knobs; timed shot-list, audio. First frame scaled to a pixel budget (`ImageScaleToTotalPixels` 0.70 MP, steps of 32 → `GetImageSize`), **never cropped**; output frame 0 (= the input still) and 1 frame of audio are cut | prompt, size (MP), frames, seed, shift · **Eros Max**, **keep first-frame light**, **sound** + volume (dB), **48 fps** | 768×960 · 5 s: **160–184 s** · 9 s 434 s · 12 s 694 s |
 | `03c_video_h3_chain` | Continue a clip: last 22 frames + audio of the previous clip as anchor (`MiniMaxH3AddGuide`), +5 s, joined into one mp4; size taken from the clip | same as 03 | **233 s** per +5 s |
 | `04_post_upscale_rife` | lanczos ×2 → 1536×1920, RIFE 4.7 → 48 fps, audio passed through | RIFE multiplier, fps (= 24 × multiplier) · **upscale ×2**, **RIFE** | **27 s** (×3 / 72 fps: 39 s, RAM 61 GB) |
+| `01e_edit_qwen2511_persona` | Qwen-Image-Edit 2511, 40 steps cfg 4: restage a persona (expressions, profiles, angles) for a LoRA dataset | instruction, seed, size | ≈ 110 s |
+| `03L_video_ltx25_i2v` | LTX-2.5 distilled i2v — fast draft path with the same first frame and shot-list as `03` | prompt, size, frames, seed | ≈ 60 s per 9 s at 768×960 |
+| `09_edit_qwen21` | **Default editor**: Qwen-Image 2.1 Turbo, 8 steps — remove, recolour, background, outfit, sign text, hand fix | instruction, seed · **2nd reference**, **new canvas size** (outpaint 16:9 / 9:16) | ≈ 11 s |
+| `09_edit_krea_general` | Krea 2 General Edit V2 LoRA on Krea 2 Turbo — relight and soft recolour that keep the photo texture | instruction, seed, MP, ref boost, grounding | ≈ 30 s |
+| `09_edit_headswap_bfs` | BFS head swap on Qwen-Image 2.1 Turbo — last resort, fictional characters only | body image, head image, seed, BFS strength | ≈ 13 s |
+| `09_edit_upscale_4k` | SeedVR2 7B sharp, ×2.4, colour correction lab | — | ≈ 12 s |
+| `10_ref_qwen21` | 1–3 reference images → new scene (best likeness; copies pose/camera) | prompt naming image 1/2/3, canvas size · **2nd**, **3rd reference** | 5–7 s on a 96 GB card |
+| `10_ref_klein` | FLUX.3 Klein with `<ref_image_N>` — new poses and viewpoints | prompt, seed · **2nd reference** | 6–13 s on a 96 GB card |
+| `10_ref_style_krea` | official Krea 2 style-reference LoRA — palette, light and style only | prompt (content only), style strength | 17 s on a 96 GB card |
+| `10_ref_product_krea` | Krea 2 General Edit V2 — product shot into a new 4:5 scene | prompt, ref boost (2 = new scene) | 11 s on a 96 GB card |
 
 Toggles in the video workflows:
 - **Eros Max** — off = official H3 + turbo LoRA (sharper); on = community finetune Eros Max beta5 + VBVR LoRA 0.25
@@ -71,6 +81,8 @@ All Hugging Face files are mirrored in ComfyUI folder layout; `scripts/download_
 | loras | `H3_VBVR_Pro_attn_only` (Eros Max toggle) | Civitai — [search](https://civitai.com/search/models?query=H3%20VBVR) |
 
 The Eros Max files are only needed if you switch that toggle on; the off branch never loads them.
+
+Editing and reference workflows (`09_*`, `10_*`, `01e`, `03L`) need, by file name: `qwen_image_2.1_turbo_int8_convrot`, `qwen3vl_8b_int8_convrot`, `qwen_image_2.1_vae_bf16` (Qwen-Image 2.1); `krea2_general_edit_v2_r128`, `krea2_style_reference` (Krea 2 LoRAs); `flux3-image-klein-int8-convrot`, `qwen3vl_4b_int8_convrot`, `flux2-vae` (FLUX.3 Klein); `qwen_image_edit_2511_int8_convrot`, `qwen_2.5_vl_7b_fp8_scaled` (Qwen-Image-Edit 2511); `bfs_head_v1.1_qwen_2.1` (BFS); SeedVR2 and LTX-2.5 files carry their Hugging Face download URLs inside the workflow. Search the exact file name on Hugging Face (Comfy-Org mirrors) or Civitai.
 
 Links only; no weights are redistributed here. Civitai downloads need a login.
 

@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Правка кадра · Студия ComfyUI</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="alternate" type="text/markdown" href="md/ch-fix.md" title="Markdown для ИИ-агентов">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: textbook — one reading column, wide media strips, data tables in mono. Copper accent = the test persona's hair. */
+:root{
+  --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
+  --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Onest", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 80px;display:grid;gap:56px}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(20px,3vw,26px);font-weight:500;margin-bottom:14px}
+h3{font-size:16px;font-weight:500}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.lead{font-size:18px;color:var(--muted);max-width:62ch;margin-top:14px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+section{display:grid;gap:18px;min-width:0}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.step .n{font:500 12px var(--mono);color:var(--accent)}
+.step .t{font:500 26px/1 var(--display)}
+.step .t small{font:400 13px var(--body);color:var(--muted)}
+.total{font:500 14px var(--mono);color:var(--muted)}
+.total b{color:var(--fg)}
+/* media */
+.strip{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+figure{margin:0;display:grid;gap:8px;min-width:0}
+figure img,figure video{width:100%;max-width:100%;height:auto;border-radius:8px;background:#000;display:block}
+figcaption{font-size:13px;color:var(--muted)}
+figcaption b{color:var(--fg);font-weight:600}
+.wide img{border-radius:8px}
+.tag{display:inline-block;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-right:6px;vertical-align:1px}
+.tag.good{color:var(--good)}.tag.warn{color:var(--warn)}.tag.bad{color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);white-space:nowrap}
+tr.win td{background:var(--accent-soft)}
+/* workflows */
+.wf{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .file{font:500 13px var(--mono);color:var(--accent);word-break:break-all}
+.card ul{margin:0;padding-left:18px;font-size:14px}
+.card .time{font:500 13px var(--mono);color:var(--muted)}
+.rules{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.rules li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.rules b{font-weight:600}
+pre{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font:13px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{font:500 13px var(--body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible,video:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.paths td:first-child{white-space:nowrap}
+@media (max-width:760px){.pipe,.strip,.wf{grid-template-columns:minmax(0,1fr)}}
+
+/* book navigation */
+.bookbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between;
+  font:500 13px var(--mono);border-bottom:1px solid var(--line);padding-bottom:12px}
+.bookbar a{text-decoration:none}
+.bookbar .where{color:var(--muted)}
+.pager{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.pager a{display:grid;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--fg)}
+.pager a:hover{border-color:var(--accent)}
+.pager .dir{font:500 12px var(--mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.pager .next{text-align:right;grid-column:2}
+/* contents */
+.toc{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.toc li{border-bottom:1px solid var(--line)}
+.toc a{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;gap:4px 14px;align-items:baseline;padding:14px 4px;text-decoration:none;color:var(--fg)}
+.toc a:hover .ct{color:var(--accent)}
+.toc .cn{font:500 13px var(--mono);color:var(--accent)}
+.toc .ct{font:500 18px/1.25 var(--display)}
+.toc .cd{grid-column:2;color:var(--muted);font-size:14px}
+.toc .st{grid-row:1;grid-column:3}
+.news{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.news li{display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:12px}
+.news time{font:500 13px var(--mono);color:var(--muted)}
+@media (max-width:760px){.toc a{grid-template-columns:2.4em minmax(0,1fr)}.toc .st{grid-row:auto;grid-column:2}
+  .pager{grid-template-columns:minmax(0,1fr)}.pager .next{grid-column:1}.news li{grid-template-columns:minmax(0,1fr);gap:0}}
+/* trend replications (chapter ch-trends + trend-<id>.html pages, built by build_book.py) */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tcard{display:grid;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--fg)}
+.tcard:hover{border-color:var(--accent)}
+.tcard .pair{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.tcard img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.tcard .ci{display:grid;gap:4px;padding:10px 12px}
+.tcard .cm{font:500 12px var(--mono);color:var(--muted)}
+.tr-steps{counter-reset:st;display:grid;gap:28px}
+.tr-steps>section{display:grid;gap:12px}
+.tr-steps>section>h2::before{counter-increment:st;content:counter(st) " · ";color:var(--accent)}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.duo figure{margin:0;display:grid;gap:6px}
+.duo img{width:100%;height:auto;border-radius:8px;display:block}
+.duo figcaption{font-size:13px;color:var(--muted)}
+/* public build: link instead of a creator's original */
+.olink{display:flex;align-items:center;justify-content:center;text-align:center;aspect-ratio:3/4;background:var(--panel,rgba(127,127,127,.08));color:var(--muted);font:500 13px/1.4 var(--mono);text-decoration:none}
+.olink.big{aspect-ratio:auto;min-height:180px;padding:24px;border:1px dashed var(--line);border-radius:10px;color:var(--accent);font-size:15px}
+.olink small{color:var(--muted);font-size:12px}
+/* contents parts + "start here" highlights (cover) */
+.toc li.part{border-bottom:0;padding:26px 4px 6px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hl{display:grid;gap:6px;align-content:start;text-decoration:none;color:var(--fg)}
+.hl img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
+.hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
+@media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+/* textbook navigation (2026-10-26): chapter menu in the bar, «главное за минуту», «на этой странице», reading routes */
+.chmenu{position:relative;font:500 13px var(--mono)}
+.chmenu summary{cursor:pointer;color:var(--accent);list-style:none}
+.chmenu summary::-webkit-details-marker{display:none}
+.chmenu summary::after{content:" ▾"}
+.chmenu[open] summary::after{content:" ▴"}
+.chmenu ol{position:absolute;right:0;top:calc(100% + 8px);z-index:5;width:min(360px,calc(100vw - 32px));max-height:70vh;overflow:auto;
+  margin:0;padding:8px 0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.chmenu li a{display:flex;gap:10px;padding:6px 14px;text-decoration:none;color:var(--fg);font:400 14px/1.35 var(--body)}
+.chmenu li a:hover{background:var(--accent-soft)}
+.chmenu li a[aria-current]{color:var(--accent);font-weight:600}
+.chmenu .cn{font:500 12px var(--mono);color:var(--muted);min-width:1.8em}
+.chmenu li.mp{padding:10px 14px 4px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chintro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}
+.keybox{background:var(--accent-soft);border-radius:10px;padding:14px 18px}
+.keybox b,.onpage b{display:block;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.keybox ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.onpage{border:1px solid var(--line);border-radius:10px;padding:14px 18px;background:var(--panel)}
+.onpage ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.onpage a{text-decoration:none}.onpage a:hover{text-decoration:underline}
+.mdlink{font:500 12px var(--mono);color:var(--muted);margin:0}
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.route{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;align-items:start}
+.route img{width:120px;aspect-ratio:4/5;object-fit:cover;border-radius:8px}
+.route .rt{display:grid;gap:4px}
+.route .rt b{font:500 17px/1.2 var(--display)}
+.route .rt span{color:var(--muted);font-size:14px;line-height:1.4}
+.route ol{margin:6px 0 0;padding-left:20px;font-size:14px;display:grid;gap:2px}
+.agentbox{border:1px dashed var(--accent);border-radius:10px;padding:14px 18px;max-width:80ch}
+/* theory: diagrams, callouts, glossary, evidence tags */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:560px}
+.diagram svg text{font-family:var(--body);fill:var(--fg)}
+.diagram svg .muted{fill:var(--muted)}
+.diagram svg .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.diagram svg .hot{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.diagram svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+.diagram svg .ahead{fill:var(--muted)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;padding:12px 16px;max-width:72ch}
+.callout b:first-child{color:var(--accent)}
+.ev{display:inline-block;font:600 10px/1 var(--mono);letter-spacing:.04em;padding:3px 6px;border-radius:4px;vertical-align:2px;border:1px solid currentColor}
+.ev.m{color:var(--good)}.ev.s{color:var(--warn)}.ev.r{color:var(--accent)}
+.gloss{display:grid;gap:0;margin:0;border-top:1px solid var(--line);max-width:80ch}
+.gloss>div{display:grid;grid-template-columns:minmax(150px,13em) minmax(0,1fr);gap:4px 18px;padding:12px 4px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+.gloss>div:target{background:var(--accent-soft)}
+.gloss dt{font:600 15px var(--body)}
+.gloss dt small{display:block;font:400 12px var(--mono);color:var(--muted)}
+.gloss dd{margin:0;font-size:15px}
+.letters{display:flex;flex-wrap:wrap;gap:6px;font:500 13px var(--mono)}
+.letters a{padding:3px 8px;border:1px solid var(--line);border-radius:6px;text-decoration:none}
+@media (max-width:760px){.chintro,.routes{grid-template-columns:minmax(0,1fr)}.route{grid-template-columns:84px minmax(0,1fr)}.route img{width:84px}
+  .gloss>div{grid-template-columns:minmax(0,1fr)}.chmenu ol{position:fixed;left:16px;right:16px;top:56px;width:auto}}
+.cover-video{max-width:760px}
+</style>
+<style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть II · Кадр · глава 7 из 23</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html" aria-current="page"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-ref.html"><span class="cn">08</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">09</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html"><span class="cn">10</span>Скорость и качество</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">11</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">12</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">13</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">14</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">15</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">16</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">17</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · Справочник</li><li><a href="ch-eval.html"><span class="cn">18</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">19</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">20</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">21</span>Словарь</a></li><li><a href="ch-lab.html"><span class="cn">22</span>Серии экспериментов</a></li><li><a href="ch-agent.html"><span class="cn">23</span>Для вашего агента</a></li></ol></details></nav>
+<header>
+  <div class="eyebrow">Глава 7 · серия 5 · 26.10.2026</div>
+  <h1>Правка кадра</h1>
+  <p class="lead">Править дешевле, чем перегенерировать. Какой инструмент для какой правки — по 150 правкам на одних и тех же девяти картинках.</p>
+</header>
+<div class="chintro"><aside class="keybox" aria-label="Главное за минуту"><b>Главное за минуту</b><ul><li>Почти любую правку лучше всех делает Qwen-Image 2.1 за 3–11 с; свет — Krea General Edit.</li><li>Одна правка за проход и явное «оставь без изменений»: лицо, позу, предметы.</li><li>Outpaint — новым холстом нужного размера, а не серыми полями; руку чинить правкой всего кадра.</li><li>Апскейл фото — SeedVR2 7B sharp; генеративные апскейлеры перерисовывают детали.</li></ul></aside><nav class="onpage" aria-label="На этой странице"><b>На этой странице</b><ol><li><a href="#fx-why">Править, а не перегенерировать</a></li><li><a href="#fx-table">Какой инструмент для какой правки</a></li><li><a href="#fx-remove">Убрать, перекрасить, сменить фон и одежду</a></li><li><a href="#fx-text">Текст на табличке и продукт-шот</a></li><li><a href="#fx-hand">Починить руку</a></li><li><a href="#fx-outpaint">Outpaint: из 4:5 в 16:9 и 9:16</a></li><li><a href="#fx-swap">Замена головы — крайний случай</a></li><li><a href="#fx-up">Апскейл кадра до 4K</a></li><li><a href="#fx-wf">Новые workflow</a></li><li><a href="#fx-rules">Правила, которые остались</a></li></ol></nav></div>
+
+<section aria-labelledby="fx-why">
+  <h2 id="fx-why">Править, а не перегенерировать</h2>
+  <p class="prose">Хороший кадр редко бывает идеальным: лишний велосипед, не тот цвет пальто, рука держит пинцет «сквозь пальцы», нужен формат 16:9 вместо 4:5. Перегенерация меняет всё сразу. Модели редактирования меняют одно, а остальное оставляют. В серии 5 одни и те же <b>девять наших картинок</b> (портрет, человек в полный рост, ночная кухня, селфи, мастер-часовщик со сломанной рукой из SDXL, остановка с табличкой, продукт-шот, Марен, арт-киборг) прошли через пять инструментов — по 2 сида на каждую задачу, всего 150 правок.</p>
+  <div class="pipe">
+    <div class="step"><span class="n">Krea 2 General Edit V2</span><span class="t">LoRA <small>conradlocke</small></span><span>правки по инструкции; Turbo 8 шагов, ref boost 4</span></div>
+    <div class="step"><span class="n">Krea 2 Identity Edit V2</span><span class="t">LoRA <small>серия 3</small></span><span>перенос человека, лицо держит лучше всех</span></div>
+    <div class="step"><span class="n">Qwen-Edit 2511</span><span class="t">40 шагов <small>cfg 4</small></span><span>мощная, но медленная, сама меняет кадрирование</span></div>
+    <div class="step"><span class="n">Qwen-Image 2.1</span><span class="t">Turbo <small>8 шагов</small></span><span>одна модель для генерации и правки, до 16 референсов</span></div>
+    <div class="step"><span class="n">BFS</span><span class="t">head swap <small>3 версии</small></span><span>замена головы — крайний случай</span></div>
+  </div>
+  <p class="prose">Оценка: сходство лица ArcFace с исходником, «сохранность центра» для outpaint и полноразмерные кроп-листы одних и тех же участков. Считали на арендованной RTX PRO 6000: локальная видеокарта была занята. Ушёл <b>1 час, $2,45</b>. Правка на Qwen 2.1 там занимала 3–10 с, на Krea — 8–13 с, на Qwen-Edit 2511 — около 50 с. На локальной машине (16 ГБ) новые workflow считают за 11–30 с.</p>
+</section>
+
+<section aria-labelledby="fx-table">
+  <h2 id="fx-table">Какой инструмент для какой правки</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Правка</th><th>Лучше всего</th><th>Почему</th><th>Чего избегать</th></tr></thead>
+    <tbody>
+      <tr class="win"><td>убрать объект</td><td><b>Qwen 2.1</b></td><td>все велосипеды ушли, улица и человек на месте</td><td>Krea Turbo оставил дальний велосипед; 2511 перекадрирует</td></tr>
+      <tr><td>перекрасить</td><td>Qwen 2.1 или Krea General</td><td>справились все; Krea мягче сохраняет фактуру и арт-стиль</td><td>—</td></tr>
+      <tr class="win"><td>сменить свет</td><td><b>Krea General</b></td><td>тёплое утро, лицо и поза те же</td><td>2511 перерисовал женщину (другое лицо, светлее волосы)</td></tr>
+      <tr class="win"><td>сменить фон, лицо оставить</td><td><b>Qwen 2.1</b></td><td>ArcFace 0,95–0,96, чистая новая сцена</td><td>Krea тащит остатки старого фона (трамвайные рельсы)</td></tr>
+      <tr class="win"><td>сменить одежду, лицо оставить</td><td><b>Qwen 2.1</b></td><td>естественный ворот, родинка на месте, ArcFace 0,95</td><td>Krea: гигантский ворот до подбородка; Identity Edit теряет родинку</td></tr>
+      <tr><td>добавить предмет</td><td>Qwen 2.1 (точно куда сказали) или Krea</td><td>кот у стакана, лаванда у флакона — все трое</td><td>2511 добавляет лишнее (вторая веточка)</td></tr>
+      <tr class="win"><td>текст на табличке</td><td><b>Qwen 2.1</b></td><td>«LINIE 42 HAUPTBAHNHOF» точно на обоих сидах, нужный цвет</td><td>Krea на одном сиде вернул «15 Hauptbahnhof»; 2511 разорвал слово</td></tr>
+      <tr class="win"><td>починить руку</td><td><b>Qwen 2.1</b>, весь кадр</td><td>нормальный хват пинцета</td><td>Krea правку игнорирует; 2511 в режиме «вырезать-вставить» дорисовал второй инструмент</td></tr>
+      <tr class="win"><td>outpaint / новый формат</td><td><b>Qwen 2.1</b>, новый холст</td><td>16:9 и 9:16 продолжают сцену естественно</td><td>серые поля + «заполни» срабатывают у 2 из 6 вариантов</td></tr>
+      <tr><td>замена головы</td><td>BFS на Qwen 2.1</td><td>сохраняет выражение и свет тела-кадра</td><td>только наши персонажи, никогда реальные люди</td></tr>
+      <tr class="win"><td>апскейл до 4K</td><td><b>SeedVR2 7B sharp</b></td><td>самая естественная новая деталь, кадр не меняется</td><td>3B — «трещины» на коже; USDU перерисовывает веснушки</td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose"><b>Главный вывод:</b> универсальный инструмент для правок у нас теперь — Qwen-Image 2.1. Он уже стоял на диске как модель генерации (серия 2) и оказался лучшим редактором почти во всём. Krea General Edit остаётся для света и мягкой перекраски, когда важно сохранить «фотографичность» исходника. Qwen-Edit 2511 медленнее в 5–10 раз и самовольно меняет кадрирование, поэтому в повседневные правки не попал.</p>
+</section>
+
+<section aria-labelledby="fx-remove">
+  <h2 id="fx-remove">Убрать, перекрасить, сменить фон и одежду</h2>
+  <figure><img src="media/s5-remove.jpg" alt="Убрать велосипеды: пять вариантов" loading="lazy"><figcaption><b>«Убери все велосипеды».</b> Автор Krea советует для удалений Raw-модель (20 шагов, cfg 3). Turbo тоже убрал передние, но оставил дальний. Qwen 2.1 убрал всё за 5 с.</figcaption></figure>
+  <figure><img src="media/s5-background.jpg" alt="Смена фона у селфи" loading="lazy"><figcaption><b>Селфи на набережной.</b> Лицо держат все (ArcFace 0,94–0,95), но Krea оставил рельсы старой улицы. Qwen 2.1 и 2511 дали чистую набережную.</figcaption></figure>
+  <figure><img src="media/s5-outfit.jpg" alt="Смена куртки" loading="lazy"><figcaption><b>Джинсовка → кожаная куртка + серое худи.</b> Справились все четверо. 2511 при этом сдвигает кадр: велосипеды уехали.</figcaption></figure>
+  <figure><img src="media/s5-relight.jpg" alt="Ночная кухня → солнечное утро" loading="lazy"><figcaption><b>Ночь → утро.</b> Krea и Qwen 2.1 меняют только свет. 2511 рисует самые эффектные лучи, но это уже другая женщина.</figcaption></figure>
+  <ul class="rules prose">
+    <li><b>Одна правка за проход и «keep … unchanged».</b> Назовите, что должно остаться: лицо, позу, предметы. Иначе модель «улучшает» и их.</li>
+    <li><b>Krea General Edit V2 и Identity Edit V2 — по одной LoRA за раз.</b> Обе на силе 1.0 дают шум. Identity Edit игнорирует удаления и перекраску, копирует нейтральное лицо референса и его фон.</li>
+    <li><b>Qwen-Edit 2511 сам выбирает размер</b> (около 1 МП под свои пропорции), поэтому кадр сдвигается. Для правок «точно на месте» он хуже.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="fx-text">
+  <h2 id="fx-text">Текст на табличке и продукт-шот</h2>
+  <figure><img src="media/s5-sign.jpg" alt="Текст на табличке" loading="lazy"><figcaption><b>«LINIE 42 HAUPTBAHNHOF», белым на тёмно-синем.</b> Qwen 2.1 написал точно на обоих сидах. Krea — на одном из двух. 2511 разорвал слово и не перекрасил плашку.</figcaption></figure>
+  <figure><img src="media/s5-product.jpg" alt="Продукт: добавить лаванду и сменить фон" loading="lazy"><figcaption><b>Флакон: веточка лаванды и лесной фон.</b> Qwen 2.1 сохранил сланцевый камень и капли. Krea «поставил» флакон прямо в мох — камень пропал.</figcaption></figure>
+</section>
+
+<section aria-labelledby="fx-hand">
+  <h2 id="fx-hand">Починить руку</h2>
+  <p class="prose">Кадр SDXL из серии 2: пинцет проходит сквозь кисть, а кончик торчит снизу отдельно. Пробовали два способа: правку всего кадра и «вырезать руку → увеличить до 1 МП → поправить → вклеить обратно с мягким краем».</p>
+  <figure><img src="media/s5-hand.jpg" alt="Рука с пинцетом: пять вариантов" loading="lazy"><figcaption><b>Qwen 2.1 по всему кадру</b> собрал нормальный хват: пинцет между большим и указательным пальцами. Krea правку проигнорировал. 2511 держит настоящий пинцет, но неестественно. Вырезка с увеличением дала 2511 слишком много свободы, и он дорисовал второй инструмент.</figcaption></figure>
+</section>
+
+<section aria-labelledby="fx-outpaint">
+  <h2 id="fx-outpaint">Outpaint: из 4:5 в 16:9 и 9:16</h2>
+  <p class="prose">Для видео и сторис нужен другой формат. Сравнили два подхода. <b>Серые поля:</b> картинку уменьшают, добавляют поля и просят их заполнить — Qwen советует для этого свою официальную формулировку «Extend the image beyond its boundaries using outpainting…». <b>Новый холст:</b> картинка идёт референсом, а выход сразу нужного размера.</p>
+  <figure><img src="media/s5-outpaint-169.jpg" alt="Портрет в 16:9" loading="lazy"><figcaption><b>Портрет → 16:9.</b> Qwen 2.1 с новым холстом естественно продолжил окно и стену. Krea с полями оставил серую полосу слева. 2511 серые поля не заполнил вовсе.</figcaption></figure>
+  <figure><img src="media/s5-outpaint-916.jpg" alt="Улица в 9:16" loading="lazy"><figcaption><b>Улица → 9:16.</b> Qwen 2.1 достроил фасады сверху и брусчатку снизу. 2511 на этот раз поля заполнил. Krea с полями их оставил, а с новым холстом перекомпоновал кадр.</figcaption></figure>
+  <ul class="rules prose">
+    <li><b>«Поля + заполни» ненадёжно у всех моделей:</b> сработало в 2 случаях из 6. Новый холст в Qwen 2.1 сработал в обоих форматах — в workflow это тоггл <i>new canvas size</i>.</li>
+    <li>Модель перерисовывает и центр (сходство с исходником 23–25 дБ), поэтому для персонажа проверяйте лицо после outpaint.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="fx-swap">
+  <h2 id="fx-swap">Замена головы — крайний случай</h2>
+  <p class="prose">BFS (Best Face Swap) — набор LoRA, которые переносят голову с одной картинки на тело другой: поза, одежда, свет и место остаются от «тела». Делаем это <b>только с нашими сгенерированными персонажами</b>. Сначала всегда пробуем перенос через Identity Edit или LoRA персонажа.</p>
+  <figure><img src="media/s5-headswap.jpg" alt="Замена головы: четыре способа" loading="lazy"><figcaption><b>Все три BFS переносят голову вместе с волосами.</b> Qwen 2.1 сохраняет свет кадра. 2511 точнее копирует лицо с референса, но приглушает волосы. Krea смешивает два лица. Identity Edit протащил трамвай из фона референса.</figcaption></figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Пара (тело ← голова)</th><th>BFS · Qwen 2.1</th><th>BFS · Krea 2</th><th>BFS · 2511</th><th>Identity Edit</th></tr></thead>
+    <tbody>
+      <tr><td>остановка ← селфи</td><td class="num">0,27–0,47</td><td class="num">0,32–0,34</td><td class="num">0,37–0,44</td><td class="num">0,33–0,43</td></tr>
+      <tr><td>селфи ← Марен</td><td class="num">0,69–0,75</td><td class="num">0,59–0,61</td><td class="num">0,49–0,50</td><td class="num">0,57–0,65</td></tr>
+    </tbody>
+  </table></div>
+  <p class="prose">ArcFace к голове-референсу. Разброс большой, поэтому выбираем на глаз из 2–3 сидов. BFS для Qwen 2.1 обучен на базовой модели, но на нашей Turbo работает так же (0,72–0,75 против 0,69–0,71), и докачивать базу не нужно.</p>
+</section>
+
+<section aria-labelledby="fx-up">
+  <h2 id="fx-up">Апскейл кадра до 4K</h2>
+  <figure><img src="media/s5-upscale.jpg" alt="Кроп лба и брови после шести апскейлеров" loading="lazy"><figcaption><b>Один и тот же участок 420×420 px</b> после увеличения 1280×1600 → 3072×3840. SeedVR2 7B sharp дорисовывает волоски и поры. 3B даёт сухую «потрескавшуюся» кожу. USDU с Krea сглаживает кожу и перерисовывает веснушки, а кадр чуть съезжает.</figcaption></figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Метод</th><th>Время (PRO 6000)</th><th>Вывод</th></tr></thead>
+    <tbody>
+      <tr class="win"><td><b>SeedVR2 7B sharp</b>, коррекция цвета lab</td><td class="num">25 с</td><td>лучшая деталь, кадр не меняется; локально 12 с</td></tr>
+      <tr><td>OmniSR ×4</td><td class="num">6 с</td><td>чёткая копия исходной фактуры, безопасный вариант</td></tr>
+      <tr><td>Remacri ×4</td><td class="num">7–9 с</td><td>чуть пластиковая кожа</td></tr>
+      <tr><td>SeedVR2 3B</td><td class="num">34–38 с</td><td>артефакты «трещин» на коже</td></tr>
+      <tr><td>Ultimate SD Upscale + Krea (denoise 0,22)</td><td class="num">31–39 с</td><td>генеративный: меняет детали, не для персонажа и продукта</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="fx-wf">
+  <h2 id="fx-wf">Новые workflow</h2>
+  <div class="wf">
+    <div class="card"><span class="file">09_edit_qwen21.json</span><h3>Правка одной фразой</h3>
+      <ul><li>Qwen-Image 2.1 Turbo, 8 шагов: убрать, перекрасить, фон, одежда, текст, рука</li><li>Тоггл <b>2nd reference</b>: второй Load Image как &lt;image2&gt; — вставить предмет или одежду</li><li>Тоггл <b>new canvas size</b> + ширина/высота: outpaint и смена формата</li></ul><span class="time">≈ 11 с</span></div>
+    <div class="card"><span class="file">09_edit_krea_general.json</span><h3>Мягкая правка, свет</h3>
+      <ul><li>Krea 2 General Edit V2: свет, перекраска с сохранением фактуры</li><li>Поля: инструкция, seed, МП (≤ 2), ref boost, grounding</li></ul><span class="time">≈ 30 с</span></div>
+    <div class="card"><span class="file">09_edit_headswap_bfs.json</span><h3>Замена головы (крайний случай)</h3>
+      <ul><li>BFS на Qwen 2.1 Turbo, официальный промпт</li><li>Два Load Image: тело и голова; поля: seed, сила BFS</li></ul><span class="time">≈ 13 с</span></div>
+    <div class="card"><span class="file">09_edit_upscale_4k.json</span><h3>Апскейл кадра до 4K</h3>
+      <ul><li>Официальный шаблон SeedVR2 + наш выбор: 7B sharp, ×2,4, цвет lab</li></ul><span class="time">≈ 12 с</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="fx-rules">
+  <h2 id="fx-rules">Правила, которые остались</h2>
+  <ul class="rules prose">
+    <li><b>Сначала Qwen 2.1, потом остальные.</b> Он самый быстрый, лучше всех держит лицо (0,95–0,96 при смене фона и одежды) и делает ровно то, что сказано.</li>
+    <li><b>Свет — на Krea General Edit.</b> Модели, которые «умеют всё», при смене света перерисовывают человека.</li>
+    <li><b>Не вырезать фрагмент для правки.</b> Без контекста кадра модель дорисовывает лишнее. Руку лучше чинить правкой всего кадра.</li>
+    <li><b>Outpaint — новым холстом, не серыми полями.</b></li>
+    <li><b>Апскейл фото — SeedVR2 7B sharp.</b> Генеративные апскейлеры не ставить на персонажа и продукт.</li>
+    <li><b>Лицо меряем ArcFace и глазами.</b> Цифра ловит смену человека, но не потерянную родинку — Identity Edit потерял её при цифре 0,64.</li>
+  </ul>
+</section>
+
+<p class="mdlink">Для ИИ-агентов: <a href="md/ch-fix.md">эта глава в Markdown</a> · <a href="llms.txt">llms.txt</a></p>
+<nav class="pager" aria-label="Главы"><a href="ch-prompts.html" rel="prev"><span class="dir">← назад</span>Промпты</a><a class="next" href="ch-ref.html" rel="next"><span class="dir">дальше →</span>Перенос по референсу</a></nav>
+</div>
+
+<script>
+document.querySelectorAll('button[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.copy), txt=el.textContent;
+    var done=function(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Копировать'},1500)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
+    try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
+  });
+});
+// ←/→ = previous/next chapter (not while typing or selecting text); the chapter menu closes on an outside click or Esc
+document.addEventListener('keydown',function(e){
+  var t=e.target, m=document.querySelector('details.chmenu');
+  if(e.key==='Escape'&&m){m.open=false;return}
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||/INPUT|TEXTAREA|SELECT|VIDEO/.test(t.tagName)||t.isContentEditable)return;
+  if(String(getSelection())!=='')return;
+  var a=document.querySelector('.pager a[rel="'+(e.key==='ArrowLeft'?'prev':e.key==='ArrowRight'?'next':'')+'"]');
+  if(a)location.href=a.getAttribute('href');
+});
+document.addEventListener('click',function(e){
+  var m=document.querySelector('details.chmenu');
+  if(m&&m.open&&!m.contains(e.target))m.open=false;
+});
+</script>
+</body>
+</html>

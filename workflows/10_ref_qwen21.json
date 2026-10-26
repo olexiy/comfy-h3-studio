@@ -1,0 +1,1881 @@
+{
+ "id": "f77b4f01-95e1-502c-9c44-c2b03cbbcfca",
+ "revision": 0,
+ "last_node_id": 24,
+ "last_link_id": 50,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "MarkdownNote",
+   "pos": [
+    0,
+    0
+   ],
+   "size": [
+    440,
+    1000
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "# 10 · Put THIS face / jacket / bag / style into a new picture (Qwen-Image 2.1)\n**Use:** load 1–3 reference pictures → describe the new scene and name each reference as **image 1 / image 2 / image 3**\n(\"the woman from image 1 wearing the jacket from image 2 sits at the bar of the café from image 3\") → Run → `S6/ref_q21_*.png`.\n8 steps, cfg 1 (Turbo). \n\n| Knob | Meaning |\n|---|---|\n| 2nd / 3rd reference | switch the extra Load Image nodes on (image 2, image 3) |\n| width / height | the new picture (1024×1280 = 4:5) |\n| scene | one sentence per reference; say what must stay (\"same face, hair and outfit\") |\n\n**Known habit:** it copies the reference's pose and camera (a frontal photo → a frontal face). Write the pose you want, or use\n`10_ref_klein` for natural new poses. Clean product-style references (plain background) work best.\n\n| Reference | Use | Why (series 6, 14 refs × 3 scenes) |\n|---|---|---|\n| object / product | **10_ref_product_krea** or 10_ref_qwen21 | emblem, buckle, stitching survive (DINOv2 bag 0.87 / 0.85) |\n| garment (print, embroidery) | **10_ref_qwen21** | koi embroidery + lemon print closest |\n| face / whole character | **10_ref_qwen21** | ArcFace 0.81–0.92 from ONE photo (our Maren LoRA: 0.55) — but it copies the photo's frontal pose |\n| new pose / new camera angle | **10_ref_klein** | re-stages naturally (sits, turns, walks); details a bit looser |\n| art style / film look | **10_ref_qwen21** | gouache, risograph, Cinestill look on new content |\n| place | 10_ref_qwen21 (same view) · 10_ref_klein (other viewpoint) | Qwen keeps the exact room, Klein can turn the camera |\n| palette / light only | **10_ref_style_krea** | Qwen and Qwen-Edit 2511 paste the reference picture as the background |\n| 2–3 references at once | **10_ref_qwen21**, toggles 2nd / 3rd | face + jacket + café all kept |"
+   ]
+  },
+  {
+   "id": 6,
+   "type": "LoadImage",
+   "pos": [
+    480,
+    0
+   ],
+   "size": [
+    380,
+    460
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "title": "Reference 1 (image 1)",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      2,
+      5,
+      9
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "widgets_values": [
+    "s6/char_cardi.png",
+    "image"
+   ]
+  },
+  {
+   "id": 7,
+   "type": "LoadImage",
+   "pos": [
+    480,
+    500
+   ],
+   "size": [
+    380,
+    460
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "title": "Reference 2 (image 2, optional)",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      6,
+      10
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "widgets_values": [
+    "s6/obj_bag.png",
+    "image"
+   ]
+  },
+  {
+   "id": 8,
+   "type": "LoadImage",
+   "pos": [
+    480,
+    1000
+   ],
+   "size": [
+    380,
+    460
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "title": "Reference 3 (image 3, optional)",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      11
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "widgets_values": [
+    "s6/place_cafe.png",
+    "image"
+   ]
+  },
+  {
+   "id": 23,
+   "type": "SaveImage",
+   "pos": [
+    1440,
+    0
+   ],
+   "size": [
+    440,
+    600
+   ],
+   "flags": {},
+   "order": 22,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "title": "Save image",
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 32
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "S6/ref_q21"
+   ]
+  },
+  {
+   "id": 24,
+   "type": "ebc6b196-4f09-46df-a154-15a7f454d12c",
+   "title": "Qwen 2.1 · references",
+   "pos": [
+    900,
+    0
+   ],
+   "size": [
+    480,
+    560
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images.image_1",
+     "type": "IMAGE",
+     "link": 33
+    },
+    {
+     "name": "images.image_1_1",
+     "type": "IMAGE",
+     "link": 34
+    },
+    {
+     "name": "images.image_2",
+     "type": "IMAGE",
+     "link": 35
+    },
+    {
+     "name": "images.image_1_2",
+     "type": "IMAGE",
+     "link": 36
+    },
+    {
+     "name": "images.image_2_1",
+     "type": "IMAGE",
+     "link": 37
+    },
+    {
+     "name": "images.image_3",
+     "type": "IMAGE",
+     "link": 38
+    },
+    {
+     "label": "scene",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": null
+    },
+    {
+     "label": "seed",
+     "name": "noise_seed",
+     "type": "INT",
+     "widget": {
+      "name": "noise_seed"
+     },
+     "link": null
+    },
+    {
+     "label": "2nd reference",
+     "name": "switch",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "switch"
+     },
+     "link": null
+    },
+    {
+     "label": "3rd reference",
+     "name": "switch_1",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "switch_1"
+     },
+     "link": null
+    },
+    {
+     "label": "width",
+     "name": "width",
+     "type": "INT",
+     "widget": {
+      "name": "width"
+     },
+     "link": null
+    },
+    {
+     "label": "height",
+     "name": "height",
+     "type": "INT",
+     "widget": {
+      "name": "height"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      32
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core"
+   },
+   "widgets_values": [
+    "The woman from image 1 with the same face, hair and outfit sits by the window of a cosy café reading a paperback book, warm afternoon light, full body visible.",
+    20261023,
+    false,
+    false,
+    1024,
+    1280
+   ]
+  }
+ ],
+ "links": [
+  [
+   33,
+   6,
+   0,
+   24,
+   0,
+   "IMAGE"
+  ],
+  [
+   34,
+   6,
+   0,
+   24,
+   1,
+   "IMAGE"
+  ],
+  [
+   35,
+   7,
+   0,
+   24,
+   2,
+   "IMAGE"
+  ],
+  [
+   36,
+   6,
+   0,
+   24,
+   3,
+   "IMAGE"
+  ],
+  [
+   37,
+   7,
+   0,
+   24,
+   4,
+   "IMAGE"
+  ],
+  [
+   38,
+   8,
+   0,
+   24,
+   5,
+   "IMAGE"
+  ],
+  [
+   32,
+   24,
+   0,
+   23,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.45,
+   "offset": [
+    60,
+    120
+   ]
+  },
+  "workflowRendererVersion": "LG"
+ },
+ "version": 0.4,
+ "definitions": {
+  "subgraphs": [
+   {
+    "id": "ebc6b196-4f09-46df-a154-15a7f454d12c",
+    "version": 1,
+    "state": {
+     "lastGroupId": 3,
+     "lastNodeId": 22,
+     "lastLinkId": 50,
+     "lastRerouteId": 0
+    },
+    "revision": 0,
+    "config": {},
+    "name": "Qwen 2.1 · references",
+    "inputNode": {
+     "id": -10,
+     "bounding": [
+      350,
+      76,
+      180,
+      348
+     ]
+    },
+    "outputNode": {
+     "id": -20,
+     "bounding": [
+      3290,
+      76,
+      140,
+      68
+     ]
+    },
+    "inputs": [
+     {
+      "id": "599c14fc-46c3-4819-a8f5-554673e9dd6b",
+      "name": "images.image_1",
+      "type": "IMAGE",
+      "linkIds": [
+       2
+      ],
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "8345ca12-7f31-4550-9335-22240b740947",
+      "name": "images.image_1_1",
+      "type": "IMAGE",
+      "linkIds": [
+       5
+      ],
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "a5e9a070-005f-4292-9554-7d070abc49cb",
+      "name": "images.image_2",
+      "type": "IMAGE",
+      "linkIds": [
+       6
+      ],
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "1f92aea1-4e7c-45ea-bbc5-27935b395939",
+      "name": "images.image_1_2",
+      "type": "IMAGE",
+      "linkIds": [
+       9
+      ],
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "0f0749e5-1ad1-4c1b-9d81-0e542f79577f",
+      "name": "images.image_2_1",
+      "type": "IMAGE",
+      "linkIds": [
+       10
+      ],
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "c750fd2f-284c-469b-9ac8-1dccac82c3f6",
+      "name": "images.image_3",
+      "type": "IMAGE",
+      "linkIds": [
+       11
+      ],
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "3efd7bd3-c3c8-432b-b9ef-3cfbd0bf6c38",
+      "name": "prompt",
+      "type": "STRING",
+      "linkIds": [
+       40,
+       41,
+       42
+      ],
+      "label": "scene",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "8aa84a13-39cf-4594-b6bb-14b535415938",
+      "name": "noise_seed",
+      "type": "INT",
+      "linkIds": [
+       43
+      ],
+      "label": "seed",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "72089519-ddd5-4914-979f-810dc8940bab",
+      "name": "switch",
+      "type": "BOOLEAN",
+      "linkIds": [
+       44,
+       45
+      ],
+      "label": "2nd reference",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "1d5bec55-9b02-4dfe-aab6-75148ada7001",
+      "name": "switch_1",
+      "type": "BOOLEAN",
+      "linkIds": [
+       46,
+       47
+      ],
+      "label": "3rd reference",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "37f17d94-9190-4be4-946a-e48f6124dffa",
+      "name": "width",
+      "type": "INT",
+      "linkIds": [
+       48
+      ],
+      "label": "width",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "06859c08-c6e8-4284-9d10-0ae1ad99a688",
+      "name": "height",
+      "type": "INT",
+      "linkIds": [
+       49
+      ],
+      "label": "height",
+      "pos": [
+       390,
+       96
+      ]
+     }
+    ],
+    "outputs": [
+     {
+      "id": "43f0eb73-6457-4299-a92c-1ae25fce2043",
+      "name": "IMAGE",
+      "type": "IMAGE",
+      "linkIds": [
+       39
+      ],
+      "localized_name": "IMAGE",
+      "pos": [
+       3320,
+       96
+      ]
+     }
+    ],
+    "widgets": [],
+    "nodes": [
+     {
+      "id": 2,
+      "type": "UNETLoader",
+      "pos": [
+       610,
+       76
+      ],
+      "size": [
+       400,
+       82
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "UNETLoader"
+      },
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "MODEL",
+        "type": "MODEL",
+        "links": [
+         1
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "qwen_image_2.1_turbo_int8_convrot.safetensors",
+       "default"
+      ]
+     },
+     {
+      "id": 3,
+      "type": "CLIPLoader",
+      "pos": [
+       610,
+       218
+      ],
+      "size": [
+       400,
+       106
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "CLIPLoader"
+      },
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "CLIP",
+        "type": "CLIP",
+        "links": [
+         3,
+         7,
+         12
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "qwen3vl_8b_int8_convrot.safetensors",
+       "qwen_image",
+       "default"
+      ]
+     },
+     {
+      "id": 4,
+      "type": "VAELoader",
+      "pos": [
+       610,
+       384
+      ],
+      "size": [
+       400,
+       58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "VAELoader"
+      },
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "VAE",
+        "type": "VAE",
+        "links": [
+         4,
+         8,
+         13,
+         31
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "qwen_image_2.1_vae_bf16.safetensors"
+      ]
+     },
+     {
+      "id": 5,
+      "type": "QwenImage21Cache",
+      "pos": [
+       1050,
+       76
+      ],
+      "size": [
+       340,
+       82
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "QwenImage21Cache"
+      },
+      "inputs": [
+       {
+        "name": "model",
+        "type": "MODEL",
+        "link": 1
+       }
+      ],
+      "outputs": [
+       {
+        "name": "MODEL",
+        "type": "MODEL",
+        "links": [
+         22
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "auto",
+       "default"
+      ]
+     },
+     {
+      "id": 9,
+      "type": "TextEncodeQwenImage21",
+      "pos": [
+       2030,
+       76
+      ],
+      "size": [
+       420,
+       300
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "TextEncodeQwenImage21"
+      },
+      "title": "Scene · 1 ref",
+      "inputs": [
+       {
+        "name": "clip",
+        "type": "CLIP",
+        "link": 3
+       },
+       {
+        "name": "images.image_1",
+        "type": "*",
+        "link": 2
+       },
+       {
+        "name": "vae",
+        "type": "VAE",
+        "link": 4
+       },
+       {
+        "localized_name": "prompt",
+        "name": "prompt",
+        "type": "STRING",
+        "widget": {
+         "name": "prompt"
+        },
+        "link": 40
+       }
+      ],
+      "outputs": [
+       {
+        "name": "positive",
+        "type": "CONDITIONING",
+        "links": [
+         15
+        ],
+        "slot_index": 0
+       },
+       {
+        "name": "negative",
+        "type": "CONDITIONING",
+        "links": [
+         17
+        ],
+        "slot_index": 1
+       },
+       {
+        "name": "latent",
+        "type": "LATENT",
+        "links": null,
+        "slot_index": 2
+       }
+      ],
+      "widgets_values": [
+       "The woman from image 1 with the same face, hair and outfit sits by the window of a cosy café reading a paperback book, warm afternoon light, full body visible.",
+       "",
+       1024
+      ]
+     },
+     {
+      "id": 10,
+      "type": "TextEncodeQwenImage21",
+      "pos": [
+       2030,
+       436
+      ],
+      "size": [
+       420,
+       300
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "TextEncodeQwenImage21"
+      },
+      "title": "Scene · 2 refs",
+      "inputs": [
+       {
+        "name": "clip",
+        "type": "CLIP",
+        "link": 7
+       },
+       {
+        "name": "images.image_1",
+        "type": "*",
+        "link": 5
+       },
+       {
+        "name": "images.image_2",
+        "type": "*",
+        "link": 6
+       },
+       {
+        "name": "vae",
+        "type": "VAE",
+        "link": 8
+       },
+       {
+        "localized_name": "prompt",
+        "name": "prompt",
+        "type": "STRING",
+        "widget": {
+         "name": "prompt"
+        },
+        "link": 41
+       }
+      ],
+      "outputs": [
+       {
+        "name": "positive",
+        "type": "CONDITIONING",
+        "links": [
+         14
+        ],
+        "slot_index": 0
+       },
+       {
+        "name": "negative",
+        "type": "CONDITIONING",
+        "links": [
+         16
+        ],
+        "slot_index": 1
+       },
+       {
+        "name": "latent",
+        "type": "LATENT",
+        "links": null,
+        "slot_index": 2
+       }
+      ],
+      "widgets_values": [
+       "The woman from image 1 with the same face, hair and outfit sits by the window of a cosy café reading a paperback book, warm afternoon light, full body visible.",
+       "",
+       1024
+      ]
+     },
+     {
+      "id": 11,
+      "type": "TextEncodeQwenImage21",
+      "pos": [
+       2030,
+       796
+      ],
+      "size": [
+       420,
+       300
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "TextEncodeQwenImage21"
+      },
+      "title": "Scene · 3 refs",
+      "inputs": [
+       {
+        "name": "clip",
+        "type": "CLIP",
+        "link": 12
+       },
+       {
+        "name": "images.image_1",
+        "type": "*",
+        "link": 9
+       },
+       {
+        "name": "images.image_2",
+        "type": "*",
+        "link": 10
+       },
+       {
+        "name": "images.image_3",
+        "type": "*",
+        "link": 11
+       },
+       {
+        "name": "vae",
+        "type": "VAE",
+        "link": 13
+       },
+       {
+        "localized_name": "prompt",
+        "name": "prompt",
+        "type": "STRING",
+        "widget": {
+         "name": "prompt"
+        },
+        "link": 42
+       }
+      ],
+      "outputs": [
+       {
+        "name": "positive",
+        "type": "CONDITIONING",
+        "links": [
+         18
+        ],
+        "slot_index": 0
+       },
+       {
+        "name": "negative",
+        "type": "CONDITIONING",
+        "links": [
+         20
+        ],
+        "slot_index": 1
+       },
+       {
+        "name": "latent",
+        "type": "LATENT",
+        "links": null,
+        "slot_index": 2
+       }
+      ],
+      "widgets_values": [
+       "The woman from image 1 with the same face, hair and outfit sits by the window of a cosy café reading a paperback book, warm afternoon light, full body visible.",
+       "",
+       1024
+      ]
+     },
+     {
+      "id": 12,
+      "type": "ComfySwitchNode",
+      "pos": [
+       2490,
+       76
+      ],
+      "size": [
+       340,
+       80
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ComfySwitchNode"
+      },
+      "title": "Switch · 2nd ref (pos)",
+      "inputs": [
+       {
+        "name": "on_false",
+        "type": "CONDITIONING",
+        "link": 15
+       },
+       {
+        "name": "on_true",
+        "type": "CONDITIONING",
+        "link": 14
+       },
+       {
+        "localized_name": "switch",
+        "name": "switch",
+        "type": "BOOLEAN",
+        "widget": {
+         "name": "switch"
+        },
+        "link": 44
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "CONDITIONING",
+        "links": [
+         19
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       false
+      ]
+     },
+     {
+      "id": 13,
+      "type": "ComfySwitchNode",
+      "pos": [
+       2490,
+       216
+      ],
+      "size": [
+       340,
+       80
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ComfySwitchNode"
+      },
+      "title": "Switch · 2nd ref (neg)",
+      "inputs": [
+       {
+        "name": "on_false",
+        "type": "CONDITIONING",
+        "link": 17
+       },
+       {
+        "name": "on_true",
+        "type": "CONDITIONING",
+        "link": 16
+       },
+       {
+        "localized_name": "switch",
+        "name": "switch",
+        "type": "BOOLEAN",
+        "widget": {
+         "name": "switch"
+        },
+        "link": 45
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "CONDITIONING",
+        "links": [
+         21
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       false
+      ]
+     },
+     {
+      "id": 14,
+      "type": "ComfySwitchNode",
+      "pos": [
+       2490,
+       356
+      ],
+      "size": [
+       340,
+       80
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ComfySwitchNode"
+      },
+      "title": "Switch · 3rd ref (pos)",
+      "inputs": [
+       {
+        "name": "on_false",
+        "type": "CONDITIONING",
+        "link": 19
+       },
+       {
+        "name": "on_true",
+        "type": "CONDITIONING",
+        "link": 18
+       },
+       {
+        "localized_name": "switch",
+        "name": "switch",
+        "type": "BOOLEAN",
+        "widget": {
+         "name": "switch"
+        },
+        "link": 46
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "CONDITIONING",
+        "links": [
+         23
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       false
+      ]
+     },
+     {
+      "id": 15,
+      "type": "ComfySwitchNode",
+      "pos": [
+       2490,
+       496
+      ],
+      "size": [
+       340,
+       80
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ComfySwitchNode"
+      },
+      "title": "Switch · 3rd ref (neg)",
+      "inputs": [
+       {
+        "name": "on_false",
+        "type": "CONDITIONING",
+        "link": 21
+       },
+       {
+        "name": "on_true",
+        "type": "CONDITIONING",
+        "link": 20
+       },
+       {
+        "localized_name": "switch",
+        "name": "switch",
+        "type": "BOOLEAN",
+        "widget": {
+         "name": "switch"
+        },
+        "link": 47
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "CONDITIONING",
+        "links": [
+         24
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       false
+      ]
+     },
+     {
+      "id": 16,
+      "type": "EmptyLatentImage",
+      "pos": [
+       2490,
+       636
+      ],
+      "size": [
+       340,
+       106
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "EmptyLatentImage"
+      },
+      "title": "New canvas",
+      "inputs": [
+       {
+        "localized_name": "width",
+        "name": "width",
+        "type": "INT",
+        "widget": {
+         "name": "width"
+        },
+        "link": 48
+       },
+       {
+        "localized_name": "height",
+        "name": "height",
+        "type": "INT",
+        "widget": {
+         "name": "height"
+        },
+        "link": 49
+       }
+      ],
+      "outputs": [
+       {
+        "name": "LATENT",
+        "type": "LATENT",
+        "links": [
+         29
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       1024,
+       1280,
+       1
+      ]
+     },
+     {
+      "id": 17,
+      "type": "ManualSigmas",
+      "pos": [
+       2870,
+       76
+      ],
+      "size": [
+       340,
+       58
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ManualSigmas"
+      },
+      "title": "Turbo 8-step schedule",
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "SIGMAS",
+        "type": "SIGMAS",
+        "links": [
+         28
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "1.0, 0.978453, 0.95418, 0.926626, 0.89508, 0.845148, 0.704534, 0.414568, 0"
+      ]
+     },
+     {
+      "id": 18,
+      "type": "CFGGuider",
+      "pos": [
+       2870,
+       194
+      ],
+      "size": [
+       340,
+       102
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "CFGGuider"
+      },
+      "inputs": [
+       {
+        "name": "model",
+        "type": "MODEL",
+        "link": 22
+       },
+       {
+        "name": "positive",
+        "type": "CONDITIONING",
+        "link": 23
+       },
+       {
+        "name": "negative",
+        "type": "CONDITIONING",
+        "link": 24
+       }
+      ],
+      "outputs": [
+       {
+        "name": "GUIDER",
+        "type": "GUIDER",
+        "links": [
+         26
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       1.0
+      ]
+     },
+     {
+      "id": 19,
+      "type": "RandomNoise",
+      "pos": [
+       2870,
+       356
+      ],
+      "size": [
+       340,
+       82
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "RandomNoise"
+      },
+      "inputs": [
+       {
+        "localized_name": "noise_seed",
+        "name": "noise_seed",
+        "type": "INT",
+        "widget": {
+         "name": "noise_seed"
+        },
+        "link": 43
+       }
+      ],
+      "outputs": [
+       {
+        "name": "NOISE",
+        "type": "NOISE",
+        "links": [
+         25
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       20261023,
+       "fixed"
+      ]
+     },
+     {
+      "id": 20,
+      "type": "KSamplerSelect",
+      "pos": [
+       2870,
+       498
+      ],
+      "size": [
+       340,
+       58
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "KSamplerSelect"
+      },
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "SAMPLER",
+        "type": "SAMPLER",
+        "links": [
+         27
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "euler"
+      ]
+     },
+     {
+      "id": 21,
+      "type": "SamplerCustomAdvanced",
+      "pos": [
+       2870,
+       616
+      ],
+      "size": [
+       340,
+       122
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "SamplerCustomAdvanced"
+      },
+      "inputs": [
+       {
+        "name": "noise",
+        "type": "NOISE",
+        "link": 25
+       },
+       {
+        "name": "guider",
+        "type": "GUIDER",
+        "link": 26
+       },
+       {
+        "name": "sampler",
+        "type": "SAMPLER",
+        "link": 27
+       },
+       {
+        "name": "sigmas",
+        "type": "SIGMAS",
+        "link": 28
+       },
+       {
+        "name": "latent_image",
+        "type": "LATENT",
+        "link": 29
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "LATENT",
+        "links": [
+         30
+        ],
+        "slot_index": 0
+       },
+       {
+        "name": "denoised_output",
+        "type": "LATENT",
+        "links": null,
+        "slot_index": 1
+       }
+      ],
+      "widgets_values": []
+     },
+     {
+      "id": 22,
+      "type": "VAEDecode",
+      "pos": [
+       2870,
+       798
+      ],
+      "size": [
+       340,
+       56
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "VAEDecode"
+      },
+      "inputs": [
+       {
+        "name": "samples",
+        "type": "LATENT",
+        "link": 30
+       },
+       {
+        "name": "vae",
+        "type": "VAE",
+        "link": 31
+       }
+      ],
+      "outputs": [
+       {
+        "name": "IMAGE",
+        "type": "IMAGE",
+        "links": [
+         39
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": []
+     }
+    ],
+    "groups": [
+     {
+      "id": 1,
+      "title": "1 · Models",
+      "bounding": [
+       580,
+       0,
+       840,
+       472
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+     },
+     {
+      "id": 2,
+      "title": "2 · References",
+      "bounding": [
+       1500,
+       0,
+       420,
+       1486
+      ],
+      "color": "#3f5f8a",
+      "font_size": 24,
+      "flags": {}
+     },
+     {
+      "id": 3,
+      "title": "3 · New picture",
+      "bounding": [
+       2000,
+       0,
+       1340,
+       1544
+      ],
+      "color": "#a1309b",
+      "font_size": 24,
+      "flags": {}
+     }
+    ],
+    "links": [
+     {
+      "id": 1,
+      "origin_id": 2,
+      "origin_slot": 0,
+      "target_id": 5,
+      "target_slot": 0,
+      "type": "MODEL"
+     },
+     {
+      "id": 2,
+      "origin_id": -10,
+      "origin_slot": 0,
+      "target_id": 9,
+      "target_slot": 1,
+      "type": "IMAGE"
+     },
+     {
+      "id": 3,
+      "origin_id": 3,
+      "origin_slot": 0,
+      "target_id": 9,
+      "target_slot": 0,
+      "type": "CLIP"
+     },
+     {
+      "id": 4,
+      "origin_id": 4,
+      "origin_slot": 0,
+      "target_id": 9,
+      "target_slot": 2,
+      "type": "VAE"
+     },
+     {
+      "id": 5,
+      "origin_id": -10,
+      "origin_slot": 1,
+      "target_id": 10,
+      "target_slot": 1,
+      "type": "IMAGE"
+     },
+     {
+      "id": 6,
+      "origin_id": -10,
+      "origin_slot": 2,
+      "target_id": 10,
+      "target_slot": 2,
+      "type": "IMAGE"
+     },
+     {
+      "id": 7,
+      "origin_id": 3,
+      "origin_slot": 0,
+      "target_id": 10,
+      "target_slot": 0,
+      "type": "CLIP"
+     },
+     {
+      "id": 8,
+      "origin_id": 4,
+      "origin_slot": 0,
+      "target_id": 10,
+      "target_slot": 3,
+      "type": "VAE"
+     },
+     {
+      "id": 9,
+      "origin_id": -10,
+      "origin_slot": 3,
+      "target_id": 11,
+      "target_slot": 1,
+      "type": "IMAGE"
+     },
+     {
+      "id": 10,
+      "origin_id": -10,
+      "origin_slot": 4,
+      "target_id": 11,
+      "target_slot": 2,
+      "type": "IMAGE"
+     },
+     {
+      "id": 11,
+      "origin_id": -10,
+      "origin_slot": 5,
+      "target_id": 11,
+      "target_slot": 3,
+      "type": "IMAGE"
+     },
+     {
+      "id": 12,
+      "origin_id": 3,
+      "origin_slot": 0,
+      "target_id": 11,
+      "target_slot": 0,
+      "type": "CLIP"
+     },
+     {
+      "id": 13,
+      "origin_id": 4,
+      "origin_slot": 0,
+      "target_id": 11,
+      "target_slot": 4,
+      "type": "VAE"
+     },
+     {
+      "id": 14,
+      "origin_id": 10,
+      "origin_slot": 0,
+      "target_id": 12,
+      "target_slot": 1,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 15,
+      "origin_id": 9,
+      "origin_slot": 0,
+      "target_id": 12,
+      "target_slot": 0,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 16,
+      "origin_id": 10,
+      "origin_slot": 1,
+      "target_id": 13,
+      "target_slot": 1,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 17,
+      "origin_id": 9,
+      "origin_slot": 1,
+      "target_id": 13,
+      "target_slot": 0,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 18,
+      "origin_id": 11,
+      "origin_slot": 0,
+      "target_id": 14,
+      "target_slot": 1,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 19,
+      "origin_id": 12,
+      "origin_slot": 0,
+      "target_id": 14,
+      "target_slot": 0,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 20,
+      "origin_id": 11,
+      "origin_slot": 1,
+      "target_id": 15,
+      "target_slot": 1,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 21,
+      "origin_id": 13,
+      "origin_slot": 0,
+      "target_id": 15,
+      "target_slot": 0,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 22,
+      "origin_id": 5,
+      "origin_slot": 0,
+      "target_id": 18,
+      "target_slot": 0,
+      "type": "MODEL"
+     },
+     {
+      "id": 23,
+      "origin_id": 14,
+      "origin_slot": 0,
+      "target_id": 18,
+      "target_slot": 1,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 24,
+      "origin_id": 15,
+      "origin_slot": 0,
+      "target_id": 18,
+      "target_slot": 2,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 25,
+      "origin_id": 19,
+      "origin_slot": 0,
+      "target_id": 21,
+      "target_slot": 0,
+      "type": "NOISE"
+     },
+     {
+      "id": 26,
+      "origin_id": 18,
+      "origin_slot": 0,
+      "target_id": 21,
+      "target_slot": 1,
+      "type": "GUIDER"
+     },
+     {
+      "id": 27,
+      "origin_id": 20,
+      "origin_slot": 0,
+      "target_id": 21,
+      "target_slot": 2,
+      "type": "SAMPLER"
+     },
+     {
+      "id": 28,
+      "origin_id": 17,
+      "origin_slot": 0,
+      "target_id": 21,
+      "target_slot": 3,
+      "type": "SIGMAS"
+     },
+     {
+      "id": 29,
+      "origin_id": 16,
+      "origin_slot": 0,
+      "target_id": 21,
+      "target_slot": 4,
+      "type": "LATENT"
+     },
+     {
+      "id": 30,
+      "origin_id": 21,
+      "origin_slot": 0,
+      "target_id": 22,
+      "target_slot": 0,
+      "type": "LATENT"
+     },
+     {
+      "id": 31,
+      "origin_id": 4,
+      "origin_slot": 0,
+      "target_id": 22,
+      "target_slot": 1,
+      "type": "VAE"
+     },
+     {
+      "id": 39,
+      "origin_id": 22,
+      "origin_slot": 0,
+      "target_id": -20,
+      "target_slot": 0,
+      "type": "IMAGE"
+     },
+     {
+      "id": 40,
+      "origin_id": -10,
+      "origin_slot": 6,
+      "target_id": 9,
+      "target_slot": 3,
+      "type": "STRING"
+     },
+     {
+      "id": 41,
+      "origin_id": -10,
+      "origin_slot": 6,
+      "target_id": 10,
+      "target_slot": 4,
+      "type": "STRING"
+     },
+     {
+      "id": 42,
+      "origin_id": -10,
+      "origin_slot": 6,
+      "target_id": 11,
+      "target_slot": 5,
+      "type": "STRING"
+     },
+     {
+      "id": 43,
+      "origin_id": -10,
+      "origin_slot": 7,
+      "target_id": 19,
+      "target_slot": 0,
+      "type": "INT"
+     },
+     {
+      "id": 44,
+      "origin_id": -10,
+      "origin_slot": 8,
+      "target_id": 12,
+      "target_slot": 2,
+      "type": "BOOLEAN"
+     },
+     {
+      "id": 45,
+      "origin_id": -10,
+      "origin_slot": 8,
+      "target_id": 13,
+      "target_slot": 2,
+      "type": "BOOLEAN"
+     },
+     {
+      "id": 46,
+      "origin_id": -10,
+      "origin_slot": 9,
+      "target_id": 14,
+      "target_slot": 2,
+      "type": "BOOLEAN"
+     },
+     {
+      "id": 47,
+      "origin_id": -10,
+      "origin_slot": 9,
+      "target_id": 15,
+      "target_slot": 2,
+      "type": "BOOLEAN"
+     },
+     {
+      "id": 48,
+      "origin_id": -10,
+      "origin_slot": 10,
+      "target_id": 16,
+      "target_slot": 0,
+      "type": "INT"
+     },
+     {
+      "id": 49,
+      "origin_id": -10,
+      "origin_slot": 11,
+      "target_id": 16,
+      "target_slot": 1,
+      "type": "INT"
+     }
+    ],
+    "extra": {}
+   }
+  ]
+ }
+}

@@ -1,10 +1,39 @@
-# Local H3 Studio — home ComfyUI + RunPod knowledge base
+# Студия ComfyUI — ComfyUI photo & video textbook (Russian) for people and AI agents
 
-> Measured recipes and pitfalls for driving ComfyUI (Krea 2, Qwen-Image-Edit 2511, Krea 2 Identity Edit V2, MiniMax H3, LTX-2.5) headless on a 16 GB consumer GPU, training a persona LoRA with ai-toolkit on RunPod, and evaluating results. Written for agents. Version 2026-10-25.
+> Measured recipes, theory and pitfalls for generating photos and videos with ComfyUI on a 16 GB consumer GPU
+> (RTX 5070 Ti, 62 GB RAM, Windows 11) plus rented cloud GPUs: Krea 2, Qwen-Image 2.1, FLUX.3 Klein, MiniMax H3,
+> LTX-2.5, editing and reference transfer, a fictional persona LoRA, HyperFrames editing. Human chapters are in
+> Russian; the agent guide is English. Facts carry evidence tags: [MEASURED] (run by the authors), [SOURCE]
+> (docs/community), [RULE] (derived decision). Version 2026-10-26b.
 
-## Agent docs
-- [agent-guide.md](agent-guide.md): full guide — API driving, exact model files and settings, prompt templates, persona pipeline, LoRA config, evaluation metrics, RunPod procedure, Windows pitfalls.
-- [ch-agent.html](ch-agent.html): same content inside the textbook page.
+## Start here (agents)
+- [agent-guide.md](agent-guide.md): English, dense — exact model files and settings, ComfyUI API driving, prompt templates, persona LoRA pipeline, evaluation metrics, RunPod procedure, editing rules, Windows pitfalls.
+- [book.json](book.json): chapter index with section ids, status and English summaries.
+- [llms-full.txt](llms-full.txt): every human chapter as Markdown in one file (Russian).
 
-## Human chapters (Russian)
-- [index.html](index.html): table of contents of the textbook.
+## Chapters (Russian, Markdown)
+- [01 Как устроен учебник](md/ch-intro.md): How the book is organised: audience, test bench (RTX 5070 Ti 16 GB / 62 GB RAM + RunPod RTX PRO 6000), evidence tags, experiment series, reading routes, ethics and licences.
+- [02 Как работают генеративные модели](md/ch-theory.md): Theory for practitioners: diffusion / flow matching, latent space and VAE, text encoders (CLIP vs LLM), DiT and attention cost, steps / sampler / scheduler / shift, CFG and why distilled models use cfg 1, LoRA, quantisation and RAM offload, image-to-video and edit models.
+- [03 ComfyUI: граф, ноды, workflow](md/ch-comfy.md): ComfyUI basics: nodes, typed links (MODEL, CLIP, VAE, LATENT, CONDITIONING, IMAGE), the minimal text-to-image graph, model folders, custom nodes, subgraphs and our one-node workflow style, workflows embedded in PNG/MP4, the HTTP API (/prompt, /history, /object_info, /free), caching and the queue.
+- [04 Железо, файлы и облако](md/ch-studio.md): Hardware and cloud: local box limits, folder layout of ComfyUI Desktop, local vs RunPod vs hosted API cost/time table, platform comparison, safe rented-GPU routine, full-precision H3 on a 96 GB card vs the quantised local stack.
+- [05 Кадр: фото на Krea 2](md/ch-stills.md): Photoreal stills on Krea 2 Turbo: simple one-pass vs the two-pass author recipe vs MOSS, fixing the 'AI face' (realism LoRA 0.5, upscale denoise 0.22, mature-feature words), strong body words at cfg 1.
+- [06 Промпты](md/ch-prompts.md): Copy-paste prompt templates: H3 timed shot-list with appearance/background locks, tag-style and prose-style still prompts; slot for the prompt-engineering lab (series 7, running).
+- [07 Правка кадра](md/ch-fix.md): Image editing toolkit, 150 edits on 9 stills: Qwen-Image 2.1 Turbo is the default editor (remove, background, outfit, sign text, hand, outpaint via new canvas), Krea 2 General Edit V2 for relight, BFS head swap as last resort, SeedVR2 7B sharp for 4K.
+- [08 Перенос по референсу](md/ch-ref.md): Reference transfer on 14 references: Qwen-Image 2.1 + one photo gives the best likeness (ArcFace 0.81, beats a 4000-step LoRA) but copies pose; FLUX.3 Klein for new poses/viewpoints; Krea style-reference LoRA is the only palette/light transfer; H3 Reference-to-Video with three canonical views keeps a persona's mole in place.
+- [09 Видео на MiniMax H3](md/ch-video.md): MiniMax H3 image-to-video with audio: still → video → 48 fps pipeline, settings sweep (resolution beats steps, shift), length limits (≈ 12 s locally, frames 17k+5), chaining 5 s hops with guide frames, community finetune Eros Max vs official.
+- [10 Скорость и качество](md/ch-speed.md): H3 speed vs quality: SageAttention (−41 %, same output), rejected 4-step turbo recipe (looks fine on calm 5 s, melts hands on hard 9 s), RAM budget, quality recipe = no turbo, 30 steps, res_multistep, shift 12; SeedVR2 and FILM for post.
+- [11 Сравнение моделей](md/ch-scout.md): Model scout on identical prompts: Krea 2, FLUX.3 Klein, Qwen-Image 2.1, Z-Image, MOSS, Anima, SDXL Juggernaut — strengths per task; render at native 2 MP; physics (hands using tools) only by eye; LTX-2.5 as the fast video draft path before H3.
+- [12 Какие модели существуют](md/ch-models.md): Landscape of open image/video models (Oct 2026): MiniMax H3, LTX-2.5, Wan 2.2, Krea 2, FLUX.3 Klein, Qwen-Image 2.1, Z-Image — rankings, licences (H3 excludes the EU), why to test each.
+- [13 Свой персонаж и LoRA](md/ch-persona.md): Fictional persona pipeline: hero face (age anchored by facial structure), turnaround with Qwen-Edit 2511, restaging into scenes, first-frame rules for H3, LoRA v1→v3 on RunPod (leak of marks to every woman, regularisation halves the steps in ai-toolkit, DOP + name-like trigger + 4000 steps fixes it: ArcFace 0.65, leak 0.15).
+- [14 Датасеты для LoRA](md/ch-datasets.md): LoRA datasets: what 44 Civitai creators report (own generations, real photos, video frames, big curated sets, face-less crops), shared rules (diversity except the target, 1/3 close-medium-full, caption = future prompt, trigger first), our persona recipe, free datasets with licences, tools (img2dataset, JoyCaption, Qwen3-VL, Florence-2, imagededup, ArcFace).
+- [15 Разбор креаторов](md/ch-creators.md): Creator breakdowns from Civitai generation metadata: Sleeps_In_Sunbeams — one-line prompts plus a stack of 3–6 style LoRAs on Krea 2 Turbo, 8–15 steps, cfg 1; file list with triggers; how to rebuild the stack.
+- [16 Повтор трендов](md/ch-trends.md): Trend replication loop, one page per Civitai post: metadata via the public API, missing files, rebuilt graph, closest copy + two own-subject renders in the same aesthetic; what replicates on the first render and what needs the creator's LoRA.
+- [17 Монтаж с ИИ](md/ch-editing.md): Editing with HyperFrames (HTML → MP4): 9:16 social cut on a music bar grid with ducking, seamless OBS loop + countdown, a data-driven explainer, ACE-Step music, loudness and grading measured; rules for an agent editor.
+- [18 Как мы оцениваем результат](md/ch-eval.md): Evaluation methods used in the book: Laplacian sharpness, ArcFace identity (thresholds 0.6 / 0.5 / 0.3), LAION aesthetic (matched a human ranking), CLIP (did not), OWLv2 + DINOv2 object match, centre PSNR, luma drift, corner diff, LUFS; crop sheets, blind A/B, hard test scenes.
+- [19 Workflow в ComfyUI](md/ch-workflows.md): Catalogue of the ready workflows (01 stills, 03 H3 video, 03c chain, 04 post, 09_edit_*, 10_ref_*): what each does, knobs and toggles, measured time; folder convention for agent-built vs human workflows.
+- [20 Грабли](md/ch-pitfalls.md): Pitfalls table: symptom → cause → fix (MOSS noise, sizes not multiple of 32, missing detector model, see-through fabric, two ComfyUI instances, background repaint after cropping, colour drift, finger melt).
+- [21 Словарь](md/ch-glossary.md): Glossary RU/EN: ~60 terms (attention, CFG, DiT, DOP, flow matching, LoRA, latent, quantisation, sampler, scheduler, shift, VAE…) with anchors and links to chapters.
+- [22 Серии экспериментов](md/ch-lab.md): Research programme: 18 experiment series (0–17 + 13B), run by an AI agent with a fixed protocol; status of each, where it runs (local, RunPod, API).
+
+## Optional
+- [index.html](index.html): the textbook cover (HTML, Russian).

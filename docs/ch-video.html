@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Видео на MiniMax H3 · Локальная студия H3</title>
+<title>Видео на MiniMax H3 · Студия ComfyUI</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="alternate" type="text/markdown" href="md/ch-video.md" title="Markdown для ИИ-агентов">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+/* Layout: textbook — one reading column, wide media strips, data tables in mono. Copper accent = the test persona's hair. */
 :root{
   --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
   --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
@@ -131,20 +133,74 @@ a{color:var(--accent)}
 .hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
 .hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
 @media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+/* textbook navigation (2026-10-26): chapter menu in the bar, «главное за минуту», «на этой странице», reading routes */
+.chmenu{position:relative;font:500 13px var(--mono)}
+.chmenu summary{cursor:pointer;color:var(--accent);list-style:none}
+.chmenu summary::-webkit-details-marker{display:none}
+.chmenu summary::after{content:" ▾"}
+.chmenu[open] summary::after{content:" ▴"}
+.chmenu ol{position:absolute;right:0;top:calc(100% + 8px);z-index:5;width:min(360px,calc(100vw - 32px));max-height:70vh;overflow:auto;
+  margin:0;padding:8px 0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.chmenu li a{display:flex;gap:10px;padding:6px 14px;text-decoration:none;color:var(--fg);font:400 14px/1.35 var(--body)}
+.chmenu li a:hover{background:var(--accent-soft)}
+.chmenu li a[aria-current]{color:var(--accent);font-weight:600}
+.chmenu .cn{font:500 12px var(--mono);color:var(--muted);min-width:1.8em}
+.chmenu li.mp{padding:10px 14px 4px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chintro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}
+.keybox{background:var(--accent-soft);border-radius:10px;padding:14px 18px}
+.keybox b,.onpage b{display:block;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.keybox ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.onpage{border:1px solid var(--line);border-radius:10px;padding:14px 18px;background:var(--panel)}
+.onpage ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.onpage a{text-decoration:none}.onpage a:hover{text-decoration:underline}
+.mdlink{font:500 12px var(--mono);color:var(--muted);margin:0}
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.route{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;align-items:start}
+.route img{width:120px;aspect-ratio:4/5;object-fit:cover;border-radius:8px}
+.route .rt{display:grid;gap:4px}
+.route .rt b{font:500 17px/1.2 var(--display)}
+.route .rt span{color:var(--muted);font-size:14px;line-height:1.4}
+.route ol{margin:6px 0 0;padding-left:20px;font-size:14px;display:grid;gap:2px}
+.agentbox{border:1px dashed var(--accent);border-radius:10px;padding:14px 18px;max-width:80ch}
+/* theory: diagrams, callouts, glossary, evidence tags */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:560px}
+.diagram svg text{font-family:var(--body);fill:var(--fg)}
+.diagram svg .muted{fill:var(--muted)}
+.diagram svg .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.diagram svg .hot{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.diagram svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+.diagram svg .ahead{fill:var(--muted)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;padding:12px 16px;max-width:72ch}
+.callout b:first-child{color:var(--accent)}
+.ev{display:inline-block;font:600 10px/1 var(--mono);letter-spacing:.04em;padding:3px 6px;border-radius:4px;vertical-align:2px;border:1px solid currentColor}
+.ev.m{color:var(--good)}.ev.s{color:var(--warn)}.ev.r{color:var(--accent)}
+.gloss{display:grid;gap:0;margin:0;border-top:1px solid var(--line);max-width:80ch}
+.gloss>div{display:grid;grid-template-columns:minmax(150px,13em) minmax(0,1fr);gap:4px 18px;padding:12px 4px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+.gloss>div:target{background:var(--accent-soft)}
+.gloss dt{font:600 15px var(--body)}
+.gloss dt small{display:block;font:400 12px var(--mono);color:var(--muted)}
+.gloss dd{margin:0;font-size:15px}
+.letters{display:flex;flex-wrap:wrap;gap:6px;font:500 13px var(--mono)}
+.letters a{padding:3px 8px;border:1px solid var(--line);border-radius:6px;text-decoration:none}
+@media (max-width:760px){.chintro,.routes{grid-template-columns:minmax(0,1fr)}.route{grid-template-columns:84px minmax(0,1fr)}.route img{width:84px}
+  .gloss>div{grid-template-columns:minmax(0,1fr)}.chmenu ol{position:fixed;left:16px;right:16px;top:56px;width:auto}}
+.cover-video{max-width:760px}
 </style>
 <style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
 
 <div class="wrap">
-<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 3 из 15</span></nav>
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть III · Видео · глава 9 из 23</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-ref.html"><span class="cn">08</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html" aria-current="page"><span class="cn">09</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html"><span class="cn">10</span>Скорость и качество</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">11</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">12</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">13</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">14</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">15</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">16</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">17</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · Справочник</li><li><a href="ch-eval.html"><span class="cn">18</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">19</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">20</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">21</span>Словарь</a></li><li><a href="ch-lab.html"><span class="cn">22</span>Серии экспериментов</a></li><li><a href="ch-agent.html"><span class="cn">23</span>Для вашего агента</a></li></ol></details></nav>
 <header>
-  <div class="eyebrow">Глава 3 · image → video · серия 0</div>
+  <div class="eyebrow">Глава 9 · image → video · серия 0</div>
   <h1>Видео на MiniMax H3</h1>
-  <p class="lead">Как оживить кадр в ролик со звуком: какие настройки дали лучший результат, сколько секунд выдерживает домашний компьютер и как склеивать длинные сцены.</p>
+  <p class="lead">Как оживить кадр в ролик со звуком: какие настройки дали лучший результат, сколько секунд выдерживает компьютер с 16 ГБ видеопамяти и как склеивать длинные сцены.</p>
 </header>
+<div class="chintro"><aside class="keybox" aria-label="Главное за минуту"><b>Главное за минуту</b><ul><li>Разрешение важнее числа шагов; стороны кадра кратны 32.</li><li>Короткий промпт — лицо плывёт; нужна раскадровка по секундам.</li><li>Локальный предел — около 12 секунд; длиннее — цепочка частей по 5–8 с с якорем из последних кадров.</li></ul></aside><nav class="onpage" aria-label="На этой странице"><b>На этой странице</b><ol><li><a href="#pipe">Пайплайн за ~4 минуты</a></li><li><a href="#video">Видео: что получилось</a></li><li><a href="#h3tbl">Настройки видео: два раунда тестов</a></li><li><a href="#next">Длина видео и склейка клипов</a></li><li><a href="#eros">H3 Eros Max против официальной H3</a></li></ol></nav></div>
 
-<p class="prose" style="background:var(--accent-soft);border-radius:10px;padding:12px 14px"><b>Обновление 24.10.2026:</b> времена ниже из серии 0. С SageAttention и турбо-LoRA на 4 шага тот же 5-секундный ролик считается за 64 с — <a href="ch-speed.html">глава «Скорость и память»</a>.</p>
+<p class="prose" style="background:var(--accent-soft);border-radius:10px;padding:12px 14px"><b>Обновление 24.10.2026:</b> времена ниже из серии 0. С SageAttention и турбо-LoRA на 4 шага тот же 5-секундный ролик считается за 64 с — <a href="ch-speed.html">глава «Скорость и качество»</a>.</p>
 
 <section aria-labelledby="pipe">
   <h2 id="pipe">Пайплайн за ~4 минуты</h2>
@@ -172,7 +228,7 @@ a{color:var(--accent)}
       <figcaption><span class="tag bad">мыльно</span><b>V14</b> · те же настройки, первый кадр из MOSS. Резкость 124 против ≈980 у Krea.</figcaption>
     </figure>
   </div>
-  <p class="prose" style="color:var(--muted);font-size:14px">В роликах есть звук, его генерирует сама H3 по строке <code>overall_soundscape</code>. Включи его в плеере.</p>
+  <p class="prose" style="color:var(--muted);font-size:14px">В роликах есть звук, его генерирует сама H3 по строке <code>overall_soundscape</code>. Включите его в плеере.</p>
   <figure class="wide">
     <img src="media/h3-video-configs-grid.jpg" alt="Кадры из четырёх видео-конфигураций: V1, V11, V13, V14" loading="lazy" width="914" height="1216">
     <figcaption>По три кадра (начало, середина, конец) из V1, V11, V13 и V14. У V14 (MOSS) лицо меняется и всё мягче.</figcaption>
@@ -211,7 +267,7 @@ a{color:var(--accent)}
       <tr><td class="num">5 с</td><td class="num">124</td><td class="num">165 с</td><td class="num">33</td><td class="num">58,6 ГБ</td><td class="num">1010 / 932 / 957</td><td>эталон</td></tr>
       <tr><td class="num">6 с</td><td class="num">141</td><td class="num">219 с</td><td class="num">36</td><td class="num">54,3 ГБ</td><td class="num">972 / 683 / 732</td><td>все действия</td></tr>
       <tr class="win"><td class="num">9 с</td><td class="num">226</td><td class="num">434 с</td><td class="num">48</td><td class="num">55,7 ГБ</td><td class="num">946 / 724 / 712</td><td><b>лучшее соотношение качества и времени</b></td></tr>
-      <tr><td class="num">12 с</td><td class="num">294</td><td class="num">694 с</td><td class="num">57</td><td class="num">59,4 ГБ</td><td class="num">1062 / 811 / 869</td><td>все действия; <b>практический предел дома</b></td></tr>
+      <tr><td class="num">12 с</td><td class="num">294</td><td class="num">694 с</td><td class="num">57</td><td class="num">59,4 ГБ</td><td class="num">1062 / 811 / 869</td><td>все действия; <b>практический локальный предел</b></td></tr>
       <tr><td class="num">15 с</td><td class="num">362</td><td class="num">956 с</td><td class="num">63</td><td class="num">58,8 ГБ</td><td class="num">1145 / 1017 / 399</td><td>фон плывёт, конец мыльный</td></tr>
     </tbody>
   </table></div>
@@ -262,14 +318,15 @@ a{color:var(--accent)}
     <figcaption>Сверху вниз: 03 официальная, 05 Eros Max, 05 + shift 8. Движение почти одинаковое, все три выполняют раскадровку. Абсолютная резкость здесь ниже, чем на остановке: мягкий свет в комнате, мало мелких деталей. Сравнивать можно только строки между собой.</figcaption>
   </figure>
   <ul class="rules prose">
-    <li><b>Для одетых сцен бери <code>03</code>.</b> Eros Max не быстрее и мягче. Его единственный плюс — анатомия, которую официальная H3 размазывает.</li>
+    <li><b>Для одетых сцен берите <code>03</code>.</b> Eros Max не быстрее и мягче. Его единственный плюс — анатомия, которую официальная H3 размазывает.</li>
     <li><b>В <code>05</code> теперь по умолчанию shift 8.</b> Старая версия сохранена как <code>05_video_h3_erosmax_i2v_baseline</code>.</li>
-    <li><b>Пальцы плывут, когда руки трогают тело в последней секунде.</b> Действие с касанием ставь в середину клипа, а заканчивай спокойным удержанием. В negative: <code>fused fingers, missing fingers</code>.</li>
-    <li><b>Не запускай H3 в Desktop, пока считает агент.</b> Два ComfyUI с H3 оставили 3 ГБ свободной RAM, время выросло вдвое.</li>
+    <li><b>Пальцы плывут, когда руки трогают тело в последней секунде.</b> Действие с касанием ставьте в середину клипа, а заканчивайте спокойным удержанием. В negative: <code>fused fingers, missing fingers</code>.</li>
+    <li><b>Не запускайте H3 в Desktop, пока считает скрипт агента.</b> Два ComfyUI с H3 оставили 3 ГБ свободной RAM, время выросло вдвое.</li>
   </ul>
 </section>
 
-<nav class="pager" aria-label="Главы"><a href="ch-stills.html"><span class="dir">← назад</span>Кадр: фото на Krea 2</a><a class="next" href="ch-speed.html"><span class="dir">дальше →</span>Скорость и качество</a></nav>
+<p class="mdlink">Для ИИ-агентов: <a href="md/ch-video.md">эта глава в Markdown</a> · <a href="llms.txt">llms.txt</a></p>
+<nav class="pager" aria-label="Главы"><a href="ch-ref.html" rel="prev"><span class="dir">← назад</span>Перенос по референсу</a><a class="next" href="ch-speed.html" rel="next"><span class="dir">дальше →</span>Скорость и качество</a></nav>
 </div>
 
 <script>
@@ -280,6 +337,19 @@ document.querySelectorAll('button[data-copy]').forEach(function(b){
     var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
     try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
   });
+});
+// ←/→ = previous/next chapter (not while typing or selecting text); the chapter menu closes on an outside click or Esc
+document.addEventListener('keydown',function(e){
+  var t=e.target, m=document.querySelector('details.chmenu');
+  if(e.key==='Escape'&&m){m.open=false;return}
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||/INPUT|TEXTAREA|SELECT|VIDEO/.test(t.tagName)||t.isContentEditable)return;
+  if(String(getSelection())!=='')return;
+  var a=document.querySelector('.pager a[rel="'+(e.key==='ArrowLeft'?'prev':e.key==='ArrowRight'?'next':'')+'"]');
+  if(a)location.href=a.getAttribute('href');
+});
+document.addEventListener('click',function(e){
+  var m=document.querySelector('details.chmenu');
+  if(m&&m.open&&!m.contains(e.target))m.open=false;
 });
 </script>
 </body>

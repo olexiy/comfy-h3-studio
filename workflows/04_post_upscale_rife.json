@@ -112,7 +112,7 @@
   },
   {
    "id": 10,
-   "type": "fa60f947-7602-486d-bcce-4ad1b48299ca",
+   "type": "c69e49a8-4c51-46d5-a361-06ad0fb1930e",
    "title": "Post · upscale + RIFE",
    "pos": [
     900,
@@ -222,7 +222,7 @@
  "definitions": {
   "subgraphs": [
    {
-    "id": "fa60f947-7602-486d-bcce-4ad1b48299ca",
+    "id": "c69e49a8-4c51-46d5-a361-06ad0fb1930e",
     "version": 1,
     "state": {
      "lastGroupId": 2,
@@ -253,7 +253,7 @@
     },
     "inputs": [
      {
-      "id": "1c3e3f14-2f36-4e33-a9e4-472c77a75677",
+      "id": "76dfc82e-f9eb-4f33-9f67-a65509cea0ec",
       "name": "video",
       "type": "VIDEO",
       "linkIds": [
@@ -265,7 +265,7 @@
       ]
      },
      {
-      "id": "30300cb1-1b01-4db5-87ce-bd2c9b954c1e",
+      "id": "67cfc2fc-1433-4590-b129-a302016d6777",
       "name": "switch",
       "type": "BOOLEAN",
       "linkIds": [
@@ -278,7 +278,7 @@
       ]
      },
      {
-      "id": "58ef03f9-1f03-46c6-9185-81f1c3e71457",
+      "id": "21812f05-eff0-4012-a165-aba04d2302ae",
       "name": "switch_1",
       "type": "BOOLEAN",
       "linkIds": [
@@ -291,7 +291,7 @@
       ]
      },
      {
-      "id": "b9222f16-a457-411d-8570-b2f836519e1c",
+      "id": "8f514fe4-18d8-490e-8446-194881edb6f9",
       "name": "multiplier",
       "type": "INT",
       "linkIds": [
@@ -304,7 +304,7 @@
       ]
      },
      {
-      "id": "2ac6b536-b81d-48cb-9866-07502e6aa250",
+      "id": "5bd8aa53-cc49-4d27-8e34-8816f0fe41e7",
       "name": "fps",
       "type": "FLOAT",
       "linkIds": [
@@ -319,7 +319,7 @@
     ],
     "outputs": [
      {
-      "id": "a700000c-789b-4788-ab38-42c3d8a35b60",
+      "id": "460f2792-7bf4-4e71-9c20-3b46b120a0a7",
       "name": "VIDEO",
       "type": "VIDEO",
       "linkIds": [

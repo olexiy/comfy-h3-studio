@@ -1,0 +1,1284 @@
+{
+ "id": "6a701d18-11af-5de1-8716-f1f0a89bfb80",
+ "revision": 0,
+ "last_node_id": 17,
+ "last_link_id": 31,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "MarkdownNote",
+   "pos": [
+    0,
+    0
+   ],
+   "size": [
+    440,
+    860
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "# 09 · Krea 2 General Edit V2 — gentle edits that keep the look\n**Use:** load the picture → write the **instruction** → Run → `S5/edit_krea_*.png`. Turbo, 8 steps, cfg 1, ref boost 4, grounding 768\n(author's recipe). Best of series 5 for **relight**; recolours keep the original texture. **Measured (local 5070 Ti, 2026-10-26):** 30 s incl. model load (1040×1312).\n- ref boost: higher = closer to the picture, lower = freer edit · grounding: lower (512) = follows the instruction harder, higher (1024) = keeps likeness.\n- **Removals:** the author recommends Krea 2 **Raw** (20 steps, cfg 3) — not installed here; use `09_edit_qwen21` (it removed everything in series 5).\n- Identity Edit V2 (restaging a person) stays in `claude-tools\\tools\\s3.py kedit`; never load both Krea edit LoRAs at 1.0 (noise).\n\n| Fix | Use | Why (series 5, same test set) |\n|---|---|---|\n| remove an object | **09_edit_qwen21** | every bike gone, scene kept; Krea Turbo left a distant bike |\n| recolour | 09_edit_qwen21 or 09_edit_krea_general | all models pass; Krea keeps the original look softer |\n| relight | **09_edit_krea_general** | warm light, person kept; Qwen-Edit 2511 repaints the face |\n| background swap | **09_edit_qwen21** | clean new place; Krea keeps leftovers (tram rails) |\n| fix a hand | **09_edit_qwen21** (whole frame) | coherent grip; Krea ignores it; 2511 crop adds tools |\n| outpaint / new aspect | **09_edit_qwen21**, toggle *new canvas size* | grey-pad + fill fails on most models |\n| head swap (last resort) | **09_edit_headswap_bfs** | BFS on Qwen 2.1 keeps the target's expression + light |"
+   ]
+  },
+  {
+   "id": 6,
+   "type": "LoadImage",
+   "pos": [
+    480,
+    0
+   ],
+   "size": [
+    380,
+    460
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "title": "Load picture",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      2
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "widgets_values": [
+    "s5/t3_kitchen.png",
+    "image"
+   ]
+  },
+  {
+   "id": 16,
+   "type": "SaveImage",
+   "pos": [
+    1440,
+    0
+   ],
+   "size": [
+    440,
+    600
+   ],
+   "flags": {},
+   "order": 15,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "title": "Save image",
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 23
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "S5/edit_krea"
+   ]
+  },
+  {
+   "id": 17,
+   "type": "ce07a19f-72e1-4599-9499-882129db0c49",
+   "title": "Krea 2 · General Edit",
+   "pos": [
+    900,
+    0
+   ],
+   "size": [
+    480,
+    520
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 24
+    },
+    {
+     "label": "instruction",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": null
+    },
+    {
+     "label": "seed",
+     "name": "seed",
+     "type": "INT",
+     "widget": {
+      "name": "seed"
+     },
+     "link": null
+    },
+    {
+     "label": "size MP (≤ 2)",
+     "name": "megapixels",
+     "type": "FLOAT",
+     "widget": {
+      "name": "megapixels"
+     },
+     "link": null
+    },
+    {
+     "label": "ref boost (4 = author)",
+     "name": "ref_boost",
+     "type": "FLOAT",
+     "widget": {
+      "name": "ref_boost"
+     },
+     "link": null
+    },
+    {
+     "label": "grounding px (768)",
+     "name": "grounding_px",
+     "type": "INT",
+     "widget": {
+      "name": "grounding_px"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      23
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core"
+   },
+   "widgets_values": [
+    "Relight the scene as a bright sunny morning: warm sunlight streams through a window on the left and falls across the table and her face. Keep her pose, the book, the table and the kitchen unchanged.",
+    20261023,
+    1.3,
+    4.0,
+    768
+   ]
+  }
+ ],
+ "links": [
+  [
+   24,
+   6,
+   0,
+   17,
+   0,
+   "IMAGE"
+  ],
+  [
+   23,
+   17,
+   0,
+   16,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.45,
+   "offset": [
+    60,
+    120
+   ]
+  },
+  "workflowRendererVersion": "LG"
+ },
+ "version": 0.4,
+ "definitions": {
+  "subgraphs": [
+   {
+    "id": "ce07a19f-72e1-4599-9499-882129db0c49",
+    "version": 1,
+    "state": {
+     "lastGroupId": 3,
+     "lastNodeId": 15,
+     "lastLinkId": 31,
+     "lastRerouteId": 0
+    },
+    "revision": 0,
+    "config": {},
+    "name": "Krea 2 · General Edit",
+    "inputNode": {
+     "id": -10,
+     "bounding": [
+      350,
+      76,
+      180,
+      204
+     ]
+    },
+    "outputNode": {
+     "id": -20,
+     "bounding": [
+      3690,
+      76,
+      140,
+      68
+     ]
+    },
+    "inputs": [
+     {
+      "id": "84f75eae-836d-47f1-8f9c-ea5e6c0edbff",
+      "name": "image",
+      "type": "IMAGE",
+      "linkIds": [
+       2
+      ],
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "ca332bf3-203b-49b9-b571-901fe8847fbc",
+      "name": "prompt",
+      "type": "STRING",
+      "linkIds": [
+       26
+      ],
+      "label": "instruction",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "bfffa567-fd91-4d23-8a2c-a939c1780375",
+      "name": "seed",
+      "type": "INT",
+      "linkIds": [
+       27
+      ],
+      "label": "seed",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "39e87f20-b4b0-404e-88de-b94774dc5027",
+      "name": "megapixels",
+      "type": "FLOAT",
+      "linkIds": [
+       28
+      ],
+      "label": "size MP (≤ 2)",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "7469809b-f238-43e9-97aa-b2f2c011a397",
+      "name": "ref_boost",
+      "type": "FLOAT",
+      "linkIds": [
+       29
+      ],
+      "label": "ref boost (4 = author)",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "a27d38ed-2e4f-4fc9-80e9-4a595b082154",
+      "name": "grounding_px",
+      "type": "INT",
+      "linkIds": [
+       30
+      ],
+      "label": "grounding px (768)",
+      "pos": [
+       390,
+       96
+      ]
+     }
+    ],
+    "outputs": [
+     {
+      "id": "8bae8268-ac3b-4699-8647-a3fd424805bb",
+      "name": "IMAGE",
+      "type": "IMAGE",
+      "linkIds": [
+       25
+      ],
+      "localized_name": "IMAGE",
+      "pos": [
+       3720,
+       96
+      ]
+     }
+    ],
+    "widgets": [],
+    "nodes": [
+     {
+      "id": 2,
+      "type": "UNETLoader",
+      "pos": [
+       610,
+       76
+      ],
+      "size": [
+       400,
+       82
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "UNETLoader"
+      },
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "MODEL",
+        "type": "MODEL",
+        "links": [
+         1
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "krea2_turbo_int8_convrot.safetensors",
+       "default"
+      ]
+     },
+     {
+      "id": 3,
+      "type": "CLIPLoader",
+      "pos": [
+       610,
+       218
+      ],
+      "size": [
+       400,
+       106
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "CLIPLoader"
+      },
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "CLIP",
+        "type": "CLIP",
+        "links": [
+         13,
+         15
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "qwen3vl_4b_fp8_scaled.safetensors",
+       "krea2",
+       "default"
+      ]
+     },
+     {
+      "id": 4,
+      "type": "VAELoader",
+      "pos": [
+       610,
+       384
+      ],
+      "size": [
+       400,
+       58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "VAELoader"
+      },
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "VAE",
+        "type": "VAE",
+        "links": [
+         7,
+         10,
+         22
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "qwen_image_vae.safetensors"
+      ]
+     },
+     {
+      "id": 5,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+       1050,
+       76
+      ],
+      "size": [
+       360,
+       82
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "title": "LoRA · Krea 2 General Edit V2",
+      "inputs": [
+       {
+        "name": "model",
+        "type": "MODEL",
+        "link": 1
+       }
+      ],
+      "outputs": [
+       {
+        "name": "MODEL",
+        "type": "MODEL",
+        "links": [
+         8
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "krea2_general_edit_v2_r128.safetensors",
+       1.0
+      ]
+     },
+     {
+      "id": 7,
+      "type": "ImageScaleToTotalPixels",
+      "pos": [
+       1950,
+       76
+      ],
+      "size": [
+       340,
+       106
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ImageScaleToTotalPixels"
+      },
+      "title": "Scale (≤ 2 MP)",
+      "inputs": [
+       {
+        "name": "image",
+        "type": "IMAGE",
+        "link": 2
+       },
+       {
+        "localized_name": "megapixels",
+        "name": "megapixels",
+        "type": "FLOAT",
+        "widget": {
+         "name": "megapixels"
+        },
+        "link": 28
+       }
+      ],
+      "outputs": [
+       {
+        "name": "IMAGE",
+        "type": "IMAGE",
+        "links": [
+         3,
+         6,
+         11,
+         14,
+         16
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "lanczos",
+       1.3,
+       16
+      ]
+     },
+     {
+      "id": 8,
+      "type": "GetImageSize",
+      "pos": [
+       1950,
+       242
+      ],
+      "size": [
+       340,
+       78
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "GetImageSize"
+      },
+      "inputs": [
+       {
+        "name": "image",
+        "type": "IMAGE",
+        "link": 3
+       }
+      ],
+      "outputs": [
+       {
+        "name": "width",
+        "type": "INT",
+        "links": [
+         4
+        ],
+        "slot_index": 0
+       },
+       {
+        "name": "height",
+        "type": "INT",
+        "links": [
+         5
+        ],
+        "slot_index": 1
+       },
+       {
+        "name": "batch_size",
+        "type": "INT",
+        "links": null,
+        "slot_index": 2
+       }
+      ],
+      "widgets_values": []
+     },
+     {
+      "id": 9,
+      "type": "EmptySD3LatentImage",
+      "pos": [
+       1950,
+       380
+      ],
+      "size": [
+       340,
+       106
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "EmptySD3LatentImage"
+      },
+      "inputs": [
+       {
+        "name": "width",
+        "type": "INT",
+        "link": 4,
+        "widget": {
+         "name": "width"
+        }
+       },
+       {
+        "name": "height",
+        "type": "INT",
+        "link": 5,
+        "widget": {
+         "name": "height"
+        }
+       }
+      ],
+      "outputs": [
+       {
+        "name": "LATENT",
+        "type": "LATENT",
+        "links": [
+         12,
+         20
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       1024,
+       1024,
+       1
+      ]
+     },
+     {
+      "id": 10,
+      "type": "VAEEncode",
+      "pos": [
+       2430,
+       76
+      ],
+      "size": [
+       340,
+       56
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "VAEEncode"
+      },
+      "inputs": [
+       {
+        "name": "pixels",
+        "type": "IMAGE",
+        "link": 6
+       },
+       {
+        "name": "vae",
+        "type": "VAE",
+        "link": 7
+       }
+      ],
+      "outputs": [
+       {
+        "name": "LATENT",
+        "type": "LATENT",
+        "links": [
+         9
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": []
+     },
+     {
+      "id": 11,
+      "type": "Krea2EditModelPatch",
+      "pos": [
+       2430,
+       192
+      ],
+      "size": [
+       340,
+       308
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "Krea2EditModelPatch"
+      },
+      "inputs": [
+       {
+        "name": "model",
+        "type": "MODEL",
+        "link": 8
+       },
+       {
+        "name": "source_latent",
+        "type": "LATENT",
+        "link": 9
+       },
+       {
+        "name": "source_latent_b",
+        "type": "LATENT",
+        "link": null
+       },
+       {
+        "name": "ref_boost_mask",
+        "type": "MASK",
+        "link": null
+       },
+       {
+        "name": "vae",
+        "type": "VAE",
+        "link": 10
+       },
+       {
+        "name": "source_image",
+        "type": "IMAGE",
+        "link": 11
+       },
+       {
+        "name": "source_image_b",
+        "type": "IMAGE",
+        "link": null
+       },
+       {
+        "name": "target_latent",
+        "type": "LATENT",
+        "link": 12
+       },
+       {
+        "localized_name": "ref_boost",
+        "name": "ref_boost",
+        "type": "FLOAT",
+        "widget": {
+         "name": "ref_boost"
+        },
+        "link": 29
+       }
+      ],
+      "outputs": [
+       {
+        "name": "MODEL",
+        "type": "MODEL",
+        "links": [
+         17
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       4.0,
+       1.0,
+       "fit",
+       "aligned (trained)",
+       "aligned (trained)"
+      ]
+     },
+     {
+      "id": 12,
+      "type": "Krea2EditGroundedEncode",
+      "pos": [
+       2810,
+       76
+      ],
+      "size": [
+       420,
+       300
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "Krea2EditGroundedEncode"
+      },
+      "title": "Instruction",
+      "inputs": [
+       {
+        "name": "clip",
+        "type": "CLIP",
+        "link": 13
+       },
+       {
+        "name": "image",
+        "type": "IMAGE",
+        "link": 14
+       },
+       {
+        "name": "image_b",
+        "type": "IMAGE",
+        "link": null
+       },
+       {
+        "localized_name": "prompt",
+        "name": "prompt",
+        "type": "STRING",
+        "widget": {
+         "name": "prompt"
+        },
+        "link": 26
+       },
+       {
+        "localized_name": "grounding_px",
+        "name": "grounding_px",
+        "type": "INT",
+        "widget": {
+         "name": "grounding_px"
+        },
+        "link": 30
+       }
+      ],
+      "outputs": [
+       {
+        "name": "CONDITIONING",
+        "type": "CONDITIONING",
+        "links": [
+         18
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "Relight the scene as a bright sunny morning: warm sunlight streams through a window on the left and falls across the table and her face. Keep her pose, the book, the table and the kitchen unchanged.",
+       768,
+       ""
+      ]
+     },
+     {
+      "id": 13,
+      "type": "Krea2EditGroundedEncode",
+      "pos": [
+       2810,
+       436
+      ],
+      "size": [
+       340,
+       430
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "Krea2EditGroundedEncode"
+      },
+      "title": "Negative (empty, same picture)",
+      "inputs": [
+       {
+        "name": "clip",
+        "type": "CLIP",
+        "link": 15
+       },
+       {
+        "name": "image",
+        "type": "IMAGE",
+        "link": 16
+       },
+       {
+        "name": "image_b",
+        "type": "IMAGE",
+        "link": null
+       }
+      ],
+      "outputs": [
+       {
+        "name": "CONDITIONING",
+        "type": "CONDITIONING",
+        "links": [
+         19
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "",
+       768,
+       ""
+      ]
+     },
+     {
+      "id": 14,
+      "type": "KSampler",
+      "pos": [
+       3270,
+       76
+      ],
+      "size": [
+       340,
+       268
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "KSampler"
+      },
+      "title": "KSampler · 8 steps euler/simple cfg 1",
+      "inputs": [
+       {
+        "name": "model",
+        "type": "MODEL",
+        "link": 17
+       },
+       {
+        "name": "positive",
+        "type": "CONDITIONING",
+        "link": 18
+       },
+       {
+        "name": "negative",
+        "type": "CONDITIONING",
+        "link": 19
+       },
+       {
+        "name": "latent_image",
+        "type": "LATENT",
+        "link": 20
+       },
+       {
+        "localized_name": "seed",
+        "name": "seed",
+        "type": "INT",
+        "widget": {
+         "name": "seed"
+        },
+        "link": 27
+       }
+      ],
+      "outputs": [
+       {
+        "name": "LATENT",
+        "type": "LATENT",
+        "links": [
+         21
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       20261023,
+       "fixed",
+       8,
+       1.0,
+       "euler",
+       "simple",
+       1.0
+      ]
+     },
+     {
+      "id": 15,
+      "type": "VAEDecode",
+      "pos": [
+       3270,
+       404
+      ],
+      "size": [
+       340,
+       56
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "VAEDecode"
+      },
+      "inputs": [
+       {
+        "name": "samples",
+        "type": "LATENT",
+        "link": 21
+       },
+       {
+        "name": "vae",
+        "type": "VAE",
+        "link": 22
+       }
+      ],
+      "outputs": [
+       {
+        "name": "IMAGE",
+        "type": "IMAGE",
+        "links": [
+         25
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": []
+     }
+    ],
+    "groups": [
+     {
+      "id": 1,
+      "title": "1 · Models",
+      "bounding": [
+       580,
+       0,
+       860,
+       472
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+     },
+     {
+      "id": 2,
+      "title": "2 · Picture",
+      "bounding": [
+       1520,
+       0,
+       800,
+       526
+      ],
+      "color": "#3f5f8a",
+      "font_size": 24,
+      "flags": {}
+     },
+     {
+      "id": 3,
+      "title": "3 · Edit",
+      "bounding": [
+       2400,
+       0,
+       1340,
+       1150
+      ],
+      "color": "#a1309b",
+      "font_size": 24,
+      "flags": {}
+     }
+    ],
+    "links": [
+     {
+      "id": 1,
+      "origin_id": 2,
+      "origin_slot": 0,
+      "target_id": 5,
+      "target_slot": 0,
+      "type": "MODEL"
+     },
+     {
+      "id": 2,
+      "origin_id": -10,
+      "origin_slot": 0,
+      "target_id": 7,
+      "target_slot": 0,
+      "type": "IMAGE"
+     },
+     {
+      "id": 3,
+      "origin_id": 7,
+      "origin_slot": 0,
+      "target_id": 8,
+      "target_slot": 0,
+      "type": "IMAGE"
+     },
+     {
+      "id": 4,
+      "origin_id": 8,
+      "origin_slot": 0,
+      "target_id": 9,
+      "target_slot": 0,
+      "type": "INT"
+     },
+     {
+      "id": 5,
+      "origin_id": 8,
+      "origin_slot": 1,
+      "target_id": 9,
+      "target_slot": 1,
+      "type": "INT"
+     },
+     {
+      "id": 6,
+      "origin_id": 7,
+      "origin_slot": 0,
+      "target_id": 10,
+      "target_slot": 0,
+      "type": "IMAGE"
+     },
+     {
+      "id": 7,
+      "origin_id": 4,
+      "origin_slot": 0,
+      "target_id": 10,
+      "target_slot": 1,
+      "type": "VAE"
+     },
+     {
+      "id": 8,
+      "origin_id": 5,
+      "origin_slot": 0,
+      "target_id": 11,
+      "target_slot": 0,
+      "type": "MODEL"
+     },
+     {
+      "id": 9,
+      "origin_id": 10,
+      "origin_slot": 0,
+      "target_id": 11,
+      "target_slot": 1,
+      "type": "LATENT"
+     },
+     {
+      "id": 10,
+      "origin_id": 4,
+      "origin_slot": 0,
+      "target_id": 11,
+      "target_slot": 4,
+      "type": "VAE"
+     },
+     {
+      "id": 11,
+      "origin_id": 7,
+      "origin_slot": 0,
+      "target_id": 11,
+      "target_slot": 5,
+      "type": "IMAGE"
+     },
+     {
+      "id": 12,
+      "origin_id": 9,
+      "origin_slot": 0,
+      "target_id": 11,
+      "target_slot": 7,
+      "type": "LATENT"
+     },
+     {
+      "id": 13,
+      "origin_id": 3,
+      "origin_slot": 0,
+      "target_id": 12,
+      "target_slot": 0,
+      "type": "CLIP"
+     },
+     {
+      "id": 14,
+      "origin_id": 7,
+      "origin_slot": 0,
+      "target_id": 12,
+      "target_slot": 1,
+      "type": "IMAGE"
+     },
+     {
+      "id": 15,
+      "origin_id": 3,
+      "origin_slot": 0,
+      "target_id": 13,
+      "target_slot": 0,
+      "type": "CLIP"
+     },
+     {
+      "id": 16,
+      "origin_id": 7,
+      "origin_slot": 0,
+      "target_id": 13,
+      "target_slot": 1,
+      "type": "IMAGE"
+     },
+     {
+      "id": 17,
+      "origin_id": 11,
+      "origin_slot": 0,
+      "target_id": 14,
+      "target_slot": 0,
+      "type": "MODEL"
+     },
+     {
+      "id": 18,
+      "origin_id": 12,
+      "origin_slot": 0,
+      "target_id": 14,
+      "target_slot": 1,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 19,
+      "origin_id": 13,
+      "origin_slot": 0,
+      "target_id": 14,
+      "target_slot": 2,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 20,
+      "origin_id": 9,
+      "origin_slot": 0,
+      "target_id": 14,
+      "target_slot": 3,
+      "type": "LATENT"
+     },
+     {
+      "id": 21,
+      "origin_id": 14,
+      "origin_slot": 0,
+      "target_id": 15,
+      "target_slot": 0,
+      "type": "LATENT"
+     },
+     {
+      "id": 22,
+      "origin_id": 4,
+      "origin_slot": 0,
+      "target_id": 15,
+      "target_slot": 1,
+      "type": "VAE"
+     },
+     {
+      "id": 25,
+      "origin_id": 15,
+      "origin_slot": 0,
+      "target_id": -20,
+      "target_slot": 0,
+      "type": "IMAGE"
+     },
+     {
+      "id": 26,
+      "origin_id": -10,
+      "origin_slot": 1,
+      "target_id": 12,
+      "target_slot": 3,
+      "type": "STRING"
+     },
+     {
+      "id": 27,
+      "origin_id": -10,
+      "origin_slot": 2,
+      "target_id": 14,
+      "target_slot": 4,
+      "type": "INT"
+     },
+     {
+      "id": 28,
+      "origin_id": -10,
+      "origin_slot": 3,
+      "target_id": 7,
+      "target_slot": 1,
+      "type": "FLOAT"
+     },
+     {
+      "id": 29,
+      "origin_id": -10,
+      "origin_slot": 4,
+      "target_id": 11,
+      "target_slot": 8,
+      "type": "FLOAT"
+     },
+     {
+      "id": 30,
+      "origin_id": -10,
+      "origin_slot": 5,
+      "target_id": 12,
+      "target_slot": 4,
+      "type": "INT"
+     }
+    ],
+    "extra": {}
+   }
+  ]
+ }
+}

@@ -1,0 +1,710 @@
+{
+ "title": "Студия ComfyUI",
+ "language": "ru",
+ "version": "2026-10-26b",
+ "site": "https://olexiy.github.io/comfy-h3-studio/",
+ "agent_guide": "agent-guide.md",
+ "evidence_tags": {
+  "MEASURED": "run by the authors, numbers from logs",
+  "SOURCE": "docs / community, not re-measured",
+  "RULE": "derived decision rule"
+ },
+ "chapters": [
+  {
+   "n": 1,
+   "slug": "ch-intro",
+   "title": "Как устроен учебник",
+   "part": "Часть I · Введение",
+   "status": "done",
+   "en": "How the book is organised: audience, test bench (RTX 5070 Ti 16 GB / 62 GB RAM + RunPod RTX PRO 6000), evidence tags, experiment series, reading routes, ethics and licences.",
+   "html": "ch-intro.html",
+   "md": "md/ch-intro.md",
+   "sections": [
+    {
+     "id": "in-what",
+     "title": "О чём эта книга"
+    },
+    {
+     "id": "in-bench",
+     "title": "Тестовый стенд"
+    },
+    {
+     "id": "in-tags",
+     "title": "Как читать таблицы и выводы"
+    },
+    {
+     "id": "in-series",
+     "title": "Что такое «серия»"
+    },
+    {
+     "id": "in-persona",
+     "title": "Кто такая Марен"
+    },
+    {
+     "id": "in-ethics",
+     "title": "Лицензии и этика"
+    },
+    {
+     "id": "in-agents",
+     "title": "Если книгу читает ИИ-агент"
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "slug": "ch-theory",
+   "title": "Как работают генеративные модели",
+   "part": "Часть I · Введение",
+   "status": "done",
+   "en": "Theory for practitioners: diffusion / flow matching, latent space and VAE, text encoders (CLIP vs LLM), DiT and attention cost, steps / sampler / scheduler / shift, CFG and why distilled models use cfg 1, LoRA, quantisation and RAM offload, image-to-video and edit models.",
+   "html": "ch-theory.html",
+   "md": "md/ch-theory.md",
+   "sections": [
+    {
+     "id": "th-idea",
+     "title": "Идея за одну минуту: картинка из шума"
+    },
+    {
+     "id": "th-parts",
+     "title": "Из чего состоит модель"
+    },
+    {
+     "id": "th-latent",
+     "title": "Латентное пространство и VAE"
+    },
+    {
+     "id": "th-text",
+     "title": "Текстовый энкодер: почему проза стала работать"
+    },
+    {
+     "id": "th-dit",
+     "title": "Денойзер: трансформер и внимание"
+    },
+    {
+     "id": "th-steps",
+     "title": "Шаги, сэмплер, планировщик, shift"
+    },
+    {
+     "id": "th-cfg",
+     "title": "CFG и negative prompt"
+    },
+    {
+     "id": "th-turbo",
+     "title": "Дистилляция: турбо-модели и турбо-LoRA"
+    },
+    {
+     "id": "th-lora",
+     "title": "LoRA: маленькая добавка к большой модели"
+    },
+    {
+     "id": "th-quant",
+     "title": "Точность чисел и память"
+    },
+    {
+     "id": "th-video",
+     "title": "Как модель делает видео"
+    },
+    {
+     "id": "th-edit",
+     "title": "Как работают модели правки и референса"
+    },
+    {
+     "id": "th-next",
+     "title": "Куда дальше"
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "slug": "ch-comfy",
+   "title": "ComfyUI: граф, ноды, workflow",
+   "part": "Часть I · Введение",
+   "status": "done",
+   "en": "ComfyUI basics: nodes, typed links (MODEL, CLIP, VAE, LATENT, CONDITIONING, IMAGE), the minimal text-to-image graph, model folders, custom nodes, subgraphs and our one-node workflow style, workflows embedded in PNG/MP4, the HTTP API (/prompt, /history, /object_info, /free), caching and the queue.",
+   "html": "ch-comfy.html",
+   "md": "md/ch-comfy.md",
+   "sections": [
+    {
+     "id": "cf-what",
+     "title": "Что такое ComfyUI"
+    },
+    {
+     "id": "cf-graph",
+     "title": "Минимальный граф: текст → картинка"
+    },
+    {
+     "id": "cf-files",
+     "title": "Где ComfyUI ищет файлы"
+    },
+    {
+     "id": "cf-nodes",
+     "title": "Кастомные ноды"
+    },
+    {
+     "id": "cf-style",
+     "title": "Подграфы и наш стиль workflow"
+    },
+    {
+     "id": "cf-share",
+     "title": "Workflow внутри картинки и видео"
+    },
+    {
+     "id": "cf-api",
+     "title": "Как агент управляет ComfyUI без мыши"
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "slug": "ch-studio",
+   "title": "Железо, файлы и облако",
+   "part": "Часть I · Введение",
+   "status": "live",
+   "en": "Hardware and cloud: local box limits, folder layout of ComfyUI Desktop, local vs RunPod vs hosted API cost/time table, platform comparison, safe rented-GPU routine, full-precision H3 on a 96 GB card vs the quantised local stack.",
+   "html": "ch-studio.html",
+   "md": "md/ch-studio.md",
+   "sections": [
+    {
+     "id": "files",
+     "title": "Где что лежит"
+    },
+    {
+     "id": "remote",
+     "title": "Аренда GPU: когда это имеет смысл"
+    },
+    {
+     "id": "st-runpod",
+     "title": "RunPod на практике (25.10): полный H3 против нашего"
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "slug": "ch-stills",
+   "title": "Кадр: фото на Krea 2",
+   "part": "Часть II · Кадр",
+   "status": "live",
+   "en": "Photoreal stills on Krea 2 Turbo: simple one-pass vs the two-pass author recipe vs MOSS, fixing the 'AI face' (realism LoRA 0.5, upscale denoise 0.22, mature-feature words), strong body words at cfg 1.",
+   "html": "ch-stills.html",
+   "md": "md/ch-stills.md",
+   "sections": [
+    {
+     "id": "stills",
+     "title": "Картинки: Krea 2 против MOSS"
+    },
+    {
+     "id": "body",
+     "title": "Фигура: как получить нужные пропорции"
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "slug": "ch-prompts",
+   "title": "Промпты",
+   "part": "Часть II · Кадр",
+   "status": "wip",
+   "en": "Copy-paste prompt templates: H3 timed shot-list with appearance/background locks, tag-style and prose-style still prompts; slot for the prompt-engineering lab (series 7, running).",
+   "html": "ch-prompts.html",
+   "md": "md/ch-prompts.md",
+   "sections": [
+    {
+     "id": "pr-how",
+     "title": "Как устроен хороший промпт"
+    },
+    {
+     "id": "prompts",
+     "title": "Шаблоны промптов"
+    },
+    {
+     "id": "pr-lab",
+     "title": "Лаборатория промптов (серия 7)"
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "slug": "ch-fix",
+   "title": "Правка кадра",
+   "part": "Часть II · Кадр",
+   "status": "done",
+   "en": "Image editing toolkit, 150 edits on 9 stills: Qwen-Image 2.1 Turbo is the default editor (remove, background, outfit, sign text, hand, outpaint via new canvas), Krea 2 General Edit V2 for relight, BFS head swap as last resort, SeedVR2 7B sharp for 4K.",
+   "html": "ch-fix.html",
+   "md": "md/ch-fix.md",
+   "sections": [
+    {
+     "id": "fx-why",
+     "title": "Править, а не перегенерировать"
+    },
+    {
+     "id": "fx-table",
+     "title": "Какой инструмент для какой правки"
+    },
+    {
+     "id": "fx-remove",
+     "title": "Убрать, перекрасить, сменить фон и одежду"
+    },
+    {
+     "id": "fx-text",
+     "title": "Текст на табличке и продукт-шот"
+    },
+    {
+     "id": "fx-hand",
+     "title": "Починить руку"
+    },
+    {
+     "id": "fx-outpaint",
+     "title": "Outpaint: из 4:5 в 16:9 и 9:16"
+    },
+    {
+     "id": "fx-swap",
+     "title": "Замена головы — крайний случай"
+    },
+    {
+     "id": "fx-up",
+     "title": "Апскейл кадра до 4K"
+    },
+    {
+     "id": "fx-wf",
+     "title": "Новые workflow"
+    },
+    {
+     "id": "fx-rules",
+     "title": "Правила, которые остались"
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "slug": "ch-ref",
+   "title": "Перенос по референсу",
+   "part": "Часть II · Кадр",
+   "status": "done",
+   "en": "Reference transfer on 14 references: Qwen-Image 2.1 + one photo gives the best likeness (ArcFace 0.81, beats a 4000-step LoRA) but copies pose; FLUX.3 Klein for new poses/viewpoints; Krea style-reference LoRA is the only palette/light transfer; H3 Reference-to-Video with three canonical views keeps a persona's mole in place.",
+   "html": "ch-ref.html",
+   "md": "md/ch-ref.md",
+   "sections": [
+    {
+     "id": "rf-why",
+     "title": "Не «похожая», а именно эта"
+    },
+    {
+     "id": "rf-table",
+     "title": "Кто что слушается"
+    },
+    {
+     "id": "rf-obj",
+     "title": "Предметы, лица и персонажи"
+    },
+    {
+     "id": "rf-style",
+     "title": "Стиль, палитра, место, поза"
+    },
+    {
+     "id": "rf-video",
+     "title": "Видео: родинка больше не «плывёт»"
+    },
+    {
+     "id": "rf-wf",
+     "title": "Новые workflow"
+    },
+    {
+     "id": "rf-rules",
+     "title": "Правила, которые остались"
+    }
+   ]
+  },
+  {
+   "n": 9,
+   "slug": "ch-video",
+   "title": "Видео на MiniMax H3",
+   "part": "Часть III · Видео",
+   "status": "live",
+   "en": "MiniMax H3 image-to-video with audio: still → video → 48 fps pipeline, settings sweep (resolution beats steps, shift), length limits (≈ 12 s locally, frames 17k+5), chaining 5 s hops with guide frames, community finetune Eros Max vs official.",
+   "html": "ch-video.html",
+   "md": "md/ch-video.md",
+   "sections": [
+    {
+     "id": "pipe",
+     "title": "Пайплайн за ~4 минуты"
+    },
+    {
+     "id": "video",
+     "title": "Видео: что получилось"
+    },
+    {
+     "id": "h3tbl",
+     "title": "Настройки видео: два раунда тестов"
+    },
+    {
+     "id": "next",
+     "title": "Длина видео и склейка клипов"
+    },
+    {
+     "id": "eros",
+     "title": "H3 Eros Max против официальной H3"
+    }
+   ]
+  },
+  {
+   "n": 10,
+   "slug": "ch-speed",
+   "title": "Скорость и качество",
+   "part": "Часть III · Видео",
+   "status": "done",
+   "en": "H3 speed vs quality: SageAttention (−41 %, same output), rejected 4-step turbo recipe (looks fine on calm 5 s, melts hands on hard 9 s), RAM budget, quality recipe = no turbo, 30 steps, res_multistep, shift 12; SeedVR2 and FILM for post.",
+   "html": "ch-speed.html",
+   "md": "md/ch-speed.md",
+   "sections": [
+    {
+     "id": "sp-result",
+     "title": "Первый замер: 163 → 64 секунды (на короткой сцене)"
+    },
+    {
+     "id": "sp-table",
+     "title": "Все варианты"
+    },
+    {
+     "id": "sp-learn",
+     "title": "Что казалось после первого замера"
+    },
+    {
+     "id": "sp-ram",
+     "title": "Куда уходит оперативная память"
+    },
+    {
+     "id": "sp-sage",
+     "title": "Что такое SageAttention"
+    },
+    {
+     "id": "sp-how",
+     "title": "Как включить SageAttention"
+    },
+    {
+     "id": "sp-live",
+     "title": "Как смотреть рендер вживую"
+    },
+    {
+     "id": "sp-quality",
+     "title": "Раунд качества: 30 шагов без турбо"
+    },
+    {
+     "id": "sp-selfie",
+     "title": "Селфи вместо штатива"
+    },
+    {
+     "id": "sp-next",
+     "title": "Уроки серии 1"
+    }
+   ]
+  },
+  {
+   "n": 11,
+   "slug": "ch-scout",
+   "title": "Сравнение моделей",
+   "part": "Часть IV · Модели",
+   "status": "done",
+   "en": "Model scout on identical prompts: Krea 2, FLUX.3 Klein, Qwen-Image 2.1, Z-Image, MOSS, Anima, SDXL Juggernaut — strengths per task; render at native 2 MP; physics (hands using tools) only by eye; LTX-2.5 as the fast video draft path before H3.",
+   "html": "ch-scout.html",
+   "md": "md/ch-scout.md",
+   "sections": [
+    {
+     "id": "sc-why",
+     "title": "Зачем сравнивать модели и как мы это делали"
+    },
+    {
+     "id": "sc-profiles",
+     "title": "Профили моделей"
+    },
+    {
+     "id": "sc-2mp",
+     "title": "Главная находка: рисовать в родном размере 2 МП"
+    },
+    {
+     "id": "sc-physics",
+     "title": "Физика: кто понимает, как вещи взаимодействуют"
+    },
+    {
+     "id": "sc-art",
+     "title": "Рисованное: девушка-киборг"
+    },
+    {
+     "id": "sc-video",
+     "title": "Видео: LTX-2.5 против H3"
+    }
+   ]
+  },
+  {
+   "n": 12,
+   "slug": "ch-models",
+   "title": "Какие модели существуют",
+   "part": "Часть IV · Модели",
+   "status": "live",
+   "en": "Landscape of open image/video models (Oct 2026): MiniMax H3, LTX-2.5, Wan 2.2, Krea 2, FLUX.3 Klein, Qwen-Image 2.1, Z-Image — rankings, licences (H3 excludes the EU), why to test each.",
+   "html": "ch-models.html",
+   "md": "md/ch-models.md",
+   "sections": [
+    {
+     "id": "alt",
+     "title": "Есть ли модели лучше? Обзор на октябрь 2026"
+    }
+   ]
+  },
+  {
+   "n": 13,
+   "slug": "ch-persona",
+   "title": "Свой персонаж и LoRA",
+   "part": "Часть V · Персонаж и LoRA",
+   "status": "live",
+   "en": "Fictional persona pipeline: hero face (age anchored by facial structure), turnaround with Qwen-Edit 2511, restaging into scenes, first-frame rules for H3, LoRA v1→v3 on RunPod (leak of marks to every woman, regularisation halves the steps in ai-toolkit, DOP + name-like trigger + 4000 steps fixes it: ArcFace 0.65, leak 0.15).",
+   "html": "ch-persona.html",
+   "md": "md/ch-persona.md",
+   "sections": [
+    {
+     "id": "ps-hero",
+     "title": "Эталонное лицо: как получить приметы и правильный возраст"
+    },
+    {
+     "id": "ps-sheet",
+     "title": "Лист ракурсов на Qwen-Image-Edit 2511"
+    },
+    {
+     "id": "ps-restage",
+     "title": "Перенос в новые сцены: заготовка датасета"
+    },
+    {
+     "id": "ps-ff",
+     "title": "Первый кадр для видео: шесть вариантов, один сценарий"
+    },
+    {
+     "id": "ps-lora1",
+     "title": "LoRA v1 и v2: приметы против утечки"
+    },
+    {
+     "id": "ps-lora3",
+     "title": "LoRA v3: DOP вместо чужих фото — приметы на месте, утечки нет"
+    },
+    {
+     "id": "lora",
+     "title": "Рецепт целиком: от лица до LoRA"
+    }
+   ]
+  },
+  {
+   "n": 14,
+   "slug": "ch-datasets",
+   "title": "Датасеты для LoRA",
+   "part": "Часть V · Персонаж и LoRA",
+   "status": "live",
+   "en": "LoRA datasets: what 44 Civitai creators report (own generations, real photos, video frames, big curated sets, face-less crops), shared rules (diversity except the target, 1/3 close-medium-full, caption = future prompt, trigger first), our persona recipe, free datasets with licences, tools (img2dataset, JoyCaption, Qwen3-VL, Florence-2, imagededup, ArcFace).",
+   "html": "ch-datasets.html",
+   "md": "md/ch-datasets.md",
+   "sections": [
+    {
+     "id": "ds-why",
+     "title": "Главное за минуту"
+    },
+    {
+     "id": "ds-how",
+     "title": "Как креаторы набирают данные: что пишут в постах"
+    },
+    {
+     "id": "ds-pipe",
+     "title": "Наш рабочий рецепт: персонаж из одного лица"
+    },
+    {
+     "id": "ds-free",
+     "title": "Готовые бесплатные датасеты"
+    },
+    {
+     "id": "ds-tools",
+     "title": "Инструменты"
+    }
+   ]
+  },
+  {
+   "n": 15,
+   "slug": "ch-creators",
+   "title": "Разбор креаторов",
+   "part": "Часть VI · Чужие рецепты",
+   "status": "live",
+   "en": "Creator breakdowns from Civitai generation metadata: Sleeps_In_Sunbeams — one-line prompts plus a stack of 3–6 style LoRAs on Krea 2 Turbo, 8–15 steps, cfg 1; file list with triggers; how to rebuild the stack.",
+   "html": "ch-creators.html",
+   "md": "md/ch-creators.md",
+   "sections": [
+    {
+     "id": "cr-how",
+     "title": "Как мы разбираем авторов"
+    },
+    {
+     "id": "cr-sleeps",
+     "title": "Sleeps_In_Sunbeams"
+    }
+   ]
+  },
+  {
+   "n": 16,
+   "slug": "ch-trends",
+   "title": "Повтор трендов",
+   "part": "Часть VI · Чужие рецепты",
+   "status": "live",
+   "en": "Trend replication loop, one page per Civitai post: metadata via the public API, missing files, rebuilt graph, closest copy + two own-subject renders in the same aesthetic; what replicates on the first render and what needs the creator's LoRA.",
+   "html": "ch-trends.html",
+   "md": "md/ch-trends.md",
+   "sections": [
+    {
+     "id": "s-1",
+     "title": "Как устроен раздел"
+    }
+   ]
+  },
+  {
+   "n": 17,
+   "slug": "ch-editing",
+   "title": "Монтаж с ИИ",
+   "part": "Часть VII · Монтаж",
+   "status": "done",
+   "en": "Editing with HyperFrames (HTML → MP4): 9:16 social cut on a music bar grid with ducking, seamless OBS loop + countdown, a data-driven explainer, ACE-Step music, loudness and grading measured; rules for an agent editor.",
+   "html": "ch-editing.html",
+   "md": "md/ch-editing.md",
+   "sections": [
+    {
+     "id": "ed-why",
+     "title": "Монтажёр из кода: HyperFrames"
+    },
+    {
+     "id": "ed-vertical",
+     "title": "Вертикальный ролик 9:16 с музыкой"
+    },
+    {
+     "id": "ed-loop",
+     "title": "Заставка для стрима: бесшовная петля + отсчёт"
+    },
+    {
+     "id": "ed-explainer",
+     "title": "Объясняющий ролик: что делает LoRA"
+    },
+    {
+     "id": "ed-sound",
+     "title": "Звук и цвет: что измерили"
+    },
+    {
+     "id": "ed-rules",
+     "title": "Правила, которые остались"
+    }
+   ]
+  },
+  {
+   "n": 18,
+   "slug": "ch-eval",
+   "title": "Как мы оцениваем результат",
+   "part": "Часть VIII · Справочник",
+   "status": "done",
+   "en": "Evaluation methods used in the book: Laplacian sharpness, ArcFace identity (thresholds 0.6 / 0.5 / 0.3), LAION aesthetic (matched a human ranking), CLIP (did not), OWLv2 + DINOv2 object match, centre PSNR, luma drift, corner diff, LUFS; crop sheets, blind A/B, hard test scenes.",
+   "html": "ch-eval.html",
+   "md": "md/ch-eval.md",
+   "sections": [
+    {
+     "id": "ev-why",
+     "title": "Зачем цифры и почему их мало"
+    },
+    {
+     "id": "ev-metrics",
+     "title": "Метрики, которые встречаются в книге"
+    },
+    {
+     "id": "ev-sheets",
+     "title": "Кроп-листы: главный инструмент"
+    },
+    {
+     "id": "ev-protocol",
+     "title": "Протокол сравнения"
+    },
+    {
+     "id": "ev-tools",
+     "title": "Инструменты"
+    }
+   ]
+  },
+  {
+   "n": 19,
+   "slug": "ch-workflows",
+   "title": "Workflow в ComfyUI",
+   "part": "Часть VIII · Справочник",
+   "status": "live",
+   "en": "Catalogue of the ready workflows (01 stills, 03 H3 video, 03c chain, 04 post, 09_edit_*, 10_ref_*): what each does, knobs and toggles, measured time; folder convention for agent-built vs human workflows.",
+   "html": "ch-workflows.html",
+   "md": "md/ch-workflows.md",
+   "sections": [
+    {
+     "id": "wf",
+     "title": "Где лежат workflow"
+    }
+   ]
+  },
+  {
+   "n": 20,
+   "slug": "ch-pitfalls",
+   "title": "Грабли",
+   "part": "Часть VIII · Справочник",
+   "status": "live",
+   "en": "Pitfalls table: symptom → cause → fix (MOSS noise, sizes not multiple of 32, missing detector model, see-through fabric, two ComfyUI instances, background repaint after cropping, colour drift, finger melt).",
+   "html": "ch-pitfalls.html",
+   "md": "md/ch-pitfalls.md",
+   "sections": [
+    {
+     "id": "pit",
+     "title": "Грабли, на которые наступили"
+    }
+   ]
+  },
+  {
+   "n": 21,
+   "slug": "ch-glossary",
+   "title": "Словарь",
+   "part": "Часть VIII · Справочник",
+   "status": "live",
+   "en": "Glossary RU/EN: ~60 terms (attention, CFG, DiT, DOP, flow matching, LoRA, latent, quantisation, sampler, scheduler, shift, VAE…) with anchors and links to chapters.",
+   "html": "ch-glossary.html",
+   "md": "md/ch-glossary.md",
+   "sections": [
+    {
+     "id": "gl-list",
+     "title": "Термины по алфавиту (латиница, затем кириллица)"
+    }
+   ]
+  },
+  {
+   "n": 22,
+   "slug": "ch-lab",
+   "title": "Серии экспериментов",
+   "part": "Часть VIII · Справочник",
+   "status": "live",
+   "en": "Research programme: 18 experiment series (0–17 + 13B), run by an AI agent with a fixed protocol; status of each, where it runs (local, RunPod, API).",
+   "html": "ch-lab.html",
+   "md": "md/ch-lab.md",
+   "sections": [
+    {
+     "id": "series",
+     "title": "Серии экспериментов"
+    }
+   ]
+  },
+  {
+   "n": 23,
+   "slug": "ch-agent",
+   "title": "Для вашего агента",
+   "part": "Часть VIII · Справочник",
+   "status": "live",
+   "en": "The agent guide itself (English).",
+   "html": "ch-agent.html",
+   "md": "md/ch-agent.md",
+   "sections": [
+    {
+     "id": "ag",
+     "title": "Machine-readable guide"
+    }
+   ]
+  }
+ ]
+}

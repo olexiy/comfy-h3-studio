@@ -1,0 +1,1633 @@
+{
+ "id": "e94bddea-7829-58d9-bc6c-6273c1007a62",
+ "revision": 0,
+ "last_node_id": 22,
+ "last_link_id": 41,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "MarkdownNote",
+   "pos": [
+    0,
+    0
+   ],
+   "size": [
+    440,
+    900
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "title": "Note",
+   "color": "#432",
+   "bgcolor": "#653",
+   "inputs": [],
+   "outputs": [],
+   "widgets_values": [
+    "# 09 · Qwen-Image 2.1 — fix a picture with one sentence\n**Use:** load the picture → write the **instruction** (what changes + \"keep … unchanged\") → Run → `S5/edit_q21_*.png`.\n8 steps, cfg 1 (Turbo schedule). **Measured (local 5070 Ti, 2026-10-26):** 11 s incl. model load (928×1152).\n\n| Knob | Meaning |\n|---|---|\n| instruction | one change per run; name what must stay (\"keep her face, hair and pose unchanged\") |\n| 2nd reference | adds the second Load Image as `<image2>` (a garment, an object to insert) |\n| new canvas size | **outpaint / change the aspect**: the picture stays the reference, the output gets width × height (16:9 = 1536×864, 9:16 = 864×1536). Write \"Show more of the scene to the left and right.\" |\n\n**Which tool for which fix (series 5):**\n| Fix | Use | Why (series 5, same test set) |\n|---|---|---|\n| remove an object | **09_edit_qwen21** | every bike gone, scene kept; Krea Turbo left a distant bike |\n| recolour | 09_edit_qwen21 or 09_edit_krea_general | all models pass; Krea keeps the original look softer |\n| relight | **09_edit_krea_general** | warm light, person kept; Qwen-Edit 2511 repaints the face |\n| background swap | **09_edit_qwen21** | clean new place; Krea keeps leftovers (tram rails) |\n| fix a hand | **09_edit_qwen21** (whole frame) | coherent grip; Krea ignores it; 2511 crop adds tools |\n| outpaint / new aspect | **09_edit_qwen21**, toggle *new canvas size* | grey-pad + fill fails on most models |\n| head swap (last resort) | **09_edit_headswap_bfs** | BFS on Qwen 2.1 keeps the target's expression + light |"
+   ]
+  },
+  {
+   "id": 6,
+   "type": "LoadImage",
+   "pos": [
+    480,
+    0
+   ],
+   "size": [
+    380,
+    460
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "title": "Load picture (image 1 = canvas)",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      4,
+      7
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "widgets_values": [
+    "s5/t2_street.png",
+    "image"
+   ]
+  },
+  {
+   "id": 7,
+   "type": "LoadImage",
+   "pos": [
+    480,
+    500
+   ],
+   "size": [
+    380,
+    460
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "title": "Load 2nd reference (optional)",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      8
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "widgets_values": [
+    "s5/t7_product.png",
+    "image"
+   ]
+  },
+  {
+   "id": 21,
+   "type": "SaveImage",
+   "pos": [
+    1440,
+    0
+   ],
+   "size": [
+    440,
+    600
+   ],
+   "flags": {},
+   "order": 20,
+   "mode": 0,
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "title": "Save image",
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 27
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "widgets_values": [
+    "S5/edit_q21"
+   ]
+  },
+  {
+   "id": 22,
+   "type": "c3cd8f5f-293a-42c7-b218-1fbc75812b72",
+   "title": "Qwen 2.1 · edit",
+   "pos": [
+    900,
+    0
+   ],
+   "size": [
+    480,
+    560
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images.image_1",
+     "type": "IMAGE",
+     "link": 28
+    },
+    {
+     "name": "images.image_1_1",
+     "type": "IMAGE",
+     "link": 29
+    },
+    {
+     "name": "images.image_2",
+     "type": "IMAGE",
+     "link": 30
+    },
+    {
+     "label": "instruction",
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": null
+    },
+    {
+     "label": "seed",
+     "name": "noise_seed",
+     "type": "INT",
+     "widget": {
+      "name": "noise_seed"
+     },
+     "link": null
+    },
+    {
+     "label": "2nd reference",
+     "name": "switch",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "switch"
+     },
+     "link": null
+    },
+    {
+     "label": "new canvas size (outpaint)",
+     "name": "switch_1",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "switch_1"
+     },
+     "link": null
+    },
+    {
+     "label": "canvas width",
+     "name": "width",
+     "type": "INT",
+     "widget": {
+      "name": "width"
+     },
+     "link": null
+    },
+    {
+     "label": "canvas height",
+     "name": "height",
+     "type": "INT",
+     "widget": {
+      "name": "height"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      27
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core"
+   },
+   "widgets_values": [
+    "Remove all the bicycles from the image. Keep the man, the street, the leaves and the shop fronts unchanged.",
+    20261023,
+    false,
+    false,
+    1536,
+    864
+   ]
+  }
+ ],
+ "links": [
+  [
+   28,
+   6,
+   0,
+   22,
+   0,
+   "IMAGE"
+  ],
+  [
+   29,
+   6,
+   0,
+   22,
+   1,
+   "IMAGE"
+  ],
+  [
+   30,
+   7,
+   0,
+   22,
+   2,
+   "IMAGE"
+  ],
+  [
+   27,
+   22,
+   0,
+   21,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.45,
+   "offset": [
+    60,
+    120
+   ]
+  },
+  "workflowRendererVersion": "LG"
+ },
+ "version": 0.4,
+ "definitions": {
+  "subgraphs": [
+   {
+    "id": "c3cd8f5f-293a-42c7-b218-1fbc75812b72",
+    "version": 1,
+    "state": {
+     "lastGroupId": 3,
+     "lastNodeId": 20,
+     "lastLinkId": 41,
+     "lastRerouteId": 0
+    },
+    "revision": 0,
+    "config": {},
+    "name": "Qwen 2.1 · edit",
+    "inputNode": {
+     "id": -10,
+     "bounding": [
+      350,
+      76,
+      180,
+      276
+     ]
+    },
+    "outputNode": {
+     "id": -20,
+     "bounding": [
+      3290,
+      76,
+      140,
+      68
+     ]
+    },
+    "inputs": [
+     {
+      "id": "e89f7f70-329b-468e-b0dd-8a2787b647f7",
+      "name": "images.image_1",
+      "type": "IMAGE",
+      "linkIds": [
+       4
+      ],
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "a792e6df-5c26-4ea7-bef6-ed7732c1fb80",
+      "name": "images.image_1_1",
+      "type": "IMAGE",
+      "linkIds": [
+       7
+      ],
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "a94ed067-8f7c-4cbe-a65f-fc9b883ce90a",
+      "name": "images.image_2",
+      "type": "IMAGE",
+      "linkIds": [
+       8
+      ],
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "c26d9384-e5d0-4ef1-ab07-3991aae8fca7",
+      "name": "prompt",
+      "type": "STRING",
+      "linkIds": [
+       32,
+       33
+      ],
+      "label": "instruction",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "bc138b91-a483-461e-8d09-64c240bd0280",
+      "name": "noise_seed",
+      "type": "INT",
+      "linkIds": [
+       34
+      ],
+      "label": "seed",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "bc49ac4f-58e3-4a5c-86f3-623798a39272",
+      "name": "switch",
+      "type": "BOOLEAN",
+      "linkIds": [
+       35,
+       36,
+       37
+      ],
+      "label": "2nd reference",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "5fc53f70-281b-4402-96de-8db464c61465",
+      "name": "switch_1",
+      "type": "BOOLEAN",
+      "linkIds": [
+       38
+      ],
+      "label": "new canvas size (outpaint)",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "f4248cb6-b9ad-4411-9520-3c05a0003672",
+      "name": "width",
+      "type": "INT",
+      "linkIds": [
+       39
+      ],
+      "label": "canvas width",
+      "pos": [
+       390,
+       96
+      ]
+     },
+     {
+      "id": "8b30ac56-e29a-41a9-8fad-154cad956ef7",
+      "name": "height",
+      "type": "INT",
+      "linkIds": [
+       40
+      ],
+      "label": "canvas height",
+      "pos": [
+       390,
+       96
+      ]
+     }
+    ],
+    "outputs": [
+     {
+      "id": "68194a3a-3b99-4ae0-92ad-98a88bf4c228",
+      "name": "IMAGE",
+      "type": "IMAGE",
+      "linkIds": [
+       31
+      ],
+      "localized_name": "IMAGE",
+      "pos": [
+       3320,
+       96
+      ]
+     }
+    ],
+    "widgets": [],
+    "nodes": [
+     {
+      "id": 2,
+      "type": "UNETLoader",
+      "pos": [
+       610,
+       76
+      ],
+      "size": [
+       400,
+       82
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "UNETLoader"
+      },
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "MODEL",
+        "type": "MODEL",
+        "links": [
+         1
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "qwen_image_2.1_turbo_int8_convrot.safetensors",
+       "default"
+      ]
+     },
+     {
+      "id": 3,
+      "type": "CLIPLoader",
+      "pos": [
+       610,
+       218
+      ],
+      "size": [
+       400,
+       106
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "CLIPLoader"
+      },
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "CLIP",
+        "type": "CLIP",
+        "links": [
+         2,
+         5
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "qwen3vl_8b_int8_convrot.safetensors",
+       "qwen_image",
+       "default"
+      ]
+     },
+     {
+      "id": 4,
+      "type": "VAELoader",
+      "pos": [
+       610,
+       384
+      ],
+      "size": [
+       400,
+       58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "VAELoader"
+      },
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "VAE",
+        "type": "VAE",
+        "links": [
+         3,
+         6,
+         26
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "qwen_image_2.1_vae_bf16.safetensors"
+      ]
+     },
+     {
+      "id": 5,
+      "type": "QwenImage21Cache",
+      "pos": [
+       1050,
+       76
+      ],
+      "size": [
+       340,
+       82
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "QwenImage21Cache"
+      },
+      "inputs": [
+       {
+        "name": "model",
+        "type": "MODEL",
+        "link": 1
+       }
+      ],
+      "outputs": [
+       {
+        "name": "MODEL",
+        "type": "MODEL",
+        "links": [
+         17
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "auto",
+       "default"
+      ]
+     },
+     {
+      "id": 8,
+      "type": "TextEncodeQwenImage21",
+      "pos": [
+       2030,
+       76
+      ],
+      "size": [
+       420,
+       300
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "TextEncodeQwenImage21"
+      },
+      "title": "Instruction",
+      "inputs": [
+       {
+        "name": "clip",
+        "type": "CLIP",
+        "link": 2
+       },
+       {
+        "name": "images.image_1",
+        "type": "*",
+        "link": 4
+       },
+       {
+        "name": "vae",
+        "type": "VAE",
+        "link": 3
+       },
+       {
+        "localized_name": "prompt",
+        "name": "prompt",
+        "type": "STRING",
+        "widget": {
+         "name": "prompt"
+        },
+        "link": 32
+       }
+      ],
+      "outputs": [
+       {
+        "name": "positive",
+        "type": "CONDITIONING",
+        "links": [
+         10
+        ],
+        "slot_index": 0
+       },
+       {
+        "name": "negative",
+        "type": "CONDITIONING",
+        "links": [
+         12
+        ],
+        "slot_index": 1
+       },
+       {
+        "name": "latent",
+        "type": "LATENT",
+        "links": [
+         14
+        ],
+        "slot_index": 2
+       }
+      ],
+      "widgets_values": [
+       "Remove all the bicycles from the image. Keep the man, the street, the leaves and the shop fronts unchanged.",
+       "",
+       1024
+      ]
+     },
+     {
+      "id": 9,
+      "type": "TextEncodeQwenImage21",
+      "pos": [
+       2030,
+       436
+      ],
+      "size": [
+       420,
+       300
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "TextEncodeQwenImage21"
+      },
+      "title": "Instruction + 2nd reference",
+      "inputs": [
+       {
+        "name": "clip",
+        "type": "CLIP",
+        "link": 5
+       },
+       {
+        "name": "images.image_1",
+        "type": "*",
+        "link": 7
+       },
+       {
+        "name": "images.image_2",
+        "type": "*",
+        "link": 8
+       },
+       {
+        "name": "vae",
+        "type": "VAE",
+        "link": 6
+       },
+       {
+        "localized_name": "prompt",
+        "name": "prompt",
+        "type": "STRING",
+        "widget": {
+         "name": "prompt"
+        },
+        "link": 33
+       }
+      ],
+      "outputs": [
+       {
+        "name": "positive",
+        "type": "CONDITIONING",
+        "links": [
+         9
+        ],
+        "slot_index": 0
+       },
+       {
+        "name": "negative",
+        "type": "CONDITIONING",
+        "links": [
+         11
+        ],
+        "slot_index": 1
+       },
+       {
+        "name": "latent",
+        "type": "LATENT",
+        "links": [
+         13
+        ],
+        "slot_index": 2
+       }
+      ],
+      "widgets_values": [
+       "Remove all the bicycles from the image. Keep the man, the street, the leaves and the shop fronts unchanged.",
+       "",
+       1024
+      ]
+     },
+     {
+      "id": 10,
+      "type": "ComfySwitchNode",
+      "pos": [
+       2490,
+       76
+      ],
+      "size": [
+       340,
+       80
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ComfySwitchNode"
+      },
+      "title": "Switch · 2nd ref (pos)",
+      "inputs": [
+       {
+        "name": "on_false",
+        "type": "CONDITIONING",
+        "link": 10
+       },
+       {
+        "name": "on_true",
+        "type": "CONDITIONING",
+        "link": 9
+       },
+       {
+        "localized_name": "switch",
+        "name": "switch",
+        "type": "BOOLEAN",
+        "widget": {
+         "name": "switch"
+        },
+        "link": 35
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "CONDITIONING",
+        "links": [
+         18
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       false
+      ]
+     },
+     {
+      "id": 11,
+      "type": "ComfySwitchNode",
+      "pos": [
+       2490,
+       216
+      ],
+      "size": [
+       340,
+       80
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ComfySwitchNode"
+      },
+      "title": "Switch · 2nd ref (neg)",
+      "inputs": [
+       {
+        "name": "on_false",
+        "type": "CONDITIONING",
+        "link": 12
+       },
+       {
+        "name": "on_true",
+        "type": "CONDITIONING",
+        "link": 11
+       },
+       {
+        "localized_name": "switch",
+        "name": "switch",
+        "type": "BOOLEAN",
+        "widget": {
+         "name": "switch"
+        },
+        "link": 36
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "CONDITIONING",
+        "links": [
+         19
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       false
+      ]
+     },
+     {
+      "id": 12,
+      "type": "ComfySwitchNode",
+      "pos": [
+       2490,
+       356
+      ],
+      "size": [
+       340,
+       80
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ComfySwitchNode"
+      },
+      "title": "Switch · 2nd ref (latent)",
+      "inputs": [
+       {
+        "name": "on_false",
+        "type": "LATENT",
+        "link": 14
+       },
+       {
+        "name": "on_true",
+        "type": "LATENT",
+        "link": 13
+       },
+       {
+        "localized_name": "switch",
+        "name": "switch",
+        "type": "BOOLEAN",
+        "widget": {
+         "name": "switch"
+        },
+        "link": 37
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "LATENT",
+        "links": [
+         16
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       false
+      ]
+     },
+     {
+      "id": 13,
+      "type": "EmptyLatentImage",
+      "pos": [
+       2490,
+       496
+      ],
+      "size": [
+       340,
+       106
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "EmptyLatentImage"
+      },
+      "title": "New canvas (outpaint)",
+      "inputs": [
+       {
+        "localized_name": "width",
+        "name": "width",
+        "type": "INT",
+        "widget": {
+         "name": "width"
+        },
+        "link": 39
+       },
+       {
+        "localized_name": "height",
+        "name": "height",
+        "type": "INT",
+        "widget": {
+         "name": "height"
+        },
+        "link": 40
+       }
+      ],
+      "outputs": [
+       {
+        "name": "LATENT",
+        "type": "LATENT",
+        "links": [
+         15
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       1536,
+       864,
+       1
+      ]
+     },
+     {
+      "id": 14,
+      "type": "ComfySwitchNode",
+      "pos": [
+       2490,
+       662
+      ],
+      "size": [
+       340,
+       80
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ComfySwitchNode"
+      },
+      "title": "Switch · new canvas",
+      "inputs": [
+       {
+        "name": "on_false",
+        "type": "LATENT",
+        "link": 16
+       },
+       {
+        "name": "on_true",
+        "type": "LATENT",
+        "link": 15
+       },
+       {
+        "localized_name": "switch",
+        "name": "switch",
+        "type": "BOOLEAN",
+        "widget": {
+         "name": "switch"
+        },
+        "link": 38
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "LATENT",
+        "links": [
+         24
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       false
+      ]
+     },
+     {
+      "id": 15,
+      "type": "ManualSigmas",
+      "pos": [
+       2870,
+       76
+      ],
+      "size": [
+       340,
+       58
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "ManualSigmas"
+      },
+      "title": "Turbo 8-step schedule",
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "SIGMAS",
+        "type": "SIGMAS",
+        "links": [
+         23
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "1.0, 0.978453, 0.95418, 0.926626, 0.89508, 0.845148, 0.704534, 0.414568, 0"
+      ]
+     },
+     {
+      "id": 16,
+      "type": "CFGGuider",
+      "pos": [
+       2870,
+       194
+      ],
+      "size": [
+       340,
+       102
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "CFGGuider"
+      },
+      "inputs": [
+       {
+        "name": "model",
+        "type": "MODEL",
+        "link": 17
+       },
+       {
+        "name": "positive",
+        "type": "CONDITIONING",
+        "link": 18
+       },
+       {
+        "name": "negative",
+        "type": "CONDITIONING",
+        "link": 19
+       }
+      ],
+      "outputs": [
+       {
+        "name": "GUIDER",
+        "type": "GUIDER",
+        "links": [
+         21
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       1.0
+      ]
+     },
+     {
+      "id": 17,
+      "type": "RandomNoise",
+      "pos": [
+       2870,
+       356
+      ],
+      "size": [
+       340,
+       82
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "RandomNoise"
+      },
+      "inputs": [
+       {
+        "localized_name": "noise_seed",
+        "name": "noise_seed",
+        "type": "INT",
+        "widget": {
+         "name": "noise_seed"
+        },
+        "link": 34
+       }
+      ],
+      "outputs": [
+       {
+        "name": "NOISE",
+        "type": "NOISE",
+        "links": [
+         20
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       20261023,
+       "fixed"
+      ]
+     },
+     {
+      "id": 18,
+      "type": "KSamplerSelect",
+      "pos": [
+       2870,
+       498
+      ],
+      "size": [
+       340,
+       58
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "KSamplerSelect"
+      },
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "SAMPLER",
+        "type": "SAMPLER",
+        "links": [
+         22
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": [
+       "euler"
+      ]
+     },
+     {
+      "id": 19,
+      "type": "SamplerCustomAdvanced",
+      "pos": [
+       2870,
+       616
+      ],
+      "size": [
+       340,
+       122
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "SamplerCustomAdvanced"
+      },
+      "inputs": [
+       {
+        "name": "noise",
+        "type": "NOISE",
+        "link": 20
+       },
+       {
+        "name": "guider",
+        "type": "GUIDER",
+        "link": 21
+       },
+       {
+        "name": "sampler",
+        "type": "SAMPLER",
+        "link": 22
+       },
+       {
+        "name": "sigmas",
+        "type": "SIGMAS",
+        "link": 23
+       },
+       {
+        "name": "latent_image",
+        "type": "LATENT",
+        "link": 24
+       }
+      ],
+      "outputs": [
+       {
+        "name": "output",
+        "type": "LATENT",
+        "links": [
+         25
+        ],
+        "slot_index": 0
+       },
+       {
+        "name": "denoised_output",
+        "type": "LATENT",
+        "links": null,
+        "slot_index": 1
+       }
+      ],
+      "widgets_values": []
+     },
+     {
+      "id": 20,
+      "type": "VAEDecode",
+      "pos": [
+       2870,
+       798
+      ],
+      "size": [
+       340,
+       56
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "properties": {
+       "Node name for S&R": "VAEDecode"
+      },
+      "inputs": [
+       {
+        "name": "samples",
+        "type": "LATENT",
+        "link": 25
+       },
+       {
+        "name": "vae",
+        "type": "VAE",
+        "link": 26
+       }
+      ],
+      "outputs": [
+       {
+        "name": "IMAGE",
+        "type": "IMAGE",
+        "links": [
+         31
+        ],
+        "slot_index": 0
+       }
+      ],
+      "widgets_values": []
+     }
+    ],
+    "groups": [
+     {
+      "id": 1,
+      "title": "1 · Models",
+      "bounding": [
+       580,
+       0,
+       840,
+       472
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+     },
+     {
+      "id": 2,
+      "title": "2 · Pictures",
+      "bounding": [
+       1500,
+       0,
+       420,
+       1006
+      ],
+      "color": "#3f5f8a",
+      "font_size": 24,
+      "flags": {}
+     },
+     {
+      "id": 3,
+      "title": "3 · Edit",
+      "bounding": [
+       2000,
+       0,
+       1340,
+       1544
+      ],
+      "color": "#a1309b",
+      "font_size": 24,
+      "flags": {}
+     }
+    ],
+    "links": [
+     {
+      "id": 1,
+      "origin_id": 2,
+      "origin_slot": 0,
+      "target_id": 5,
+      "target_slot": 0,
+      "type": "MODEL"
+     },
+     {
+      "id": 2,
+      "origin_id": 3,
+      "origin_slot": 0,
+      "target_id": 8,
+      "target_slot": 0,
+      "type": "CLIP"
+     },
+     {
+      "id": 3,
+      "origin_id": 4,
+      "origin_slot": 0,
+      "target_id": 8,
+      "target_slot": 2,
+      "type": "VAE"
+     },
+     {
+      "id": 4,
+      "origin_id": -10,
+      "origin_slot": 0,
+      "target_id": 8,
+      "target_slot": 1,
+      "type": "IMAGE"
+     },
+     {
+      "id": 5,
+      "origin_id": 3,
+      "origin_slot": 0,
+      "target_id": 9,
+      "target_slot": 0,
+      "type": "CLIP"
+     },
+     {
+      "id": 6,
+      "origin_id": 4,
+      "origin_slot": 0,
+      "target_id": 9,
+      "target_slot": 3,
+      "type": "VAE"
+     },
+     {
+      "id": 7,
+      "origin_id": -10,
+      "origin_slot": 1,
+      "target_id": 9,
+      "target_slot": 1,
+      "type": "IMAGE"
+     },
+     {
+      "id": 8,
+      "origin_id": -10,
+      "origin_slot": 2,
+      "target_id": 9,
+      "target_slot": 2,
+      "type": "IMAGE"
+     },
+     {
+      "id": 9,
+      "origin_id": 9,
+      "origin_slot": 0,
+      "target_id": 10,
+      "target_slot": 1,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 10,
+      "origin_id": 8,
+      "origin_slot": 0,
+      "target_id": 10,
+      "target_slot": 0,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 11,
+      "origin_id": 9,
+      "origin_slot": 1,
+      "target_id": 11,
+      "target_slot": 1,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 12,
+      "origin_id": 8,
+      "origin_slot": 1,
+      "target_id": 11,
+      "target_slot": 0,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 13,
+      "origin_id": 9,
+      "origin_slot": 2,
+      "target_id": 12,
+      "target_slot": 1,
+      "type": "LATENT"
+     },
+     {
+      "id": 14,
+      "origin_id": 8,
+      "origin_slot": 2,
+      "target_id": 12,
+      "target_slot": 0,
+      "type": "LATENT"
+     },
+     {
+      "id": 15,
+      "origin_id": 13,
+      "origin_slot": 0,
+      "target_id": 14,
+      "target_slot": 1,
+      "type": "LATENT"
+     },
+     {
+      "id": 16,
+      "origin_id": 12,
+      "origin_slot": 0,
+      "target_id": 14,
+      "target_slot": 0,
+      "type": "LATENT"
+     },
+     {
+      "id": 17,
+      "origin_id": 5,
+      "origin_slot": 0,
+      "target_id": 16,
+      "target_slot": 0,
+      "type": "MODEL"
+     },
+     {
+      "id": 18,
+      "origin_id": 10,
+      "origin_slot": 0,
+      "target_id": 16,
+      "target_slot": 1,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 19,
+      "origin_id": 11,
+      "origin_slot": 0,
+      "target_id": 16,
+      "target_slot": 2,
+      "type": "CONDITIONING"
+     },
+     {
+      "id": 20,
+      "origin_id": 17,
+      "origin_slot": 0,
+      "target_id": 19,
+      "target_slot": 0,
+      "type": "NOISE"
+     },
+     {
+      "id": 21,
+      "origin_id": 16,
+      "origin_slot": 0,
+      "target_id": 19,
+      "target_slot": 1,
+      "type": "GUIDER"
+     },
+     {
+      "id": 22,
+      "origin_id": 18,
+      "origin_slot": 0,
+      "target_id": 19,
+      "target_slot": 2,
+      "type": "SAMPLER"
+     },
+     {
+      "id": 23,
+      "origin_id": 15,
+      "origin_slot": 0,
+      "target_id": 19,
+      "target_slot": 3,
+      "type": "SIGMAS"
+     },
+     {
+      "id": 24,
+      "origin_id": 14,
+      "origin_slot": 0,
+      "target_id": 19,
+      "target_slot": 4,
+      "type": "LATENT"
+     },
+     {
+      "id": 25,
+      "origin_id": 19,
+      "origin_slot": 0,
+      "target_id": 20,
+      "target_slot": 0,
+      "type": "LATENT"
+     },
+     {
+      "id": 26,
+      "origin_id": 4,
+      "origin_slot": 0,
+      "target_id": 20,
+      "target_slot": 1,
+      "type": "VAE"
+     },
+     {
+      "id": 31,
+      "origin_id": 20,
+      "origin_slot": 0,
+      "target_id": -20,
+      "target_slot": 0,
+      "type": "IMAGE"
+     },
+     {
+      "id": 32,
+      "origin_id": -10,
+      "origin_slot": 3,
+      "target_id": 8,
+      "target_slot": 3,
+      "type": "STRING"
+     },
+     {
+      "id": 33,
+      "origin_id": -10,
+      "origin_slot": 3,
+      "target_id": 9,
+      "target_slot": 4,
+      "type": "STRING"
+     },
+     {
+      "id": 34,
+      "origin_id": -10,
+      "origin_slot": 4,
+      "target_id": 17,
+      "target_slot": 0,
+      "type": "INT"
+     },
+     {
+      "id": 35,
+      "origin_id": -10,
+      "origin_slot": 5,
+      "target_id": 10,
+      "target_slot": 2,
+      "type": "BOOLEAN"
+     },
+     {
+      "id": 36,
+      "origin_id": -10,
+      "origin_slot": 5,
+      "target_id": 11,
+      "target_slot": 2,
+      "type": "BOOLEAN"
+     },
+     {
+      "id": 37,
+      "origin_id": -10,
+      "origin_slot": 5,
+      "target_id": 12,
+      "target_slot": 2,
+      "type": "BOOLEAN"
+     },
+     {
+      "id": 38,
+      "origin_id": -10,
+      "origin_slot": 6,
+      "target_id": 14,
+      "target_slot": 2,
+      "type": "BOOLEAN"
+     },
+     {
+      "id": 39,
+      "origin_id": -10,
+      "origin_slot": 7,
+      "target_id": 13,
+      "target_slot": 0,
+      "type": "INT"
+     },
+     {
+      "id": 40,
+      "origin_id": -10,
+      "origin_slot": 8,
+      "target_id": 13,
+      "target_slot": 1,
+      "type": "INT"
+     }
+    ],
+    "extra": {}
+   }
+  ]
+ }
+}

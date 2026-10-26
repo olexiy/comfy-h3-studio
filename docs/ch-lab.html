@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>План исследований · Локальная студия H3</title>
+<title>Серии экспериментов · Студия ComfyUI</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="alternate" type="text/markdown" href="md/ch-lab.md" title="Markdown для ИИ-агентов">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: lab notebook — one reading column, wide media strips, data tables in mono. Copper = the test subject's hair. */
+/* Layout: textbook — one reading column, wide media strips, data tables in mono. Copper accent = the test persona's hair. */
 :root{
   --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
   --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
@@ -131,49 +133,105 @@ a{color:var(--accent)}
 .hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
 .hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
 @media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+/* textbook navigation (2026-10-26): chapter menu in the bar, «главное за минуту», «на этой странице», reading routes */
+.chmenu{position:relative;font:500 13px var(--mono)}
+.chmenu summary{cursor:pointer;color:var(--accent);list-style:none}
+.chmenu summary::-webkit-details-marker{display:none}
+.chmenu summary::after{content:" ▾"}
+.chmenu[open] summary::after{content:" ▴"}
+.chmenu ol{position:absolute;right:0;top:calc(100% + 8px);z-index:5;width:min(360px,calc(100vw - 32px));max-height:70vh;overflow:auto;
+  margin:0;padding:8px 0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.chmenu li a{display:flex;gap:10px;padding:6px 14px;text-decoration:none;color:var(--fg);font:400 14px/1.35 var(--body)}
+.chmenu li a:hover{background:var(--accent-soft)}
+.chmenu li a[aria-current]{color:var(--accent);font-weight:600}
+.chmenu .cn{font:500 12px var(--mono);color:var(--muted);min-width:1.8em}
+.chmenu li.mp{padding:10px 14px 4px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chintro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}
+.keybox{background:var(--accent-soft);border-radius:10px;padding:14px 18px}
+.keybox b,.onpage b{display:block;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.keybox ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.onpage{border:1px solid var(--line);border-radius:10px;padding:14px 18px;background:var(--panel)}
+.onpage ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.onpage a{text-decoration:none}.onpage a:hover{text-decoration:underline}
+.mdlink{font:500 12px var(--mono);color:var(--muted);margin:0}
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.route{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;align-items:start}
+.route img{width:120px;aspect-ratio:4/5;object-fit:cover;border-radius:8px}
+.route .rt{display:grid;gap:4px}
+.route .rt b{font:500 17px/1.2 var(--display)}
+.route .rt span{color:var(--muted);font-size:14px;line-height:1.4}
+.route ol{margin:6px 0 0;padding-left:20px;font-size:14px;display:grid;gap:2px}
+.agentbox{border:1px dashed var(--accent);border-radius:10px;padding:14px 18px;max-width:80ch}
+/* theory: diagrams, callouts, glossary, evidence tags */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:560px}
+.diagram svg text{font-family:var(--body);fill:var(--fg)}
+.diagram svg .muted{fill:var(--muted)}
+.diagram svg .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.diagram svg .hot{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.diagram svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+.diagram svg .ahead{fill:var(--muted)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;padding:12px 16px;max-width:72ch}
+.callout b:first-child{color:var(--accent)}
+.ev{display:inline-block;font:600 10px/1 var(--mono);letter-spacing:.04em;padding:3px 6px;border-radius:4px;vertical-align:2px;border:1px solid currentColor}
+.ev.m{color:var(--good)}.ev.s{color:var(--warn)}.ev.r{color:var(--accent)}
+.gloss{display:grid;gap:0;margin:0;border-top:1px solid var(--line);max-width:80ch}
+.gloss>div{display:grid;grid-template-columns:minmax(150px,13em) minmax(0,1fr);gap:4px 18px;padding:12px 4px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+.gloss>div:target{background:var(--accent-soft)}
+.gloss dt{font:600 15px var(--body)}
+.gloss dt small{display:block;font:400 12px var(--mono);color:var(--muted)}
+.gloss dd{margin:0;font-size:15px}
+.letters{display:flex;flex-wrap:wrap;gap:6px;font:500 13px var(--mono)}
+.letters a{padding:3px 8px;border:1px solid var(--line);border-radius:6px;text-decoration:none}
+@media (max-width:760px){.chintro,.routes{grid-template-columns:minmax(0,1fr)}.route{grid-template-columns:84px minmax(0,1fr)}.route img{width:84px}
+  .gloss>div{grid-template-columns:minmax(0,1fr)}.chmenu ol{position:fixed;left:16px;right:16px;top:56px;width:auto}}
+.cover-video{max-width:760px}
 </style>
 <style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
 
 <div class="wrap">
-<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Локальная студия H3 · оглавление</a><span class="where">глава 14 из 15</span></nav>
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть VIII · Справочник · глава 22 из 23</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-ref.html"><span class="cn">08</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">09</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html"><span class="cn">10</span>Скорость и качество</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">11</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">12</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">13</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">14</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">15</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">16</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">17</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · Справочник</li><li><a href="ch-eval.html"><span class="cn">18</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">19</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">20</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">21</span>Словарь</a></li><li><a href="ch-lab.html" aria-current="page"><span class="cn">22</span>Серии экспериментов</a></li><li><a href="ch-agent.html"><span class="cn">23</span>Для вашего агента</a></li></ol></details></nav>
 <header>
-  <div class="eyebrow">Глава 14 · 18 серий · номер = порядок</div>
-  <h1>План исследований</h1>
-  <p class="lead">Учебник растёт сериями экспериментов. Каждая серия запускается одной фразой в новом чате, результаты попадают сюда.</p>
+  <div class="eyebrow">Глава 22 · 18 серий · номер = порядок</div>
+  <h1>Серии экспериментов</h1>
+  <p class="lead">Учебник растёт сериями экспериментов. Каждую серию ведёт ИИ-агент по одному протоколу, человек принимает решения и оценивает результат.</p>
 </header>
+<div class="chintro"><aside class="keybox" aria-label="Главное за минуту"><b>Главное за минуту</b><ul><li>Одна серия — одна тема, один протокол, одна сессия агента; результаты попадают в учебник.</li><li>Агент сам решает, где считать (локально, в облаке, через API), и спрашивает человека только про загрузки, ключи и вкус.</li><li>Сделано: 0, 1, 2, 5, 6, 8, 10 и LoRA персонажа; идут 3, 4, 7.</li></ul></aside></div>
 
 <section aria-labelledby="series">
   <h2 id="series">Серии экспериментов</h2>
-  <p class="prose">16 серий + финальный проект, номер совпадает с порядком. Каждая запускается в новом чате одной фразой: <b>«запусти серию экспериментов по комфи номер N»</b>. Сессия сама читает протокол, решает, где считать каждую задачу (дома, RunPod или API), и пишет находки в заметки и в этот учебник. Спрашивает только про загрузки, ключи и бриф персонажа.</p>
+  <p class="prose">18 серий (0–17, плюс 13B), номер совпадает с порядком запуска. Каждую серию ведёт отдельная сессия ИИ-агента по общему протоколу: прочитать, что уже известно; поискать готовые решения в сообществе; спланировать опыт; решить, где считать каждую задачу (локально, в облаке или через API); измерить; записать находки в журнал и в этот учебник. Человек утверждает загрузки и траты, даёт бриф (например, внешность персонажа) и судит вкус в слепых сравнениях.</p>
   <div class="tbl"><table>
     <thead><tr><th>№</th><th>Серия</th><th>Где</th><th>Статус</th></tr></thead>
     <tbody>
-      <tr><td class="num">0</td><td>Первый эксперимент: фото → видео, длина, склейка, Eros Max</td><td>дома</td><td><span class="tag good">готово</span></td></tr>
-      <tr><td class="num">1</td><td>Скорость, память и качество H3: SageAttention, рецепт 30 шагов, апскейлеры, интерполяция, селфи</td><td>дома</td><td><span class="tag good">готово</span></td></tr>
-      <tr><td class="num">2</td><td>Разведка моделей: <b>фото</b> (FLUX.3 Klein, Qwen-Image-2.1, Z-Image) и <b>видео</b> (LTX-2.5, Wan 2.2) + своя система оценки</td><td>дома</td><td><span class="tag good">готово</span></td></tr>
-      <tr><td class="num">3</td><td>Hero-кадр и лист ракурсов персонажа, 30 «пересъёмок», чек-лист хорошего первого кадра</td><td>дома</td><td>дальше</td></tr>
-      <tr><td class="num">4</td><td>Против «ИИ-вида»: кожа, зерно, цвет</td><td>дома</td><td>дальше</td></tr>
-      <tr><td class="num">5</td><td>Редактирование вместо перегенерации: edit-модели, inpaint, смена одежды и фона</td><td>дома</td><td>дальше</td></tr>
-      <tr><td class="num">6</td><td><b>Перенос по референсу</b> (новая): кто как слушается картинки-образца — сумка, одежда, лицо, персонаж, стиль, место, комбинации; FLUX.3, Qwen edit, Krea reference, H3 Ref2V</td><td>дома</td><td>дальше</td></tr>
-      <tr><td class="num">7</td><td>Лаборатория промптов: теги или проза, длина, возраст, плотность раскадровки</td><td>дома</td><td>дальше</td></tr>
-      <tr><td class="num">8</td><td>Рецепты топ-креаторов Civitai, тест трёх лучших</td><td>по задаче</td><td>дальше</td></tr>
+      <tr><td class="num">0</td><td>Первый эксперимент: фото → видео, длина, склейка, Eros Max</td><td>локально</td><td><span class="tag good">готово</span></td></tr>
+      <tr><td class="num">1</td><td>Скорость, память и качество H3: SageAttention, рецепт 30 шагов, апскейлеры, интерполяция</td><td>локально</td><td><span class="tag good">готово</span></td></tr>
+      <tr><td class="num">2</td><td>Разведка моделей фото и видео + своя система оценки</td><td>локально</td><td><span class="tag good">готово</span></td></tr>
+      <tr><td class="num">3</td><td>Эталонное лицо и лист ракурсов персонажа, перенос в сцены, чек-лист первого кадра</td><td>локально</td><td>почти готово (осталась ручная проверка лица обратным поиском)</td></tr>
+      <tr><td class="num">4</td><td>Против «ИИ-вида»: кожа, зерно, цвет</td><td>локально</td><td>идёт: зерно для фото выбрано, осталось видео</td></tr>
+      <tr><td class="num">5</td><td><b>Правка кадра</b>: убрать, перекрасить, свет, фон, одежда, рука, outpaint, замена головы, апскейл 4K</td><td>RunPod + локально</td><td><span class="tag good">готово 26.10</span></td></tr>
+      <tr><td class="num">6</td><td><b>Перенос по референсу</b>: кто как слушается картинки-образца — сумка, одежда, лицо, стиль, место</td><td>RunPod</td><td><span class="tag good">готово</span></td></tr>
+      <tr><td class="num">7</td><td>Лаборатория промптов: теги или проза, длина, возраст, плотность раскадровки</td><td>локально</td><td><span class="tag warn">идёт</span></td></tr>
+      <tr><td class="num">8</td><td>Рецепты креаторов, повтор трендов, как креаторы обучают LoRA</td><td>локально</td><td><span class="tag good">готово</span></td></tr>
       <tr><td class="num">9</td><td>Управление движением и мини-сцена 20–30 с</td><td>по задаче</td><td>дальше</td></tr>
-      <tr><td class="num">10</td><td>Звук, речь и липсинк</td><td>по задаче</td><td>дальше</td></tr>
-      <tr><td class="num">11</td><td>RunPod: облачная копия ComfyUI, ролики 10–15 с и ~1 МП</td><td><span class="tag warn">RunPod</span></td><td>нужна настройка</td></tr>
-      <tr><td class="num">12</td><td>Обучение LoRA персонажа на RunPod по листу из серии 3</td><td><span class="tag warn">RunPod</span></td><td>нужна настройка</td></tr>
-      <tr><td class="num">13</td><td>Конвейер пакетной генерации: список промптов, автоотбор, ночной прогон</td><td>по задаче</td><td>дальше</td></tr>
-      <tr><td class="num">14</td><td>Потолок платных API: MiniMax, fal, Comfy Cloud</td><td>API</td><td>нужны ключи</td></tr>
-      <tr><td class="num">15</td><td>Тренды Civitai, контент-план и первые посты</td><td>дома + твой аккаунт</td><td>нужен аккаунт</td></tr>
-      <tr><td class="num">17</td><td><b>Финальный проект «Angel Rave»</b>: берлинский рейв-клуб, где каждый чин ангельской иерархии на своей работе (серафим — DJ, херувимы — вышибалы, офанимы — свет)</td><td>всё</td><td>после серий</td></tr>
-      <tr><td class="num">16</td><td>Монтаж с ИИ: Claude сам режет, склеивает и доводит ролики — против монтажа в DaVinci</td><td>дома</td><td>дальше</td></tr>
+      <tr><td class="num">10</td><td>Монтаж с ИИ: HyperFrames, музыка, петли, объясняющие ролики</td><td>локально</td><td><span class="tag good">готово</span></td></tr>
+      <tr><td class="num">11</td><td>Звук, речь и липсинк</td><td>по задаче</td><td>дальше</td></tr>
+      <tr><td class="num">12</td><td>Длинное и большое видео в облаке</td><td><span class="tag warn">RunPod</span></td><td>разведка готова</td></tr>
+      <tr><td class="num">13</td><td>LoRA персонажа на RunPod</td><td><span class="tag warn">RunPod</span></td><td><span class="tag good">v3 готова</span></td></tr>
+      <tr><td class="num">13B</td><td>Широкий диапазон: стилизация, фантастические персонажи, анимация</td><td>локально + RunPod</td><td>дальше</td></tr>
+      <tr><td class="num">14</td><td>Конвейер пакетной генерации: список промптов, автоотбор, ночной прогон</td><td>по задаче</td><td>дальше</td></tr>
+      <tr><td class="num">15</td><td>Потолок платных API: MiniMax, fal, Comfy Cloud, Seedance</td><td>API</td><td>нужны ключи</td></tr>
+      <tr><td class="num">16</td><td><b>Финальный проект «Angel Rave»</b>: берлинский рейв-клуб, где каждый чин ангельской иерархии на своей работе</td><td>всё</td><td>после серий</td></tr>
+      <tr><td class="num">17</td><td>Тренды Civitai, контент-план, первые посты, значки профиля</td><td>локально + аккаунт Civitai</td><td>последней</td></tr>
     </tbody>
   </table></div>
-  <p class="prose" style="color:var(--muted);font-size:14px">Для серий 11–12 один раз готовится RunPod: аккаунт, $30 предоплаты без автопополнения, ключ в зашифрованном файле, <code>runpodctl</code>, SSH-ключ. Без этого серия остановится на проверке и перечислит, чего не хватает.</p>
+  <p class="prose" style="color:var(--muted);font-size:14px">Облако: предоплата без автопополнения, API-ключ в зашифрованном файле, <code>runpodctl</code> и SSH. Каждый под создаётся с таймером самоудаления, после работы агент проверяет, что ничего не осталось включённым, и записывает стоимость.</p>
 </section>
 
-<nav class="pager" aria-label="Главы"><a href="ch-pitfalls.html"><span class="dir">← назад</span>Грабли</a><a class="next" href="ch-agent.html"><span class="dir">дальше →</span>Для вашего агента</a></nav>
+<p class="mdlink">Для ИИ-агентов: <a href="md/ch-lab.md">эта глава в Markdown</a> · <a href="llms.txt">llms.txt</a></p>
+<nav class="pager" aria-label="Главы"><a href="ch-glossary.html" rel="prev"><span class="dir">← назад</span>Словарь</a><a class="next" href="ch-agent.html" rel="next"><span class="dir">дальше →</span>Для вашего агента</a></nav>
 </div>
 
 <script>
@@ -184,6 +242,19 @@ document.querySelectorAll('button[data-copy]').forEach(function(b){
     var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
     try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
   });
+});
+// ←/→ = previous/next chapter (not while typing or selecting text); the chapter menu closes on an outside click or Esc
+document.addEventListener('keydown',function(e){
+  var t=e.target, m=document.querySelector('details.chmenu');
+  if(e.key==='Escape'&&m){m.open=false;return}
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||/INPUT|TEXTAREA|SELECT|VIDEO/.test(t.tagName)||t.isContentEditable)return;
+  if(String(getSelection())!=='')return;
+  var a=document.querySelector('.pager a[rel="'+(e.key==='ArrowLeft'?'prev':e.key==='ArrowRight'?'next':'')+'"]');
+  if(a)location.href=a.getAttribute('href');
+});
+document.addEventListener('click',function(e){
+  var m=document.querySelector('details.chmenu');
+  if(m&&m.open&&!m.contains(e.target))m.open=false;
 });
 </script>
 </body>

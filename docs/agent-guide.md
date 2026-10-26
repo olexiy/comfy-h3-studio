@@ -1,9 +1,10 @@
-# AGENT GUIDE — home ComfyUI studio (Krea 2 · Qwen-Image-Edit · MiniMax H3 · LTX-2.5) + RunPod
+# AGENT GUIDE — ComfyUI photo & video studio on a 16 GB GPU (Krea 2 · Qwen-Image 2.1 · FLUX.3 Klein · MiniMax H3 · LTX-2.5) + RunPod
 
 ```yaml
 doc: agent-guide
 audience: autonomous coding/ops agents driving ComfyUI and cloud GPUs (not humans)
-version: 2026-10-25
+version: 2026-10-26b
+companion: "Russian textbook for humans: llms.txt (map), book.json (chapter index), md/<slug>.md (each chapter), llms-full.txt (all chapters)"
 evidence_tags: {MEASURED: "run by us, numbers from our logs", SOURCE: "official template / docs / community, not re-measured", RULE: "derived decision rule"}
 baseline_box: {gpu: "RTX 5070 Ti 16 GB (Blackwell)", ram: "62 GB", os: "Windows 11", comfyui: "0.42.x", torch: "2.12+cu130", python: "3.13"}
 cloud_box: {provider: RunPod, gpu: "RTX PRO 6000 Blackwell Server Edition 96 GB", price_usd_h: 2.49, cloud: SECURE, region: IE}
@@ -14,6 +15,8 @@ content_policy: "all examples SFW, depicted adults stated 25+"
 - Sections are independent; each bullet = one fact or rule. Prefer MEASURED over SOURCE when they conflict.
 - File names below are exact (copy them). Node names are ComfyUI class_type names.
 - Numbers are for the baseline box unless a section says `cloud_box`.
+- Section map: 1 API · 2 model recipes · 3 prompting · 4 first frame for video · 5 persona + LoRA · 5b editing · 5c reference transfer · 6 evaluation · 7 RunPod · 7b Civitai replication · 8 Windows pitfalls · 9 editing video with HyperFrames · 10 RU↔EN terms · 11 open questions.
+- Human chapters with figures and full tables (Russian) are linked from `llms.txt`; cite them by `md/<slug>.md#` heading when you answer a human.
 
 ## 1. Driving ComfyUI headless (API)
 - Run a second headless instance next to the desktop app: `main.py --listen 127.0.0.1 --port 8189 --extra-model-paths-config <yaml> --input-directory <dir> --output-directory <dir> --disable-auto-launch --reserve-vram 1.5`. Never run two H3 jobs on two instances at once — free RAM falls to ~3 GB and both runs double in time. [MEASURED] Check `GET :8188/queue` before queueing.
@@ -132,6 +135,47 @@ config:
 - Weights without an HF token: `Comfy-Org/Krea-2` → `diffusion_models/krea2_raw_bf16.safetensors` (26.3 GB, not gated; its 430 keys match ai-toolkit's SingleStreamDiT exactly). `krea/Krea-2-Raw` is gated. Text encoder `Qwen/Qwen3-VL-4B-Instruct` and VAE `Qwen/Qwen-Image` download automatically. [MEASURED]
 - Speed `cloud_box`: ≈ 0.8 s/step at 512, ≈ 2.4 s/step at 1024, ≈ 55 min per 2500 steps + ≈ 2.7 min per sample round (5 images); VRAM 31.6 GB. ai-toolkit Krea 2 LoRAs load in ComfyUI `LoraLoaderModelOnly` unchanged. [MEASURED]
 - Inference: Turbo, strength 0.8 (1.0-1.2 raises identity but also the leak). [MEASURED]
+- **Result v3 (DOP, no reg set, trigger "Maren Holt", 53 images = 47 scenes + hero + 5 canonical views, rank 32, lr 1e-4, EMA 0.99, 4000 steps, buckets 512+1024, cloud_box ≈ 2.9 s/step ≈ 3.3 h ≈ $9):** ArcFace mean over 5 scenes 0.65 (portrait 0.79, full-body pier 0.54), no-trigger leak 0.15, mole + scar on the correct side; v1 0.58 / leak 0.37, v2 (reg set) 0.51 / 0.22, marks gone. Checkpoints 2500-4000 all score 0.59-0.65 → choose on the leak prompt + a contact sheet, not on the mean. Strength 0.8 > 1.0 (0.65 vs 0.60). Full body and 9:16 stills work with the LoRA (≈ 4 s/image), which no edit model achieved. [MEASURED]
+- For single stills a LoRA is not the best likeness tool: one clean photo + Qwen-Image 2.1 reaches ArcFace 0.81 vs 0.55 for this LoRA on the same scenes (section 5c). Use the LoRA for series, full body and video first frames. [MEASURED]
+
+## 5b. Image editing toolkit (series 5, 2026-10-26)
+```yaml
+editing_test: {images: 9 own SFW stills, seeds: 2, edits: 150, box: cloud_box, cost_usd: 2.45, scoring: [ArcFace vs source, centre PSNR, full-res crop sheets]}
+default_editor: qwen_image_2.1_turbo   # winner on remove, background, outfit, sign text, hand fix, outpaint
+qwen_image_2_1_edit: {unet: qwen_image_2.1_turbo_int8_convrot, clip: qwen3vl_8b_int8_convrot (type qwen_image), vae: qwen_image_2.1_vae_bf16,
+  encode: "TextEncodeQwenImage21 (prompt, negative_prompt '', resolution 1024, images.image_1 = canvas, images.image_2 = extra ref) -> positive, negative, latent",
+  model_patch: QwenImage21Cache, sampler: "SamplerCustomAdvanced + CFGGuider cfg 1 + ManualSigmas '1.0, 0.978453, 0.95418, 0.926626, 0.89508, 0.845148, 0.704534, 0.414568, 0' + euler",
+  outpaint: "EmptyLatentImage at the target size instead of the encoder latent; source stays image_1", time_s: {cloud_box: 3-10, baseline_box: 11}}
+krea2_general_edit_v2: {lora: krea2_general_edit_v2_r128 @1.0 on krea2_turbo_int8, nodes: [Krea2EditModelPatch, Krea2EditGroundedEncode], steps: 8, cfg: 1,
+  ref_boost: 4, grounding_px: 768, fit_mode: fit, target_latent: wired, best_for: relight, time_s: {cloud_box: 8-13, baseline_box: 30}}
+qwen_image_edit_2511: {steps: 40, cfg: 4, shift: 3.1, time_s: {cloud_box: 50}, note: "FluxKontextImageScale re-sizes to ~1 MP Kontext sizes -> framing shifts; repaints faces on relight"}
+bfs_head_swap: {best: "bfs_head_v1.1_qwen_2.1 @1.0 on the Turbo checkpoint (ArcFace to head 0.72-0.75 vs 0.69-0.71 on base + turbo LoRA)", prompt: official "head_swap: start with <image1> ...", resolution: 0}
+upscale_4k: {best: "SeedVR2 7B sharp int8, multiplier 2.4, color_correction lab", avoid: ["SeedVR2 3B (crackled skin)", "USDU + Krea denoise 0.22 (re-renders details, shifts)"], safe_fast: OmniSR_X4}
+```
+- Winner per fix (2 seeds each, by eye + metric): remove → Qwen 2.1 (Krea Turbo left a distant object; Krea Raw 20 steps cfg 3 also clean) · recolour → all pass · relight → Krea General (2511 repaints the person) · background swap → Qwen 2.1 (ArcFace 0.95-0.96; Krea keeps leftovers of the old scene) · outfit → Qwen 2.1 (Krea pinned to the source crop draws a giant collar; Identity Edit dropped a mole) · sign text → Qwen 2.1 (exact on both seeds) · hand → Qwen 2.1 on the whole frame. [MEASURED]
+- Grey-pad outpaint ("Extend the image beyond its boundaries using outpainting. The original caption is: …") filled the pads in 2 of 6 model × aspect cases; the target-size-canvas route on Qwen 2.1 worked for 16:9 and 9:16. [MEASURED]
+- Crop → edit → feathered paste for local fixes gave the model too much freedom (2511 drew an extra tool); edit the whole frame instead. [MEASURED]
+- Krea Identity Edit V2 as a person-swap copies objects from the reference's background (a tram) and the reference's neutral expression. [MEASURED]
+- Never load Krea General Edit V2 and Identity Edit V2 both at 1.0 (noise; ≈ 0.6 each if a graph needs both). [SOURCE]
+- Identity checks need eyes too: ArcFace 0.64 still passed an output that lost the persona's mole. [MEASURED]
+
+## 5c. Reference transfer (series 6, 2026-10-26)
+```yaml
+reference_test: {refs: 14 own SFW (object x2, garment x2, face x2, character x2, style x3, place, pose, palette), scenes_per_ref: 3, seeds: 2, box: cloud_box, cost_usd: 6.53,
+  scoring: [insightface ArcFace vs ref, OWLv2 crop + DINOv2 vs ref crop, CLIP image sim, by-eye crop sheets]}
+qwen_image_2_1_refs: {encode: "TextEncodeQwenImage21 images.image_1..3 = references, resolution 1024", canvas: "EmptyLatentImage 1024x1280 (new scene)", prompt: "name refs 'the woman from image 1', 'the bag from image 2'",
+  wins: [face_from_one_photo, garment, art_style, multi_ref], arcface: {maren: 0.81, red_portrait: 0.92, persona_lora_4000_steps: 0.55}, habit: "copies the reference's pose and camera; prompt / ref resolution / second pass do not fix it"}
+flux3_klein_refs: {node: "ReferenceMultiLatent resolution resize 1 MP, images.image0..", prompt_tokens: "<ref_image_0>, <ref_image_1>", latent: EmptyFlux2LatentImage, steps: 16, cfg: 1,
+  wins: [new_pose, new_viewpoint, pose_transfer], note: "details looser; also runs with the Krea fp8 Qwen3-VL-4B encoder (type flux3)"}
+krea2_style_reference: {lora: "Comfy-Org/Krea-2 loras/krea2_style_reference.safetensors @1.0 on krea2_turbo", ref: "TextEncodeQwenImageEditPlus image1 + FluxKontextMultiReferenceLatentMethod index_timestep_zero", sampling: "ModelSamplingFlux 1.15/0.5, 8 steps euler simple cfg 1", prompt: content only, wins: [palette_light]}
+krea2_general_edit_products: {source: product shot 1 MP, target_latent: new 4:5 canvas, ref_boost: 2, grounding_px: 768, wins: [object]}
+qwen_image_edit_2511: {result: last or near-last on every reference type, time_s: {cloud_box: 45}}
+h3_ref2v_persona: {node: MiniMaxH3ReferenceToVideo, model: minimax_h3_ref2va_pruned_int8_convrot, refs: "hero + 3/4 + profile on the mark side as <Picture 1-3>", steps: 20, sampler: res_multistep,
+  arcface_mean: {i2v_from_lora_still: [0.40, 0.56], ref2v: [0.69, 0.67], ref2v_plus_lora_first_frame: [0.46, 0.65], ref2v_plus_first_frame_from_refs: 0.55}, time_s: {cloud_box_9s_768x960: 340}}
+```
+- Palette and place metrics rewarded copies: Qwen 2.1 / 2511 pasted the reference street behind new subjects (high colour-histogram score) and returned the reference viewpoint for "opposite corner" (DINOv2 0.97). Judge on sheets. [MEASURED]
+- A persona first frame from a LoRA plus Ref2V identity refs = two identities; the face re-forms mid-clip (ArcFace min 0.12). Make the first frame from the same refs or skip it. [MEASURED]
+- Gated HF repos on rented GPUs: user stores a read token as a platform secret (RunPod `{{ RUNPOD_SECRET_hf_token }}` → `HF_TOKEN`); never move 10+ GB over a home uplink, it also starves result downloads. [MEASURED]
 
 ## 6. Evaluation harness (what metrics mean)
 - Identity: insightface buffalo_l ArcFace cosine of the largest face vs the reference. ≥ 0.6 ≈ same person; 0.5-0.6 usable; < 0.3 different. Blind to profiles (≈ 0) and fooled by animal faces (picked a dog). Faces < 100 px are unreliable. [MEASURED]
@@ -168,7 +212,7 @@ runpodctl pod list ; runpodctl pod delete <pod_id> ; runpodctl me   # verify not
 - Posts made in ComfyUI list LoRAs by file name only (`meta.additionalResources`); find the version with `GET /api/v1/models?query=<name>`; some (private/renamed) cannot be found. [MEASURED]
 - The `prompt` field is one text node; trace `ComfySwitchNode`/`StringConcatenate` inputs in `meta.comfy` to get the effective conditioning text (hidden style suffixes, LLM prompt expanders that may be on or off). [MEASURED]
 - Posts from the Civitai on-site generator (meta keys `workflow`, `ecosystem`) do not reproduce pixel-exact with the same seed in ComfyUI — compare style, not pixels. [MEASURED]
-- Page format: 1 closest copy + 2 own-subject renders in the same aesthetic (keep style sentences, LoRAs, sampler; swap the subject). [USER RULE]
+- Page format: 1 closest copy + 2 own-subject renders in the same aesthetic (keep style sentences, LoRAs, sampler; swap the subject). [RULE]
 - Diagnosis: right subject + wrong medium in the no-LoRA render = the look is a style LoRA (adding ta86_myw4y made post 146084006 near-identical); don't rewrite the prompt. [MEASURED]
 - Krea 2 Turbo two-pass used by half of top graphs (8 steps ≈ 1 MP → `LatentUpscaleBy` ×1.5 nearest-exact → 4 steps euler/simple denoise 0.4): same quality as one pass at 1280×1600, 18 % faster, one pass cleaner on small text — a speed knob, not a quality gain. [MEASURED]
 - Expected outcome (6 posts, 2026-10-25): prompt-only artist-style posts and posts whose model + LoRAs are already local replicate on the first render (14–40 s per image on a 16 GB card); posts whose look comes from a creator LoRA/finetune need that file — the no-LoRA render is still useful as a "what the LoRA adds" baseline. Cap size at ≈ 2.4 MP keeping aspect; published sizes are often upscaled. [MEASURED]
@@ -181,7 +225,22 @@ runpodctl pod list ; runpodctl pod delete <pod_id> ; runpodctl me   # verify not
 - One downloader per file (two writers on one `.part` corrupted a 7 GB file); verify HF LFS sha256. [MEASURED]
 - Builders that regenerate all workflows when called without arguments will overwrite a human's edited files — build one target per call. [MEASURED]
 
-## 9. Open questions (not yet measured)
-- Resolved 2026-10-25: regularisation set (47 same-scene images of other women, `is_reg: true`, reg_weight 1.0) cut the no-trigger leak from 0.48 to 0.24 ArcFace and removed leaked marks, at equal identity (0.60) — but at 2500 steps the persona's small marks disappeared too (reg slows learning). Open: how many steps / which lr bring the marks back with reg on (try 4000 steps or lr 2e-4).
-- 9:16 vs 4:5 first frames; H3 Ref2V with persona references; H3 LoRA from still images; H3 15-30 s clips on a 96 GB card.
+## 9. Editing video with HyperFrames (series 10, 2026-10-26)
+HyperFrames (HeyGen, Apache-2.0) renders HTML compositions (GSAP timelines) to MP4 with headless Chrome + FFmpeg, CPU only, 20-100 s per clip. CLI pinned per project (`npx --yes hyperframes@0.8.200 …`).
+- Work loop: brief → shot/scene list in a generator script (`make_*.py` writes `index.html` + `compositions/*.html`); never hand-edit the HTML. Registry first (`npx hyperframes catalog --json`) for captions, lower thirds, follow cards, backgrounds, transitions. `check` → fix every error and unintended warning → `snapshot --at <t>` at seams and scene midpoints → render → measure. [RULE]
+- Cutting: plain cuts (~98 %); cut on the music bar grid (100 BPM = 2.4 s bar); social 9:16 shots 1-2.4 s, landscape 4-9 s; J-cut sound leads picture by 0.25-0.4 s; nothing static for ≥ 3 s. [RULE]
+- Picture: frame 0 is the thumbnail (title or key image already visible); pre-scale AI footage with ffmpeg lanczos to the needed size (4:5 → 9:16 cover = 1536×1920) and choose a per-shot `object-position`; never upscale 2× in the browser. 9:16 safe band: text only between y = 168 and 1330 px, caption bottom ≈ 600 px from the bottom. [MEASURED + RULE]
+- Type: ≥ 28 px on a 1080 short side, ≤ 4-5 words per caption line, last line on screen ≥ 2 s; animate x/y/scale/opacity only (`check` rejects tweening layout properties); nested timelines → sub-compositions. [SOURCE]
+- Sound: social −14…−16 LUFS integrated, true peak ≤ −1 dBTP, measured on every render (`ffmpeg -af ebur128=peak=true`); pre-normalise sources with ffmpeg; duck a music bed to ≈ 0.27 under a voice (media-use `audio-duck.mjs`). `<hf-audio-group>` buses sum at unity; a bus compressor with the default −24 dB threshold eats 3-8 dB → threshold 6-10 dB under the measured peaks. [MEASURED]
+- Loops: whole bars; every layer equal at t = 0 and at the end; registry backgrounds hard-code 4-6 s durations → write the mount length into the copy; verify with a frame-0 vs last-frame pixel diff (achieved 0.01/255). [MEASURED]
+- Music: ACE-Step 1.5 turbo on a rented RTX 4090 ≈ 4 s per 32 s track (`[Instrumental]`, set bpm); choose the in-point so the track's own ending lands on the last frame. [MEASURED]
+- Grade: `media-treatment --analyze` per shot first; `night-lift` on dark shots (crushed blacks 37 % → 0 %); grading adds ≈ 25 % render time. [MEASURED]
+- Explainers: real data over decoration — one seed, one prompt, one variable; numbers on screen must come from measurements; one idea per scene, 4-10 s per scene, takeaway card at the end. [RULE]
+
+## 10. Russian ↔ English terms (to read the human chapters)
+кадр = still / frame · первый кадр = first frame (I2V) · ролик = clip · раскадровка = timed shot list · правка = edit · перенос по референсу = reference transfer · персонаж = persona / character · эталонное лицо = hero still · приметы = permanent marks (mole, scar) · утечка = leak / bleeding · сид = seed · шаги = steps · сила LoRA = LoRA strength · подпись = caption · датасет = dataset · замок (appearance/background lock) = lock line · дрейф = drift · кроп-лист = crop sheet · бок о бок = side-by-side · слепой A/B = blind A/B · локально = on the baseline box · в облаке / аренда = cloud_box (RunPod) · серия N = experiment series N · готово / пополняется / в работе = done / growing / in progress · ЗАМЕР / ИСТОЧНИК / ПРАВИЛО = MEASURED / SOURCE / RULE.
+
+## 11. Open questions (not yet measured)
+- Resolved 2026-10-25: the leak — regularisation sets halve the subject's steps in ai-toolkit; DOP + name-like trigger + 4000 steps fixed both leak and marks (section 5, result v3).
+- 9:16 vs 4:5 first frames; H3 Ref2V on the 16 GB baseline box (tested only on cloud_box, section 5c); H3 LoRA from still images; H3 15-30 s clips on a 96 GB card; prompt lab (series 7, running): tags vs prose, length, age wording, shot-list density.
 - Resolved 2026-10-25: H3 full precision vs quantised → no visible gap (section 2, minimax_h3.precision_test).
