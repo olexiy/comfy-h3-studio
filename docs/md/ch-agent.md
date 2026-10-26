@@ -281,6 +281,11 @@ sprites: {turntable: "tools/g4_turntable.py: ortho camera at 35 deg, light fixed
 hex_tiles: {a_whole_ai_tiles: "Krea 'one thick hexagon slab' x6 terrains -> Pixal3D -> level -> fit flat-top hexagon (best rotation+scale on the top-view outline): mean radial error 2.2-4.6 % (circle 3.4-5.9 %); rounded corners leave gaps; slab thickness varies",
   b_exact_kit: "Blender 6-gon prism (first vertex on +Y: rotate 30 deg for flat-top, no bevel) + AI top texture + earth sides + Pixal3D props: seamless but flatter; props bring their own grass base",
   rules: ["turn copies by k*60 deg", "measure each cell's floor by downward rays (ring at 0.72 R + centre, median)"], tool: "tools/g11_board.py"}
+hosted_3d_not_run_by_us: {source: "fuser.studio/articles/meshy-vs-rodin-vs-tripo (2026-09-28, one photo, defaults, 1 run)",
+  meshy7: "30,076 tris, 2K PBR (base/MR/normal), 11.0 MB, ~5.5 min, most expensive (~2x Rodin High)", rodin_gen25_high: "500k tris, 2K PBR + baked-light GLB, 34.3 MB, ~2.5 min",
+  tripo25: "501,532 tris, one 2K colour map (PBR off), 15.9 MB, ~1.5 min, cheapest",
+  comfy_nodes: "MeshyImageToModelSmartTopologyNode (target_polycount), Rodin3D_Gen25_Image (Fast/Regular/Extreme-High), TripoP1ImageToModelNode (low-poly); paid with Comfy account credits",
+  rig_rule: "MeshyRigModelNode / TripoRigNode take the SAME service's task id (Meshy: humanoid, textured only); external mesh -> TripoImportModelNode first; free humanoid rig = Mixamo (T/A pose); UniRig open-source, no independent benchmark found"}
 engine_opt_godot47: {bench: "output/GA/G13/proj/bench.gd + tools/g13_bench.sh (windowed 1280x720, Forward+, vsync off, sun shadows, 300 frames)",
   gpu_ms_2500_instances: {plain_20k: 9.79, godot_auto_lod: 1.94, chain_20k_5k_1p5k_visibility_range_12_30m: 0.86, plain_5k: 2.51, multimesh_5k: 4.01, eight_props_nodes: 2.50, eight_props_multimesh: 3.97},
   rules: ["triangles decide, not draw calls: Godot 4.7 auto-instances identical meshes (2500 nodes = 29 calls incl. shadows; 8 meshes = 177 calls, same GPU time)",
