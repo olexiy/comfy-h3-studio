@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Гном на поляне</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* G14 demo page: one world, three renderers (Three.js 3D · hex board of AI tiles · 2D pixel canvas). Book tokens. */
+:root{
+  --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
+  --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Onest", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;padding-block:24px 56px;display:grid;gap:20px}
+.bookbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between;font:500 13px var(--mono)}
+.bookbar a{color:var(--accent);text-decoration:none}
+.bookbar .where{color:var(--muted)}
+h1{font:700 clamp(24px,4vw,38px)/1.15 var(--display);margin:0}
+.lead{color:var(--muted);margin:6px 0 0;max-width:70ch}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--panel)}
+.seg button,.btn{font:500 14px var(--body);color:var(--fg);background:none;border:0;padding:8px 16px;cursor:pointer;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.btn{border:1px solid var(--line);border-radius:999px;background:var(--panel)}
+.btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.score{margin-left:auto;font:500 14px var(--mono);color:var(--muted)}
+.score b{color:var(--fg)}
+.stage{position:relative;width:100%;aspect-ratio:16/10;max-height:78vh;border-radius:12px;overflow:hidden;background:#9cc27a;
+  border:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none}
+.stage:fullscreen{max-height:none;border-radius:0;aspect-ratio:auto}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#px{image-rendering:pixelated}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:14px;background:rgba(20,24,28,.55);color:#fff;text-align:center;padding:16px;z-index:5}
+.overlay[hidden]{display:none}
+.overlay h2{font:700 clamp(20px,3.4vw,30px) var(--display);margin:0}
+.overlay p{margin:0;max-width:44ch;font-size:15px;opacity:.9}
+.play{font:600 18px var(--body);background:var(--accent);color:#fff;border:0;border-radius:999px;padding:14px 34px;cursor:pointer;min-height:48px}
+.play:disabled{opacity:.6;cursor:progress}
+.prog{width:min(320px,70%);height:6px;border-radius:3px;background:rgba(255,255,255,.25);overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:#fff;transition:width .2s}
+.stats{position:absolute;top:10px;left:10px;z-index:3;font:500 12px/1.5 var(--mono);color:#fff;background:rgba(0,0,0,.55);padding:8px 10px;border-radius:8px;white-space:pre}
+.stats[hidden]{display:none}
+.toast{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:4;font:600 15px var(--body);color:#fff;background:rgba(0,0,0,.6);
+  padding:8px 16px;border-radius:999px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1}
+.joy{position:absolute;left:18px;bottom:18px;width:120px;height:120px;border-radius:50%;z-index:3;background:rgba(255,255,255,.18);
+  border:2px solid rgba(255,255,255,.45);touch-action:none}
+.joy i{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:rgba(255,255,255,.75);
+  box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.hint{font-size:14px;color:var(--muted);max-width:75ch}
+.hint kbd{font:500 12px var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;background:var(--panel)}
+.notes{display:grid;gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.note{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:14px}
+.note b{display:block;font:500 14px var(--display);margin-bottom:4px}
+@media (max-width:760px){.notes{grid-template-columns:1fr}.score{margin-left:0}.joy{width:104px;height:104px}.stage{aspect-ratio:4/5;max-height:72vh}}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div class="wrap">
+<nav class="bookbar" aria-label="Учебник"><a href="ch-3d.html#demo">← ИИ для 3D-ассетов</a><span class="where">демо · все ассеты сделаны ИИ</span></nav>
+<header>
+  <h1>Гном на поляне</h1>
+  <p class="lead">Маленькая игра из ассетов этой главы: модели из Pixal3D, гекс-плитки из G11, пиксель-арт из тех же моделей. Один мир, три стиля. Соберите все монетки.</p>
+</header>
+
+<div class="bar" role="toolbar" aria-label="Управление демо">
+  <div class="seg" role="group" aria-label="Стиль">
+    <button data-mode="3d" aria-pressed="true">3D</button><button data-mode="hex" aria-pressed="false">Гексы</button><button data-mode="px" aria-pressed="false">Пиксель</button>
+  </div>
+  <button class="btn" id="snd" aria-pressed="true">Звук: вкл</button>
+  <button class="btn" id="st" aria-pressed="false">Статистика</button>
+  <button class="btn" id="fs">Во весь экран</button>
+  <span class="score">Монетки: <b id="sc">0</b> из <b id="sct">0</b></span>
+</div>
+
+<div class="stage" id="stage">
+  <canvas id="gl" aria-label="Игровое поле"></canvas>
+  <canvas id="px" hidden aria-label="Игровое поле, пиксель-арт"></canvas>
+  <div class="stats" id="stats" hidden></div>
+  <div class="toast" id="toast"></div>
+  <div class="joy" id="joy" aria-hidden="true"><i></i></div>
+  <div class="overlay" id="ov">
+    <h2>Гном на поляне</h2>
+    <p id="ovt">Загружаю модели…</p>
+    <div class="prog"><i id="pg"></i></div>
+    <button class="play" id="play" disabled>Играть</button>
+  </div>
+</div>
+
+<p class="hint">Ходить: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> или стрелки, на телефоне — джойстик слева внизу. В гексах гном не заходит на воду, горы, лес и деревню. Звук включается после «Играть».</p>
+
+<div class="notes">
+  <div class="note"><b>3D</b>15 моделей из Pixal3D, по 5 000 треугольников, текстуры 512 px в WebP: около 0,3 МБ на модель. Наклон «вида на ¾» снят скриптом <code>ga_level.py</code>.</div>
+  <div class="note"><b>Гексы</b>Шесть целых ИИ-плиток, выровненных и вписанных в правильный шестиугольник. 61 клетка, копии повёрнуты на 60°, чтобы не повторялись.</div>
+  <div class="note"><b>Пиксель</b>Те же модели, отрендеренные в одном масштабе (28 px на метр) и сведённые к одной палитре из 32 цветов. Гном — 8 направлений.</div>
+</div>
+</div>
+
+<!-- every file the game fetches by script, listed so publish_public.py copies it -->
+<template id="demo-files"><source src="media/demo/assets.json"><source src="media/demo/barrel.glb.wasm"><source src="media/demo/chest.glb.wasm"><source src="media/demo/cottage.glb.wasm"><source src="media/demo/crates.glb.wasm"><source src="media/demo/dirt.jpg"><source src="media/demo/gnome.glb.wasm"><source src="media/demo/grass.jpg"><source src="media/demo/lantern.glb.wasm"><source src="media/demo/mushroom.glb.wasm"><source src="media/demo/pines.glb.wasm"><source src="media/demo/px.json"><source src="media/demo/px_atlas.png"><source src="media/demo/px_dirt.png"><source src="media/demo/px_grass.png"><source src="media/demo/rocks.glb.wasm"><source src="media/demo/sign.glb.wasm"><source src="media/demo/stump.glb.wasm"><source src="media/demo/tile_field.glb.wasm"><source src="media/demo/tile_forest.glb.wasm"><source src="media/demo/tile_meadow.glb.wasm"><source src="media/demo/tile_mountain.glb.wasm"><source src="media/demo/tile_village.glb.wasm"><source src="media/demo/tile_water.glb.wasm"><source src="media/demo/tower.glb.wasm"><source src="media/demo/turret.glb.wasm"><source src="media/demo/well.glb.wasm"><source src="media/demo/wheat.glb.wasm"></template>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const M = 'media/demo/';
+const $ = id => document.getElementById(id);
+const stage = $('stage'), gl = $('gl'), pxc = $('px');
+
+// ---------------------------------------------------------------- world (shared by 3D and pixel; metres, x → right, z → down-screen)
+const PROPS = [
+  ['tower', -9, -6], ['well', 0, -5], ['mushroom', 9, -5.5], ['cottage', -4.5, -9], ['turret', -10.5, 3], ['turret', 10.5, 3.5],
+  ['pines', -13, -9.5], ['pines', 13, -9.5], ['pines', -13.5, 8.5], ['pines', 5.5, 9], ['pines', 13.5, -1], ['pines', -6.5, 9.5],
+  ['rocks', 12.5, 8.5], ['rocks', -13, -2.5], ['lantern', 1.7, 6], ['lantern', -1.7, 2.6], ['lantern', 1.7, -2.4], ['sign', 2.3, 1.4],
+  ['barrel', 5, -2.2], ['barrel', 5.9, -1.3], ['crates', 6.8, -2.6], ['chest', -5, 4.2], ['stump', -3.2, 6.4], ['stump', 7.5, 2.2],
+  ['wheat', -7.2, -2.4], ['wheat', -8.5, -1.4], ['wheat', -6, -1.2], ['wheat', 4.5, -8]];
+const PATHS = [[-1.1, -3.2, 1.1, 11], [-11, -0.9, 11, 0.9]];          // dirt strips [x0, z0, x1, z1]
+const COINS = [[-11, -6], [11, -2.5], [-8, 6.5], [8.5, 6.5], [3, -7.5], [-3, -3.5], [9.5, 10], [-11, 10.5]];
+const BOUNDS = [-15.5, -11.5, 15.5, 12];
+const SPEED = 3.2, GR = 0.32;                                       // gnome speed m/s, collider radius m
+
+// hex board: radius-4 axial map, flat-top, R = 1 m; blocked terrains
+const HEXR = 4, R = 1, BLOCK = new Set(['water', 'mountain', 'forest', 'village']);
+function hexTerrain(q, r) {
+  const s = -q - r, d = Math.max(Math.abs(q), Math.abs(r), Math.abs(s));
+  if (d === 0) return 'meadow';
+  const key = q + ',' + r;
+  const fixed = {'-2,-1': 'water', '-3,-1': 'water', '-3,0': 'water', '-2,0': 'water', '2,-3': 'mountain', '3,-3': 'mountain', '3,-2': 'mountain',
+    '4,-4': 'mountain', '1,2': 'village', '-1,3': 'village', '0,-3': 'forest', '-1,-2': 'forest', '4,-1': 'forest', '-4,4': 'forest', '-3,4': 'forest',
+    '2,1': 'field', '3,0': 'field', '2,0': 'field', '-2,2': 'field', '-1,2': 'field', '0,3': 'field', '1,-1': 'field'};
+  if (fixed[key]) return fixed[key];
+  return ((q * 7 + r * 11 + 40) % 9 === 0) ? 'forest' : 'meadow';
+}
+const HEXES = [];
+for (let q = -HEXR; q <= HEXR; q++) for (let r = Math.max(-HEXR, -q - HEXR); r <= Math.min(HEXR, -q + HEXR); r++) HEXES.push([q, r, hexTerrain(q, r)]);
+const hexPos = (q, r) => [R * 1.5 * q, R * Math.sqrt(3) * (r + q / 2)];
+function hexAt(x, z) {                                              // axial rounding (cube coordinates)
+  const qf = (2 / 3 * x) / R, rf = (-1 / 3 * x + Math.sqrt(3) / 3 * z) / R, sf = -qf - rf;
+  let q = Math.round(qf), r = Math.round(rf), s = Math.round(sf);
+  const dq = Math.abs(q - qf), dr = Math.abs(r - rf), ds = Math.abs(s - sf);
+  if (dq > dr && dq > ds) q = -r - s; else if (dr > ds) r = -q - s;
+  return [q, r];
+}
+const HEXMAP = new Map(HEXES.map(([q, r, t]) => [q + ',' + r, t]));
+const HEXCOINS = [[3, 1], [-3, 2], [0, -4], [-4, 1], [2, 2], [4, -3 + 1], [-1, -3], [1, 3]].filter(([q, r]) => !BLOCK.has(HEXMAP.get(q + ',' + r)));
+
+// ---------------------------------------------------------------- state
+const state = { mode: '3d', started: false, x: 0, z: 2.5, dir: 0, moving: false, walk: 0, stepAcc: 0, got: new Set(), hx: 0, hz: 0, hdir: 0, hgot: new Set() };
+let assets = null;                                                  // assets.json: per-model collider radius / tile floor
+const keys = new Set(), joy = { x: 0, y: 0 };
+
+// ---------------------------------------------------------------- input
+addEventListener('keydown', e => { const k = e.key.toLowerCase(); if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) { keys.add(k); if (state.started) e.preventDefault(); } });
+addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
+addEventListener('blur', () => keys.clear());
+(() => {
+  const el = $('joy'), knob = el.firstElementChild; let id = null;
+  const set = e => {
+    const b = el.getBoundingClientRect(), cx = b.left + b.width / 2, cy = b.top + b.height / 2, max = b.width / 2;
+    let dx = e.clientX - cx, dy = e.clientY - cy; const d = Math.hypot(dx, dy);
+    if (d > max) { dx *= max / d; dy *= max / d; }
+    knob.style.transform = `translate(${dx}px,${dy}px)`; joy.x = dx / max; joy.y = dy / max;
+  };
+  el.addEventListener('pointerdown', e => { id = e.pointerId; el.setPointerCapture(id); set(e); });
+  el.addEventListener('pointermove', e => { if (e.pointerId === id) set(e); });
+  const end = e => { if (e.pointerId !== id) return; id = null; joy.x = joy.y = 0; knob.style.transform = ''; };
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+})();
+function inputVec() {
+  let x = joy.x, y = joy.y;
+  if (keys.has('a') || keys.has('arrowleft')) x -= 1;
+  if (keys.has('d') || keys.has('arrowright')) x += 1;
+  if (keys.has('w') || keys.has('arrowup')) y -= 1;
+  if (keys.has('s') || keys.has('arrowdown')) y += 1;
+  const l = Math.hypot(x, y);
+  if (l < 0.15) return [0, 0];
+  return l > 1 ? [x / l, y / l] : [x, y];
+}
+
+// ---------------------------------------------------------------- sound: WebAudio synthesis, nothing to download
+const snd = {
+  ctx: null, out: null, on: true, noise: null, last: 0,
+  init() {
+    if (this.ctx) return;
+    const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+    const ctx = this.ctx = new C(); this.out = ctx.createGain(); this.out.gain.value = 0.8; this.out.connect(ctx.destination);
+    const b = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    this.noise = b; this.ambient();
+  },
+  env(node, t, a, peak, dec) { node.gain.setValueAtTime(0.0001, t); node.gain.exponentialRampToValueAtTime(peak, t + a); node.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); },
+  burst(type, freq, q, peak, dec, rate = 1) {
+    const c = this.ctx, t = c.currentTime, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = this.noise; s.playbackRate.value = rate; f.type = type; f.frequency.value = freq; f.Q.value = q;
+    s.connect(f); f.connect(g); g.connect(this.out); this.env(g, t, 0.004, peak, dec); s.start(t, Math.random() * 0.8); s.stop(t + dec + 0.05);
+  },
+  tone(type, f0, f1, peak, dur, delay = 0) {
+    const c = this.ctx, t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    o.connect(g); g.connect(this.out); this.env(g, t, 0.005, peak, dur); o.start(t); o.stop(t + dur + 0.05);
+  },
+  step(surface) {
+    if (!this.ctx || !this.on) return;
+    if (state.mode === 'px') { this.tone('square', surface === 'dirt' ? 190 : 140, 70, 0.05, 0.05); return; }   // chiptune feet
+    const v = 0.9 + Math.random() * 0.25;
+    if (surface === 'dirt') { this.burst('bandpass', 2600 * v, 1.1, 0.35, 0.07); this.burst('lowpass', 500, 0.7, 0.2, 0.05); }
+    else this.burst('lowpass', 1100 * v, 0.6, 0.32, 0.11, 0.8);
+  },
+  bump() {
+    if (!this.ctx || !this.on) return;
+    const now = performance.now(); if (now - this.last < 350) return; this.last = now;
+    if (state.mode === 'px') { this.tone('square', 220, 55, 0.08, 0.14); return; }
+    this.tone('sine', 150, 45, 0.5, 0.18); this.burst('lowpass', 380, 0.8, 0.35, 0.12);
+  },
+  coin() {
+    if (!this.ctx || !this.on) return;
+    if (state.mode === 'px') { this.tone('square', 988, 988, 0.07, 0.07); this.tone('square', 1319, 1319, 0.07, 0.22, 0.07); return; }
+    [1047, 1319, 1568].forEach((f, i) => this.tone('sine', f, f * 1.01, 0.22, 0.35, i * 0.07));
+  },
+  fanfare() { if (!this.ctx || !this.on) return; [523, 659, 784, 1047, 784, 1047].forEach((f, i) => this.tone(state.mode === 'px' ? 'square' : 'triangle', f, f, 0.12, 0.2, i * 0.11)); },
+  ambient() {
+    const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(), lfo = c.createOscillator(), lg = c.createGain();
+    s.buffer = this.noise; s.loop = true; f.type = 'lowpass'; f.frequency.value = 420; g.gain.value = 0.05;
+    lfo.frequency.value = 0.08; lg.gain.value = 0.035; lfo.connect(lg); lg.connect(g.gain);
+    s.connect(f); f.connect(g); g.connect(this.out); s.start(); lfo.start();
+    const bird = () => {                                            // a chirp of 2–4 notes every 2–7 s
+      if (this.on && state.started) { const n = 2 + (Math.random() * 3 | 0), base = 2300 + Math.random() * 1500;
+        for (let i = 0; i < n; i++) this.tone('sine', base * (1 + 0.15 * Math.random()), base * (1.25 + 0.2 * Math.random()), 0.035, 0.09, i * 0.12); }
+      setTimeout(bird, 2000 + Math.random() * 5000);
+    };
+    setTimeout(bird, 1500);
+  },
+  toggle() { this.on = !this.on; if (this.out) this.out.gain.value = this.on ? 0.8 : 0; }
+};
+
+// ---------------------------------------------------------------- shared movement + collisions
+function surfaceAt(x, z) { return PATHS.some(([x0, z0, x1, z1]) => x >= x0 && x <= x1 && z >= z0 && z <= z1) ? 'dirt' : 'grass'; }
+function collide(nx, nz) {                                          // circle colliders; returns [x, z, hit prop index | -1]
+  let hit = -1;
+  for (let k = 0; k < 2; k++) for (let i = 0; i < PROPS.length; i++) {
+    const [name, px, pz] = PROPS[i], rr = assets[name].r + GR, dx = nx - px, dz = nz - pz, d = Math.hypot(dx, dz);
+    if (d < rr && d > 1e-6) { nx = px + dx / d * rr; nz = pz + dz / d * rr; hit = i; }
+  }
+  nx = Math.min(Math.max(nx, BOUNDS[0]), BOUNDS[2]); nz = Math.min(Math.max(nz, BOUNDS[1]), BOUNDS[3]);
+  return [nx, nz, hit];
+}
+const hexFree = (x, z) => { const [q, r] = hexAt(x, z), t = HEXMAP.get(q + ',' + r); return t !== undefined && !BLOCK.has(t); };
+function stepWorld(dt) {
+  const [ix, iz] = inputVec(); state.moving = ix !== 0 || iz !== 0;
+  if (!state.moving) return null;
+  if (state.mode === 'hex') {
+    const sp = SPEED * 0.55, nx = state.hx + ix * sp * dt, nz = state.hz + iz * sp * dt;
+    let bumped = false;
+    if (hexFree(nx, nz)) { state.hx = nx; state.hz = nz; }
+    else if (hexFree(nx, state.hz)) { state.hx = nx; bumped = true; }
+    else if (hexFree(state.hx, nz)) { state.hz = nz; bumped = true; }
+    else bumped = true;
+    if (bumped) snd.bump();
+    state.hdir = Math.atan2(ix, iz); state.walk += dt * 9; state.stepAcc += sp * dt;
+    if (state.stepAcc > 0.32) { state.stepAcc = 0; snd.step('grass'); }
+    return null;
+  }
+  const [x, z, hit] = collide(state.x + ix * SPEED * dt, state.z + iz * SPEED * dt);
+  const moved = Math.hypot(x - state.x, z - state.z);
+  state.x = x; state.z = z; state.dir = Math.atan2(ix, iz); state.walk += dt * 10;
+  state.stepAcc += moved;
+  if (state.stepAcc > 0.55) { state.stepAcc = 0; snd.step(surfaceAt(x, z)); }
+  if (hit >= 0 && moved < SPEED * dt * 0.6) { snd.bump(); return hit; }
+  return null;
+}
+function pickCoins(list, got, x, z, rad) {
+  list.forEach((c, i) => {
+    if (got.has(i)) return;
+    const [cx, cz] = state.mode === 'hex' ? hexPos(c[0], c[1]) : c;
+    if (Math.hypot(cx - x, cz - z) < rad) { got.add(i); snd.coin(); score(); if (got.size === list.length) { snd.fanfare(); toast('Все монетки собраны!'); } else toast(`Монетка ${got.size} из ${list.length}`); }
+  });
+}
+function score() { const hex = state.mode === 'hex'; $('sc').textContent = (hex ? state.hgot : state.got).size; $('sct').textContent = (hex ? HEXCOINS : COINS).length; }
+let tt = 0; function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('on'), 1600); }
+
+// ---------------------------------------------------------------- three.js (3D meadow + hex board share one renderer)
+const renderer = new THREE.WebGLRenderer({ canvas: gl, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const camera = new THREE.PerspectiveCamera(40, 16 / 10, 0.1, 200);
+const loader = new GLTFLoader();
+const models = {};
+function loadModels(names, onEach) {
+  return Promise.all(names.map(n => new Promise((ok, bad) => loader.load(M + n + '.glb.wasm', g => {
+    g.scene.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; } });
+    models[n] = g.scene; onEach(); ok();
+  }, undefined, bad))));
+}
+function lights(scene, span) {
+  scene.add(new THREE.HemisphereLight(0xeef6ff, 0x8aa660, 2.0));
+  const sun = new THREE.DirectionalLight(0xfff1dc, 2.9); sun.position.set(-8, 14, 9); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -span, right: span, top: span, bottom: -span, near: 1, far: 60 });
+  sun.shadow.bias = -0.0005; scene.add(sun, sun.target); return sun;
+}
+function groundTex(name, rep) {
+  const t = new THREE.TextureLoader().load(M + name + '.jpg'); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(...rep);
+  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+function coinMesh() {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.07, 24),
+    new THREE.MeshStandardMaterial({ color: 0xffc934, metalness: 0.6, roughness: 0.3, emissive: 0x6a4500 }));
+  m.rotation.x = Math.PI / 2; const g = new THREE.Group(); g.add(m); m.castShadow = true; return g;
+}
+
+const W3 = { scene: null, gnome: null, props: [], coins: [], sun: null, wob: new Map() };
+function build3D() {
+  const s = W3.scene = new THREE.Scene(); s.background = new THREE.Color(0xbfdcef); s.fog = new THREE.Fog(0xbfdcef, 30, 55);
+  W3.sun = lights(s, 18);
+  const g = new THREE.Mesh(new THREE.PlaneGeometry(80, 70), new THREE.MeshStandardMaterial({ map: groundTex('grass', [16, 14]), roughness: 1 }));
+  g.rotation.x = -Math.PI / 2; g.receiveShadow = true; s.add(g);
+  const dirt = new THREE.MeshStandardMaterial({ map: groundTex('dirt', [1, 1]), roughness: 1, polygonOffset: true, polygonOffsetFactor: -2 });
+  for (const [x0, z0, x1, z1] of PATHS) {
+    const w = x1 - x0, h = z1 - z0, m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), dirt.clone());
+    m.material.map = groundTex('dirt', [w / 3, h / 3]); m.rotation.x = -Math.PI / 2; m.position.set((x0 + x1) / 2, 0.005, (z0 + z1) / 2);
+    m.receiveShadow = true; s.add(m);
+  }
+  PROPS.forEach(([n, x, z], i) => { const o = models[n].clone(); o.position.set(x, 0, z); o.rotation.y = n === 'pines' || n === 'rocks' || n === 'wheat' ? (i * 1.7) % 6.28 : 0; s.add(o); W3.props.push(o); });
+  W3.gnome = models.gnome.clone(); s.add(W3.gnome);
+  COINS.forEach(([x, z]) => { const c = coinMesh(); c.position.set(x, 0.6, z); s.add(c); W3.coins.push(c); });
+}
+const WH = { scene: null, gnome: null, coins: [], ring: null, tiles: new Map(), floor: new Map(), y: 0.6 };
+function buildHex() {
+  const s = WH.scene = new THREE.Scene(); s.background = new THREE.Color(0x2b3640);
+  lights(s, 11);
+  const table = new THREE.Mesh(new THREE.CircleGeometry(16, 64), new THREE.MeshStandardMaterial({ color: 0x5a4636, roughness: 0.9 }));
+  table.rotation.x = -Math.PI / 2; table.position.y = -0.35; table.receiveShadow = true; s.add(table);
+  HEXES.forEach(([q, r, t], i) => {
+    const o = models['tile_' + t].clone(), [x, z] = hexPos(q, r);
+    o.position.set(x, 0.6 - assets['tile_' + t].top, z);              // every tile's ground top at y = 0.6
+    o.rotation.y = ((q * 7 + r * 13 + 60) % 6) * Math.PI / 3;           // copies turned by k·60° (a hexagon maps onto itself)
+    s.add(o); WH.tiles.set(q + ',' + r, o);
+  });
+  // floor height per cell: rays straight down at 6 points on a 0.72 m ring + the centre, median hit
+  // (the ring misses the wheat / trees in the middle; assets.json's histogram "top" was too low for some tiles)
+  s.updateMatrixWorld(true); const rc = new THREE.Raycaster(), down = new THREE.Vector3(0, -1, 0);
+  HEXES.forEach(([q, r]) => {
+    const [x, z] = hexPos(q, r), o = WH.tiles.get(q + ',' + r), ys = [];
+    for (let k = 0; k <= 6; k++) {
+      const a = k * Math.PI / 3 + Math.PI / 6, rad = k === 6 ? 0 : 0.72;
+      rc.set(new THREE.Vector3(x + Math.cos(a) * rad, 5, z + Math.sin(a) * rad), down);
+      const h = rc.intersectObject(o, true)[0]; if (h) ys.push(h.point.y);
+    }
+    ys.sort((a, b) => a - b); WH.floor.set(q + ',' + r, ys.length ? ys[ys.length >> 1] : 0.6);
+  });
+  WH.gnome = models.gnome.clone(); WH.gnome.scale.setScalar(0.85); s.add(WH.gnome);
+  const ring = WH.ring = new THREE.Mesh(new THREE.RingGeometry(0.82, 0.95, 6), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55, depthWrite: false }));
+  ring.rotation.x = -Math.PI / 2; s.add(ring);
+  HEXCOINS.forEach(([q, r]) => { const c = coinMesh(), [x, z] = hexPos(q, r); c.scale.setScalar(0.7); c.position.set(x, WH.floor.get(q + ',' + r) + 0.45, z); c.userData.y = c.position.y; s.add(c); WH.coins.push(c); });
+}
+function poseGnome(g, x, z, y0, dir, walk, moving, sc = 1) {
+  const bob = moving ? Math.abs(Math.sin(walk)) * 0.07 * sc : 0;
+  g.position.set(x, y0 + bob, z);
+  let d = dir - g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d)); g.rotation.y += d * 0.25;   // smooth turn
+  g.rotation.z = moving ? Math.sin(walk) * 0.08 : g.rotation.z * 0.8;                                 // waddle
+  g.rotation.x = moving ? 0.08 : g.rotation.x * 0.8;                                                   // lean into the walk
+}
+const camPos = new THREE.Vector3();
+function draw3D(dt, t, hit) {
+  if (hit !== null) W3.wob.set(hit, 1);
+  poseGnome(W3.gnome, state.x, state.z, 0, state.dir, state.walk, state.moving);
+  W3.wob.forEach((v, i) => { const o = W3.props[i], k = Math.sin(v * 18) * v * 0.06; o.scale.set(1 - k, 1 + k, 1 - k); v -= dt * 2.5; if (v <= 0) { o.scale.set(1, 1, 1); W3.wob.delete(i); } else W3.wob.set(i, v); });
+  W3.coins.forEach((c, i) => { c.visible = !state.got.has(i); c.rotation.y = t * 2.4; c.position.y = 0.6 + Math.sin(t * 3 + i) * 0.12; });
+  camPos.set(state.x, 10, state.z + 10.5); camera.position.lerp(camPos, 1 - Math.exp(-dt * 4)); camera.lookAt(camera.position.x, 0.6, camera.position.z - 10.5);
+  W3.sun.position.set(state.x - 8, 14, state.z + 9); W3.sun.target.position.set(state.x, 0, state.z);
+  renderer.render(W3.scene, camera);
+}
+function drawHex(dt, t) {
+  const [q, r] = hexAt(state.hx, state.hz), [rx, rz] = hexPos(q, r), fl = WH.floor.get(q + ',' + r) ?? 0.6;
+  WH.y += (fl - WH.y) * (1 - Math.exp(-dt * 10));                     // step smoothly between cells of different height
+  poseGnome(WH.gnome, state.hx, state.hz, WH.y, state.hdir, state.walk, state.moving, 0.85);
+  WH.ring.position.set(rx, fl + 0.03, rz);
+  WH.coins.forEach((c, i) => { c.visible = !state.hgot.has(i); c.rotation.y = t * 2.4; c.position.y = c.userData.y + Math.sin(t * 3 + i) * 0.08; });
+  camPos.set(state.hx * 0.75, 6.8, state.hz * 0.75 + 6.8); camera.position.lerp(camPos, 1 - Math.exp(-dt * 3)); camera.lookAt(camera.position.x, 0.4, camera.position.z - 6.8);
+  renderer.render(WH.scene, camera);
+}
+
+// ---------------------------------------------------------------- pixel mode: 2D canvas, sprites from px_atlas.png
+const PX = { atlas: null, meta: null, grass: null, dirt: null, ctx: pxc.getContext('2d'), scale: 3, w: 0, h: 0 };
+const PE = Math.sin(35 * Math.PI / 180);                            // ground foreshortening of the 35° sprite camera
+function img(src) { return new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = bad; i.src = src; }); }
+async function loadPixel() {
+  const [a, m, g, d] = await Promise.all([img(M + 'px_atlas.png'), fetch(M + 'px.json').then(r => r.json()), img(M + 'px_grass.png'), img(M + 'px_dirt.png')]);
+  Object.assign(PX, { atlas: a, meta: m, grass: g, dirt: d });
+}
+// ground detail for the pixel mode: tufts, flowers, pebbles at fixed pseudo-random spots (a flat 32 px tile alone reads as felt)
+const DECO = (() => { let h = 7; const rnd = () => (h = (h * 16807) % 2147483647) / 2147483647, out = [];
+  for (let i = 0; i < 520; i++) { const x = BOUNDS[0] - 2 + rnd() * (BOUNDS[2] - BOUNDS[0] + 4), z = BOUNDS[1] - 2 + rnd() * (BOUNDS[3] - BOUNDS[1] + 4);
+    if (surfaceAt(x, z) === 'dirt') { if (rnd() < 0.5) out.push(['pebble', x, z]); continue; }
+    const k = rnd(); out.push([k < 0.6 ? 'tuft' : 'flower', x, z, ['#ffffff', '#ffd84a', '#ff7a5c', '#7fd6ff', '#f59ad8'][(rnd() * 5) | 0]]); }
+  return out; })();
+function drawDeco(c, ppm, ox, oy, W, H) {
+  for (const [k, x, z, col] of DECO) {
+    const fx = Math.round(x * ppm), fy = Math.round(z * ppm * PE);
+    if (fx < ox - 4 || fx > ox + W + 4 || fy < oy - 4 || fy > oy + H + 4) continue;
+    if (k === 'tuft') { c.fillStyle = '#4f7a24'; c.fillRect(fx - 2, fy - 2, 1, 2); c.fillRect(fx, fy - 3, 1, 3); c.fillRect(fx + 2, fy - 2, 1, 2); c.fillStyle = '#86b83c'; c.fillRect(fx, fy - 3, 1, 1); }
+    else if (k === 'flower') { c.fillStyle = '#3f6a1e'; c.fillRect(fx, fy - 1, 1, 2); c.fillStyle = col; c.fillRect(fx - 1, fy - 3, 3, 1); c.fillRect(fx, fy - 4, 1, 3); c.fillStyle = '#ffe9a0'; c.fillRect(fx, fy - 3, 1, 1); }
+    else { c.fillStyle = '#6d5a4a'; c.fillRect(fx, fy, 2, 1); c.fillStyle = '#a89480'; c.fillRect(fx, fy - 1, 2, 1); }
+  }
+}
+function drawPixel(t) {
+  const c = PX.ctx, ppm = PX.meta.ppm, W = PX.w, H = PX.h, S = PX.meta.sprites;
+  c.imageSmoothingEnabled = false;
+  const ox = Math.round(state.x * ppm - W / 2), oy = Math.round(state.z * ppm * PE - H / 2);   // camera: world px of the top-left corner
+  c.save(); c.translate(-ox, -oy);
+  c.fillStyle = c.createPattern(PX.grass, 'repeat'); c.fillRect(ox, oy, W, H);
+  c.fillStyle = c.createPattern(PX.dirt, 'repeat');
+  for (const [x0, z0, x1, z1] of PATHS) c.fillRect(Math.round(x0 * ppm), Math.round(z0 * ppm * PE), Math.round((x1 - x0) * ppm), Math.round((z1 - z0) * ppm * PE));
+  drawDeco(c, ppm, ox, oy, W, H);
+  const items = PROPS.map(([n, x, z]) => [n, x, z]);
+  const k = ((Math.round(state.dir / (Math.PI / 4)) % 8) + 8) % 8;
+  items.push(['gnome_' + k, state.x, state.z, true]);
+  COINS.forEach(([x, z], i) => { if (!state.got.has(i)) items.push(['coin', x, z]); });
+  items.sort((a, b) => a[2] - b[2]);
+  for (const [n, x, z, me] of items) {
+    const fx = Math.round(x * ppm), fy = Math.round(z * ppm * PE);
+    if (n === 'coin') {                                              // 7 px coin drawn in code, "spinning" by width
+      const w = Math.max(1, Math.round(Math.abs(Math.cos(t * 4 + x)) * 3)), y = fy - 9 + Math.round(Math.sin(t * 5 + z) * 1.5);
+      c.fillStyle = 'rgba(0,0,0,.25)'; c.fillRect(fx - 3, fy - 1, 7, 2);
+      c.fillStyle = '#3a2410'; c.fillRect(fx - w - 1, y - 4, w * 2 + 3, 9); c.fillStyle = '#ffcc33'; c.fillRect(fx - w, y - 3, w * 2 + 1, 7);
+      c.fillStyle = '#fff2a8'; c.fillRect(fx - w + (w > 1 ? 1 : 0), y - 2, 1, 3); continue;
+    }
+    const [sx, sy, sw, sh, ax, ay] = S[n];
+    const bob = me && state.moving ? (Math.sin(state.walk) > 0 ? -1 : 0) : 0;
+    c.fillStyle = 'rgba(0,0,0,.22)'; c.beginPath(); c.ellipse(fx, fy, Math.max(4, assets[n.split('_')[0]].r * ppm), Math.max(2, assets[n.split('_')[0]].r * ppm * PE), 0, 0, 7); c.fill();
+    c.drawImage(PX.atlas, sx, sy, sw, sh, Math.round(fx - ax), Math.round(fy - ay) + bob, sw, sh);
+  }
+  c.restore();
+}
+
+// ---------------------------------------------------------------- loop, sizing, modes
+const stats = { on: false, fps: 60, acc: 0 };
+function resize() {
+  const b = stage.getBoundingClientRect(), w = Math.max(1, b.width), h = Math.max(1, b.height);
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  PX.scale = Math.max(2, Math.round(w / 420)); PX.w = Math.ceil(w / PX.scale); PX.h = Math.ceil(h / PX.scale);
+  pxc.width = PX.w; pxc.height = PX.h;
+}
+new ResizeObserver(resize).observe(stage);
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now; const t = now / 1000;
+  if (state.started) {
+    const hit = stepWorld(dt);
+    if (state.mode === 'hex') pickCoins(HEXCOINS, state.hgot, state.hx, state.hz, 0.55); else pickCoins(COINS, state.got, state.x, state.z, 0.7);
+    if (state.mode === '3d') draw3D(dt, t, hit); else if (state.mode === 'hex') drawHex(dt, t); else drawPixel(t);
+  } else if (state.mode === '3d' && W3.scene) draw3D(dt, t, null);
+  stats.fps += (1 / Math.max(dt, 1e-3) - stats.fps) * 0.05; stats.acc += dt;
+  if (stats.on && stats.acc > 0.25) {
+    stats.acc = 0; const i = renderer.info;
+    $('stats').textContent = state.mode === 'px'
+      ? `FPS ${stats.fps.toFixed(0)}\nспрайтов ${PROPS.length + 1 + COINS.length}\nатлас ${PX.atlas ? PX.atlas.width + '×' + PX.atlas.height : '-'} px, 1 текстура\nмасштаб ×${PX.scale}`
+      : `FPS ${stats.fps.toFixed(0)}\ndraw calls ${i.render.calls}\nтреугольников ${(i.render.triangles / 1000).toFixed(0)}k\nгеометрий ${i.memory.geometries} · текстур ${i.memory.textures}`;
+  }
+  requestAnimationFrame(frame);
+}
+async function setMode(m) {
+  if (m === state.mode && (m !== '3d' || W3.scene)) return;
+  document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
+  const need = m === 'hex' && !WH.scene ? 'hex' : m === 'px' && !PX.atlas ? 'px' : null;
+  if (need) {
+    const ov = $('ov'); ov.hidden = false; $('play').hidden = true; $('ovt').textContent = need === 'hex' ? 'Загружаю гекс-плитки…' : 'Загружаю спрайты…'; $('pg').style.width = '0';
+    try {
+      if (need === 'hex') { const n = ['meadow', 'forest', 'water', 'mountain', 'village', 'field'].map(t => 'tile_' + t); let k = 0;
+        await loadModels(n, () => { $('pg').style.width = (++k / n.length * 100) + '%'; }); buildHex(); }
+      else await loadPixel();
+    } catch (e) { $('ovt').textContent = 'Не удалось загрузить: ' + e; return; }
+    ov.hidden = state.started; $('play').hidden = false;
+  }
+  state.mode = m; gl.hidden = m === 'px'; pxc.hidden = m !== 'px'; score();
+  if (m === 'hex') camera.position.set(state.hx * 0.75, 6.8, state.hz * 0.75 + 6.8);
+}
+document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+$('snd').addEventListener('click', e => { snd.toggle(); e.currentTarget.setAttribute('aria-pressed', snd.on); e.currentTarget.textContent = 'Звук: ' + (snd.on ? 'вкл' : 'выкл'); });
+$('st').addEventListener('click', e => { stats.on = !stats.on; $('stats').hidden = !stats.on; e.currentTarget.setAttribute('aria-pressed', stats.on); });
+$('fs').addEventListener('click', () => { try { document.fullscreenElement ? document.exitFullscreen() : stage.requestFullscreen(); } catch (e) { toast('Полный экран недоступен'); } });
+$('play').addEventListener('click', () => { snd.init(); if (snd.ctx && snd.ctx.state === 'suspended') snd.ctx.resume(); state.started = true; $('ov').hidden = true; stage.focus(); });
+
+window.DEMO = { state, W3, WH, PX, camera, renderer };            // console handle for debugging / tests
+
+// ---------------------------------------------------------------- boot: 3D assets load with the page (the chapter itself stays light)
+(async () => {
+  resize(); requestAnimationFrame(frame);
+  try {
+    assets = await fetch(M + 'assets.json').then(r => r.json());
+    const names = [...new Set(PROPS.map(p => p[0]))].concat('gnome'); let k = 0;
+    await loadModels(names, () => { $('pg').style.width = (++k / names.length * 100) + '%'; $('ovt').textContent = `Загружаю модели… ${k} из ${names.length}`; });
+    build3D(); score();
+    camera.position.set(state.x, 10, state.z + 10.5);
+    $('ovt').textContent = 'Все модели, плитки и спрайты сделаны ИИ и скриптами из этой главы.'; $('play').disabled = false;
+  } catch (e) { $('ovt').textContent = 'Не удалось загрузить модели: ' + e; }
+})();
+</script>
+</body>
+</html>
