@@ -186,15 +186,28 @@ a{color:var(--accent)}
 @media (max-width:760px){.chintro,.routes{grid-template-columns:minmax(0,1fr)}.route{grid-template-columns:84px minmax(0,1fr)}.route img{width:84px}
   .gloss>div{grid-template-columns:minmax(0,1fr)}.chmenu ol{position:fixed;left:16px;right:16px;top:56px;width:auto}}
 .cover-video{max-width:760px}
+/* live 3D viewer (ch-3d, <model-viewer>) */
+.m3d{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.m3d model-viewer{display:block;width:100%;height:auto;aspect-ratio:1/1;max-width:100%;background:var(--bg);border-radius:10px;--poster-color:transparent}
+.m3d-side{display:grid;gap:12px;align-content:start;min-width:0}
+.m3d-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.m3d-pick button{display:grid;gap:6px;justify-items:center;padding:6px;font-size:13px}
+.m3d-pick img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;background:var(--bg)}
+.m3d-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.m3d-l{font:500 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:4px}
+.m3d button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.m3d-stat{font:500 13px/1.4 var(--mono);font-variant-numeric:tabular-nums;margin:0}
+.m3d-note{margin:0;font-size:14px;color:var(--muted)}
+@media (max-width:760px){.m3d{grid-template-columns:minmax(0,1fr)}}
 </style>
 <style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
 
 <div class="wrap">
-<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть VIII · Справочник · глава 23 из 23</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-ref.html"><span class="cn">08</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">09</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html"><span class="cn">10</span>Скорость и качество</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">11</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">12</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">13</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">14</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">15</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">16</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">17</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · Справочник</li><li><a href="ch-eval.html"><span class="cn">18</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">19</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">20</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">21</span>Словарь</a></li><li><a href="ch-lab.html"><span class="cn">22</span>Серии экспериментов</a></li><li><a href="ch-agent.html" aria-current="page"><span class="cn">23</span>Для вашего агента</a></li></ol></details></nav>
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть IX · Справочник · глава 24 из 24</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-ref.html"><span class="cn">08</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">09</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html"><span class="cn">10</span>Скорость и качество</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">11</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">12</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">13</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">14</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">15</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">16</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">17</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · 3D для игр</li><li><a href="ch-3d.html"><span class="cn">18</span>ИИ для 3D-ассетов</a></li><li class="mp">Часть IX · Справочник</li><li><a href="ch-eval.html"><span class="cn">19</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">20</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">21</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">22</span>Словарь</a></li><li><a href="ch-lab.html"><span class="cn">23</span>Серии экспериментов</a></li><li><a href="ch-agent.html" aria-current="page"><span class="cn">24</span>Для вашего агента</a></li></ol></details></nav>
 <header>
-  <div class="eyebrow">Глава 23 · for AI agents · machine-readable</div>
+  <div class="eyebrow">Глава 24 · for AI agents · machine-readable</div>
   <h1>Для вашего агента</h1>
   <p class="lead">Written for AI agents, not people: everything an agent needs to reproduce this studio — exact files, settings, procedures, pitfalls.</p>
 </header>
@@ -204,14 +217,14 @@ a{color:var(--accent)}
   <h2 id="ag">Machine-readable guide</h2>
   <p class="prose">This section is written for AI agents, not people. Plain files: <a href="agent-guide.md">agent-guide.md</a> ·
   <a href="llms.txt">llms.txt</a> · <a href="llms-full.txt">llms-full.txt</a> (whole book as text) · <a href="book.json">book.json</a>
-  (chapter index) · every chapter as Markdown in <code>md/&lt;chapter&gt;.md</code>. Version 2026-10-26c.
+  (chapter index) · every chapter as Markdown in <code>md/&lt;chapter&gt;.md</code>. Version 2026-10-26d.
   The block below is the same markdown, unrendered, so it can be copied or parsed losslessly.</p>
-  <pre id="agent-guide" data-format="markdown" data-version="2026-10-26c"># AGENT GUIDE — ComfyUI photo &amp; video studio on a 16 GB GPU (Krea 2 · Qwen-Image 2.1 · FLUX.3 Klein · MiniMax H3 · LTX-2.5) + RunPod
+  <pre id="agent-guide" data-format="markdown" data-version="2026-10-26d"># AGENT GUIDE — ComfyUI photo &amp; video studio on a 16 GB GPU (Krea 2 · Qwen-Image 2.1 · FLUX.3 Klein · MiniMax H3 · LTX-2.5) + RunPod
 
 ```yaml
 doc: agent-guide
 audience: autonomous coding/ops agents driving ComfyUI and cloud GPUs (not humans)
-version: 2026-10-26c
+version: 2026-10-26d
 companion: &quot;Russian textbook for humans: llms.txt (map), book.json (chapter index), md/&lt;slug&gt;.md (each chapter), llms-full.txt (all chapters)&quot;
 evidence_tags: {MEASURED: &quot;run by us, numbers from our logs&quot;, SOURCE: &quot;official template / docs / community, not re-measured&quot;, RULE: &quot;derived decision rule&quot;}
 baseline_box: {gpu: &quot;RTX 5070 Ti 16 GB (Blackwell)&quot;, ram: &quot;62 GB&quot;, os: &quot;Windows 11&quot;, comfyui: &quot;0.42.x&quot;, torch: &quot;2.12+cu130&quot;, python: &quot;3.13&quot;}
@@ -456,6 +469,29 @@ HyperFrames (HeyGen, Apache-2.0) renders HTML compositions (GSAP timelines) to M
 - Music: ACE-Step 1.5 turbo on a rented RTX 4090 ≈ 4 s per 32 s track (`[Instrumental]`, set bpm); choose the in-point so the track&#x27;s own ending lands on the last frame. [MEASURED]
 - Grade: `media-treatment --analyze` per shot first; `night-lift` on dark shots (crushed blacks 37 % → 0 %); grading adds ≈ 25 % render time. [MEASURED]
 - Explainers: real data over decoration — one seed, one prompt, one variable; numbers on screen must come from measurements; one idea per scene, 4-10 s per scene, takeaway card at the end. [RULE]
+
+## 9b. 3D game assets (game-art G0–G2, 2026-10-26)
+```yaml
+image_to_3d_local: {template: 3d_pixal3d_trellis2_image_to_model, switch: &quot;PrimitiveBoolean true = TRELLIS.2, false = Pixal3D&quot;,
+  files: [diffusion_models/pixal3d_int8_convrot, diffusion_models/trellis_2_int8_convrot, vae/trellis_2_shape_vae_bf16, vae/trellis_2_texture_vae_bf16,
+          clip_vision/dino_v3_L_naf_fp32, geometry_estimation/moge_2_vitl_normal_fp16, background_removal/birefnet], repos: [Comfy-Org/Pixal3D, Comfy-Org/TRELLIS.2, Comfy-Org/MoGe, Comfy-Org/BiRefNet],
+  extra_model_paths: &quot;add geometry_estimation + background_removal keys&quot;, licence: {pixal3d: MIT, trellis2: MIT, hunyuan3d_2x: &quot;Tencent community licence, NOT valid in EU/UK/KR&quot;},
+  api_quirk: &quot;UI-&gt;API converters may drop socketless widgets: set Save3DAdvanced/Preview3DAdvanced viewport_state={} width=1024 height=1024, ImageCropToMask background=&#x27;#000000&#x27;&quot;,
+  measured_16gb: {pixal3d_s: [99, 190], trellis2_s: [106, 571], peak_vram_gb: [13.3, 15.1], ram_gb: &quot;&lt;=51&quot;, raw_out: &quot;700k tris, 4K PBR, 1000-2600 UV islands, 44-56 MB GLB, watertight&quot;},
+  verdict: &quot;Pixal3D default (follows the concept layout/colours); TRELLIS.2 re-interprets (symmetry, invented parts), fuller backs&quot;}
+concept_for_3d: &quot;Krea 2 Turbo 1024^2; whole object with margin, 3/4 view from slightly above (characters: front A-pose), plain flat light grey background, soft even shadowless light, no ground plane; stylised 2.5D style block + 1 subject line&quot;
+multi_view: {template: 3d_pixal3d_multi_views, slots: &quot;front = input camera; &#x27;left&#x27; = camera at the OBJECT&#x27;S LEFT side (+90 deg orbit); back; &#x27;right&#x27; (-90)&quot;, fov_deg: 20,
+  result: &quot;AI-drawn views (Klein, Qwen) scramble hard-surface meshes; exact mesh renders with correct slots = right shape but blotchy texture; helps only objects with a large hidden side (mushroom back)&quot;,
+  ram_gb: &quot;up to 60 of 62&quot;, qwen_note: &quot;Qwen-Image 2.1 + a reference copies the reference pose: to repaint a render, feed the render alone&quot;}
+game_budgets: {method: &quot;one graph, diffusion once, N tail branches: DecimateMesh(target_face_count) -&gt; MeshSmoothNormals -&gt; UnwrapMesh -&gt; BakeTextureFromVoxel(texture_size) + BakeNormalMapFromMesh + BakeAmbientOcclusion (high = RemeshMesh output) -&gt; ApplyTextureToMesh -&gt; Save3DAdvanced&quot;,
+  measured: {&quot;20k_2K&quot;: &quot;UV 429-478, 9.3-11.7 MB&quot;, &quot;5k_1K&quot;: &quot;UV 182-231, 2.8-3.5 MB&quot;, &quot;1.5k_1K&quot;: &quot;UV 64-89, 2.4-3.0 MB&quot;}, seconds_per_asset_incl_generation: [115, 332],
+  rule: &quot;props 5k+1K, close-up 20k+2K, far LOD 1.5k; painted curved surfaces need 2K even at 5k&quot;}
+web_and_engine: {compress: &quot;npx @gltf-transform/cli@4.5.1 webp in.glb out.glb --quality 88 (4-5x smaller)&quot;, draco_ktx2: &quot;decoders load from gstatic -&gt; blocked under strict CSP (claude.ai artifacts)&quot;,
+  viewer: &quot;&lt;model-viewer&gt; 4.3.1 (jsdelivr ES module), environment-image=neutral, camera-orbit &#x27;25deg 72deg auto&#x27;; set display:block;height:auto;aspect-ratio or the host default 150px height wins&quot;,
+  artifact_hosting: &quot;artifacts refuse .glb -&gt; serve as *.glb.wasm (byte-exact; GLTFLoader detects GLB by magic)&quot;, godot: &quot;4.7.2: --headless --path . --import, then --script check.gd lists tris + PBR maps&quot;}
+```
+- Raw AI meshes are split at UV seams in glTF; weld by distance before counting holes/parts. [MEASURED]
+- Sources&#x27; &quot;TRELLIS.2 needs &gt;= 24 GB&quot; refers to the 2025 release; the int8 ComfyUI build fits 16 GB. [MEASURED]
 
 ## 10. Russian ↔ English terms (to read the human chapters)
 кадр = still / frame · первый кадр = first frame (I2V) · ролик = clip · раскадровка = timed shot list · правка = edit · перенос по референсу = reference transfer · персонаж = persona / character · эталонное лицо = hero still · приметы = permanent marks (mole, scar) · утечка = leak / bleeding · сид = seed · шаги = steps · сила LoRA = LoRA strength · подпись = caption · датасет = dataset · замок (appearance/background lock) = lock line · дрейф = drift · кроп-лист = crop sheet · бок о бок = side-by-side · слепой A/B = blind A/B · локально = on the baseline box · в облаке / аренда = cloud_box (RunPod) · серия N = experiment series N · готово / пополняется / в работе = done / growing / in progress · ЗАМЕР / ИСТОЧНИК / ПРАВИЛО = MEASURED / SOURCE / RULE.

@@ -1,4 +1,4 @@
-# 22. Серии экспериментов
+# 23. Серии экспериментов
 
 > EN: Research programme: 18 experiment series (0–17 + 13B), run by an AI agent with a fixed protocol; status of each, where it runs (local, RunPod, API).
 

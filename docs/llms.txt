@@ -2,9 +2,10 @@
 
 > Measured recipes, theory and pitfalls for generating photos and videos with ComfyUI on a 16 GB consumer GPU
 > (RTX 5070 Ti, 62 GB RAM, Windows 11) plus rented cloud GPUs: Krea 2, Qwen-Image 2.1, FLUX.3 Klein, MiniMax H3,
-> LTX-2.5, editing and reference transfer, a fictional persona LoRA, HyperFrames editing. Human chapters are in
+> LTX-2.5, editing and reference transfer, a fictional persona LoRA, HyperFrames editing,
+> AI 3D game assets (Pixal3D / TRELLIS.2 image→mesh, game budgets, <model-viewer>). Human chapters are in
 > Russian; the agent guide is English. Facts carry evidence tags: [MEASURED] (run by the authors), [SOURCE]
-> (docs/community), [RULE] (derived decision). Version 2026-10-26c.
+> (docs/community), [RULE] (derived decision). Version 2026-10-26d.
 
 ## Start here (agents)
 - [agent-guide.md](agent-guide.md): English, dense — exact model files and settings, ComfyUI API driving, prompt templates, persona LoRA pipeline, evaluation metrics, RunPod procedure, editing rules, Windows pitfalls.
@@ -29,11 +30,12 @@
 - [15 Разбор креаторов](md/ch-creators.md): Creator breakdowns from Civitai generation metadata: Sleeps_In_Sunbeams — one-line prompts plus a stack of 3–6 style LoRAs on Krea 2 Turbo, 8–15 steps, cfg 1; file list with triggers; how to rebuild the stack.
 - [16 Повтор трендов](md/ch-trends.md): Trend replication loop, one page per Civitai post: metadata via the public API, missing files, rebuilt graph, closest copy + two own-subject renders in the same aesthetic; what replicates on the first render and what needs the creator's LoRA.
 - [17 Монтаж с ИИ](md/ch-editing.md): Editing with HyperFrames (HTML → MP4): 9:16 social cut on a music bar grid with ducking, seamless OBS loop + countdown, a data-driven explainer, ACE-Step music, loudness and grading measured; rules for an agent editor.
-- [18 Как мы оцениваем результат](md/ch-eval.md): Evaluation methods used in the book: Laplacian sharpness, ArcFace identity (thresholds 0.6 / 0.5 / 0.3), LAION aesthetic (matched a human ranking), CLIP (did not), OWLv2 + DINOv2 object match, centre PSNR, luma drift, corner diff, LUFS; crop sheets, blind A/B, hard test scenes.
-- [19 Workflow в ComfyUI](md/ch-workflows.md): Catalogue of the ready workflows (01 stills, 03 H3 video, 03c chain, 04 post, 09_edit_*, 10_ref_*): what each does, knobs and toggles, measured time; folder convention for agent-built vs human workflows.
-- [20 Грабли](md/ch-pitfalls.md): Pitfalls table: symptom → cause → fix (MOSS noise, sizes not multiple of 32, missing detector model, see-through fabric, two ComfyUI instances, background repaint after cropping, colour drift, finger melt).
-- [21 Словарь](md/ch-glossary.md): Glossary RU/EN: ~60 terms (attention, CFG, DiT, DOP, flow matching, LoRA, latent, quantisation, sampler, scheduler, shift, VAE…) with anchors and links to chapters.
-- [22 Серии экспериментов](md/ch-lab.md): Research programme: 18 experiment series (0–17 + 13B), run by an AI agent with a fixed protocol; status of each, where it runs (local, RunPod, API).
+- [18 ИИ для 3D-ассетов](md/ch-3d.md): AI 3D game assets on a 16 GB GPU: Krea 2 concept → Pixal3D (MIT, native ComfyUI) mesh with PBR in 99–190 s (TRELLIS.2 re-interprets, slower); 4-view input helps only with exact consistent views (template 'left' slot = camera at the object's left); native Decimate+UnwrapMesh+bake hits 20k/5k/1.5k budgets in one run (2.4–11.7 MB GLB, 0.4–2.5 MB with WebP); live <model-viewer> examples.
+- [19 Как мы оцениваем результат](md/ch-eval.md): Evaluation methods used in the book: Laplacian sharpness, ArcFace identity (thresholds 0.6 / 0.5 / 0.3), LAION aesthetic (matched a human ranking), CLIP (did not), OWLv2 + DINOv2 object match, centre PSNR, luma drift, corner diff, LUFS; crop sheets, blind A/B, hard test scenes.
+- [20 Workflow в ComfyUI](md/ch-workflows.md): Catalogue of the ready workflows (01 stills, 03 H3 video, 03c chain, 04 post, 09_edit_*, 10_ref_*): what each does, knobs and toggles, measured time; folder convention for agent-built vs human workflows.
+- [21 Грабли](md/ch-pitfalls.md): Pitfalls table: symptom → cause → fix (MOSS noise, sizes not multiple of 32, missing detector model, see-through fabric, two ComfyUI instances, background repaint after cropping, colour drift, finger melt).
+- [22 Словарь](md/ch-glossary.md): Glossary RU/EN: ~60 terms (attention, CFG, DiT, DOP, flow matching, LoRA, latent, quantisation, sampler, scheduler, shift, VAE…) with anchors and links to chapters.
+- [23 Серии экспериментов](md/ch-lab.md): Research programme: 18 experiment series (0–17 + 13B), run by an AI agent with a fixed protocol; status of each, where it runs (local, RunPod, API).
 
 ## Optional
 - [index.html](index.html): the textbook cover (HTML, Russian).

@@ -1,7 +1,7 @@
 {
  "title": "Студия ComfyUI",
  "language": "ru",
- "version": "2026-10-26c",
+ "version": "2026-10-26d",
  "site": "https://olexiy.github.io/comfy-h3-studio/",
  "agent_guide": "agent-guide.md",
  "evidence_tags": {
@@ -616,9 +616,57 @@
   },
   {
    "n": 18,
+   "slug": "ch-3d",
+   "title": "ИИ для 3D-ассетов",
+   "part": "Часть VIII · 3D для игр",
+   "status": "live",
+   "en": "AI 3D game assets on a 16 GB GPU: Krea 2 concept → Pixal3D (MIT, native ComfyUI) mesh with PBR in 99–190 s (TRELLIS.2 re-interprets, slower); 4-view input helps only with exact consistent views (template 'left' slot = camera at the object's left); native Decimate+UnwrapMesh+bake hits 20k/5k/1.5k budgets in one run (2.4–11.7 MB GLB, 0.4–2.5 MB with WebP); live <model-viewer> examples.",
+   "html": "ch-3d.html",
+   "md": "md/ch-3d.md",
+   "sections": [
+    {
+     "id": "g3d-shelf",
+     "title": "Витрина: три модели из одной картинки каждая"
+    },
+    {
+     "id": "g3d-asset",
+     "title": "Красивая картинка — ещё не игровой ассет ИСТОЧНИК"
+    },
+    {
+     "id": "g3d-tools",
+     "title": "Чем делать 3D в октябре 2026 ИСТОЧНИК"
+    },
+    {
+     "id": "g3d-g0",
+     "title": "Концепт → 3D-модель за 2–3 минуты ЗАМЕР"
+    },
+    {
+     "id": "g3d-g1",
+     "title": "Четыре ракурса: помогают только точные ЗАМЕР"
+    },
+    {
+     "id": "g3d-g2",
+     "title": "До игрового бюджета за один прогон ЗАМЕР"
+    },
+    {
+     "id": "g3d-web",
+     "title": "В браузер и в движок"
+    },
+    {
+     "id": "g3d-2d",
+     "title": "2D-ассеты: спрайты, интерфейс, эффекты ИСТОЧНИК"
+    },
+    {
+     "id": "g3d-next",
+     "title": "Что проверяем дальше"
+    }
+   ]
+  },
+  {
+   "n": 19,
    "slug": "ch-eval",
    "title": "Как мы оцениваем результат",
-   "part": "Часть VIII · Справочник",
+   "part": "Часть IX · Справочник",
    "status": "done",
    "en": "Evaluation methods used in the book: Laplacian sharpness, ArcFace identity (thresholds 0.6 / 0.5 / 0.3), LAION aesthetic (matched a human ranking), CLIP (did not), OWLv2 + DINOv2 object match, centre PSNR, luma drift, corner diff, LUFS; crop sheets, blind A/B, hard test scenes.",
    "html": "ch-eval.html",
@@ -647,10 +695,10 @@
    ]
   },
   {
-   "n": 19,
+   "n": 20,
    "slug": "ch-workflows",
    "title": "Workflow в ComfyUI",
-   "part": "Часть VIII · Справочник",
+   "part": "Часть IX · Справочник",
    "status": "live",
    "en": "Catalogue of the ready workflows (01 stills, 03 H3 video, 03c chain, 04 post, 09_edit_*, 10_ref_*): what each does, knobs and toggles, measured time; folder convention for agent-built vs human workflows.",
    "html": "ch-workflows.html",
@@ -663,10 +711,10 @@
    ]
   },
   {
-   "n": 20,
+   "n": 21,
    "slug": "ch-pitfalls",
    "title": "Грабли",
-   "part": "Часть VIII · Справочник",
+   "part": "Часть IX · Справочник",
    "status": "live",
    "en": "Pitfalls table: symptom → cause → fix (MOSS noise, sizes not multiple of 32, missing detector model, see-through fabric, two ComfyUI instances, background repaint after cropping, colour drift, finger melt).",
    "html": "ch-pitfalls.html",
@@ -679,10 +727,10 @@
    ]
   },
   {
-   "n": 21,
+   "n": 22,
    "slug": "ch-glossary",
    "title": "Словарь",
-   "part": "Часть VIII · Справочник",
+   "part": "Часть IX · Справочник",
    "status": "live",
    "en": "Glossary RU/EN: ~60 terms (attention, CFG, DiT, DOP, flow matching, LoRA, latent, quantisation, sampler, scheduler, shift, VAE…) with anchors and links to chapters.",
    "html": "ch-glossary.html",
@@ -695,10 +743,10 @@
    ]
   },
   {
-   "n": 22,
+   "n": 23,
    "slug": "ch-lab",
    "title": "Серии экспериментов",
-   "part": "Часть VIII · Справочник",
+   "part": "Часть IX · Справочник",
    "status": "live",
    "en": "Research programme: 18 experiment series (0–17 + 13B), run by an AI agent with a fixed protocol; status of each, where it runs (local, RunPod, API).",
    "html": "ch-lab.html",
@@ -711,10 +759,10 @@
    ]
   },
   {
-   "n": 23,
+   "n": 24,
    "slug": "ch-agent",
    "title": "Для вашего агента",
-   "part": "Часть VIII · Справочник",
+   "part": "Часть IX · Справочник",
    "status": "live",
    "en": "The agent guide itself (English).",
    "html": "ch-agent.html",

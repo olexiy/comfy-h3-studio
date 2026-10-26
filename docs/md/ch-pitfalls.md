@@ -1,4 +1,4 @@
-# 20. Грабли
+# 21. Грабли
 
 > EN: Pitfalls table: symptom → cause → fix (MOSS noise, sizes not multiple of 32, missing detector model, see-through fabric, two ComfyUI instances, background repaint after cropping, colour drift, finger melt).
 

@@ -1,4 +1,4 @@
-# 21. Словарь
+# 22. Словарь
 
 > EN: Glossary RU/EN: ~60 terms (attention, CFG, DiT, DOP, flow matching, LoRA, latent, quantisation, sampler, scheduler, shift, VAE…) with anchors and links to chapters.
 
