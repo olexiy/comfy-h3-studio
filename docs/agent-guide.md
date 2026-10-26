@@ -3,7 +3,7 @@
 ```yaml
 doc: agent-guide
 audience: autonomous coding/ops agents driving ComfyUI and cloud GPUs (not humans)
-version: 2026-10-26d
+version: 2026-10-26e
 companion: "Russian textbook for humans: llms.txt (map), book.json (chapter index), md/<slug>.md (each chapter), llms-full.txt (all chapters)"
 evidence_tags: {MEASURED: "run by us, numbers from our logs", SOURCE: "official template / docs / community, not re-measured", RULE: "derived decision rule"}
 baseline_box: {gpu: "RTX 5070 Ti 16 GB (Blackwell)", ram: "62 GB", os: "Windows 11", comfyui: "0.42.x", torch: "2.12+cu130", python: "3.13"}
@@ -249,7 +249,7 @@ HyperFrames (HeyGen, Apache-2.0) renders HTML compositions (GSAP timelines) to M
 - Grade: `media-treatment --analyze` per shot first; `night-lift` on dark shots (crushed blacks 37 % → 0 %); grading adds ≈ 25 % render time. [MEASURED]
 - Explainers: real data over decoration — one seed, one prompt, one variable; numbers on screen must come from measurements; one idea per scene, 4-10 s per scene, takeaway card at the end. [RULE]
 
-## 9b. 3D game assets (game-art G0–G2, 2026-10-26)
+## 9b. 3D game assets (game-art G0–G4, G11, G12, G14 demo, 2026-10-26)
 ```yaml
 image_to_3d_local: {template: 3d_pixal3d_trellis2_image_to_model, switch: "PrimitiveBoolean true = TRELLIS.2, false = Pixal3D",
   files: [diffusion_models/pixal3d_int8_convrot, diffusion_models/trellis_2_int8_convrot, vae/trellis_2_shape_vae_bf16, vae/trellis_2_texture_vae_bf16,
@@ -268,6 +268,23 @@ game_budgets: {method: "one graph, diffusion once, N tail branches: DecimateMesh
 web_and_engine: {compress: "npx @gltf-transform/cli@4.5.1 webp in.glb out.glb --quality 88 (4-5x smaller)", draco_ktx2: "decoders load from gstatic -> blocked under strict CSP (claude.ai artifacts)",
   viewer: "<model-viewer> 4.3.1 (jsdelivr ES module), environment-image=neutral, camera-orbit '25deg 72deg auto'; set display:block;height:auto;aspect-ratio or the host default 150px height wins",
   artifact_hosting: "artifacts refuse .glb -> serve as *.glb.wasm (byte-exact; GLTFLoader detects GLB by magic)", godot: "4.7.2: --headless --path . --import, then --script check.gd lists tris + PBR maps"}
+style_set: {method: "one style block + one subject line per prop, same seed, Krea 2 (6-11 s); Pixal3D + 20k/5k tail 99-528 s per prop", result: "8 props read as one game",
+  palette_rule: "a palette list in the shared block repaints every material (rainbow stump) -> 'natural materials keep natural colours; accents in teal / honey / coral only'"}
+tilt_fix: {problem: "Pixal3D builds in the concept camera frame: '3/4 view from slightly above' concepts -> mesh tilted 15-37 deg about X (G11 tiles 28-34, G3 props 15-36, turret 30)",
+  tool: "claude-tools/tools/ga_level.py (Blender): search tilt about X in +-50 deg, keep the one with most vertices in the bottom 2 % of height -> <name>_up.glb",
+  skip: "front-view (gnome) and multi-view (mushroom) meshes are upright; the search gives nonsense there", check: "side render before any scene or sprite use"}
+sprites: {turntable: "tools/g4_turntable.py: ortho camera at 35 deg, light fixed, 32 frames x 256 px in 13 s", atlas: "tools/ga_atlas.py <frames> <prefix> 8 --pixel 72 --colors 24 [--sat 1.35 --contrast 1.12]",
+  pixel_steps: "BOX downscale -> saturation/contrast lift (contrast pivot = mean grey of opaque pixels) -> ONE palette from opaque pixels of all frames -> binary alpha -> 1 px dark outline",
+  game_scale: "for a game render every sprite at one px-per-metre (demo: 28) instead of filling each frame; one shared palette for all sprites (demo: 22 sprites, 32 colours)",
+  sizes: "48 px enough for barrel/chest/well, lantern ~64, gnome readable at 48 but stiff without a walk cycle",
+  blender_pitfalls: ["read_factory_settings loses relative output paths -> abspath all args", "re-parent to a pivot only after view_layer.update(), else children shift by the pivot location"]}
+hex_tiles: {a_whole_ai_tiles: "Krea 'one thick hexagon slab' x6 terrains -> Pixal3D -> level -> fit flat-top hexagon (best rotation+scale on the top-view outline): mean radial error 2.2-4.6 % (circle 3.4-5.9 %); rounded corners leave gaps; slab thickness varies",
+  b_exact_kit: "Blender 6-gon prism (first vertex on +Y: rotate 30 deg for flat-top, no bevel) + AI top texture + earth sides + Pixal3D props: seamless but flatter; props bring their own grass base",
+  rules: ["turn copies by k*60 deg", "measure each cell's floor by downward rays (ring at 0.72 R + centre, median)"], tool: "tools/g11_board.py"}
+browser_demo: {page: "demo-gnome.html (book page, three@0.160.0 from jsdelivr via importmap + GLTFLoader)", modes: "3D meadow (28 props, 30 draw calls, 120k tris, 120 fps) / 61-tile hex board (67 calls, 305k tris) / 2D canvas pixel mode",
+  assets: "tools/g14_assets.py (normalise height, centre, base at 0, hex fit) -> tools/g14_web.sh (gltf-transform resize 512 + webp, output must end in .glb then rename to .glb.wasm) -> ~0.3 MB per 5k model, 6.7 MB total",
+  pixel: "tools/g14_sprites.py (fixed ppm renders) -> tools/g14_pixel.py (shared palette atlas + ground tiles: texture brightness mapped to a 4-colour ramp)",
+  colliders: "circle per prop, radius = 80th percentile of footprint distance", sound: "WebAudio synthesis only (noise bursts per surface, chirps, square-wave chiptune in pixel mode); start after a click"}
 ```
 - Raw AI meshes are split at UV seams in glTF; weld by distance before counting holes/parts. [MEASURED]
 - Sources' "TRELLIS.2 needs >= 24 GB" refers to the 2025 release; the int8 ComfyUI build fits 16 GB. [MEASURED]

@@ -199,6 +199,16 @@ a{color:var(--accent)}
 .m3d-stat{font:500 13px/1.4 var(--mono);font-variant-numeric:tabular-nums;margin:0}
 .m3d-note{margin:0;font-size:14px;color:var(--muted)}
 @media (max-width:760px){.m3d{grid-template-columns:minmax(0,1fr)}}
+/* ch-3d demo card: poster + Play link; the game page loads nothing until opened */
+.democard{display:grid;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit}
+.democard img{width:100%;height:auto;display:block}
+.democard .dc{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;padding:14px 16px}
+.democard .dc span{color:var(--muted);font-size:14px;max-width:62ch}
+.democard .playbtn{font:600 16px var(--body);background:var(--accent);color:#fff;border-radius:999px;padding:10px 26px;white-space:nowrap}
+.democard:hover .playbtn,.democard:focus-visible .playbtn{filter:brightness(1.08)}
+.pxspin{image-rendering:pixelated;max-width:288px;width:100%;border-radius:8px}
+.pxduo{display:grid;gap:14px;grid-template-columns:minmax(0,2fr) minmax(0,1fr);align-items:start}
+@media (max-width:700px){.pxduo{grid-template-columns:1fr}}
 </style>
 <style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
 </head>
@@ -217,14 +227,14 @@ a{color:var(--accent)}
   <h2 id="ag">Machine-readable guide</h2>
   <p class="prose">This section is written for AI agents, not people. Plain files: <a href="agent-guide.md">agent-guide.md</a> ·
   <a href="llms.txt">llms.txt</a> · <a href="llms-full.txt">llms-full.txt</a> (whole book as text) · <a href="book.json">book.json</a>
-  (chapter index) · every chapter as Markdown in <code>md/&lt;chapter&gt;.md</code>. Version 2026-10-26d.
+  (chapter index) · every chapter as Markdown in <code>md/&lt;chapter&gt;.md</code>. Version 2026-10-26e.
   The block below is the same markdown, unrendered, so it can be copied or parsed losslessly.</p>
-  <pre id="agent-guide" data-format="markdown" data-version="2026-10-26d"># AGENT GUIDE — ComfyUI photo &amp; video studio on a 16 GB GPU (Krea 2 · Qwen-Image 2.1 · FLUX.3 Klein · MiniMax H3 · LTX-2.5) + RunPod
+  <pre id="agent-guide" data-format="markdown" data-version="2026-10-26e"># AGENT GUIDE — ComfyUI photo &amp; video studio on a 16 GB GPU (Krea 2 · Qwen-Image 2.1 · FLUX.3 Klein · MiniMax H3 · LTX-2.5) + RunPod
 
 ```yaml
 doc: agent-guide
 audience: autonomous coding/ops agents driving ComfyUI and cloud GPUs (not humans)
-version: 2026-10-26d
+version: 2026-10-26e
 companion: &quot;Russian textbook for humans: llms.txt (map), book.json (chapter index), md/&lt;slug&gt;.md (each chapter), llms-full.txt (all chapters)&quot;
 evidence_tags: {MEASURED: &quot;run by us, numbers from our logs&quot;, SOURCE: &quot;official template / docs / community, not re-measured&quot;, RULE: &quot;derived decision rule&quot;}
 baseline_box: {gpu: &quot;RTX 5070 Ti 16 GB (Blackwell)&quot;, ram: &quot;62 GB&quot;, os: &quot;Windows 11&quot;, comfyui: &quot;0.42.x&quot;, torch: &quot;2.12+cu130&quot;, python: &quot;3.13&quot;}
@@ -470,7 +480,7 @@ HyperFrames (HeyGen, Apache-2.0) renders HTML compositions (GSAP timelines) to M
 - Grade: `media-treatment --analyze` per shot first; `night-lift` on dark shots (crushed blacks 37 % → 0 %); grading adds ≈ 25 % render time. [MEASURED]
 - Explainers: real data over decoration — one seed, one prompt, one variable; numbers on screen must come from measurements; one idea per scene, 4-10 s per scene, takeaway card at the end. [RULE]
 
-## 9b. 3D game assets (game-art G0–G2, 2026-10-26)
+## 9b. 3D game assets (game-art G0–G4, G11, G12, G14 demo, 2026-10-26)
 ```yaml
 image_to_3d_local: {template: 3d_pixal3d_trellis2_image_to_model, switch: &quot;PrimitiveBoolean true = TRELLIS.2, false = Pixal3D&quot;,
   files: [diffusion_models/pixal3d_int8_convrot, diffusion_models/trellis_2_int8_convrot, vae/trellis_2_shape_vae_bf16, vae/trellis_2_texture_vae_bf16,
@@ -489,6 +499,23 @@ game_budgets: {method: &quot;one graph, diffusion once, N tail branches: Decimat
 web_and_engine: {compress: &quot;npx @gltf-transform/cli@4.5.1 webp in.glb out.glb --quality 88 (4-5x smaller)&quot;, draco_ktx2: &quot;decoders load from gstatic -&gt; blocked under strict CSP (claude.ai artifacts)&quot;,
   viewer: &quot;&lt;model-viewer&gt; 4.3.1 (jsdelivr ES module), environment-image=neutral, camera-orbit &#x27;25deg 72deg auto&#x27;; set display:block;height:auto;aspect-ratio or the host default 150px height wins&quot;,
   artifact_hosting: &quot;artifacts refuse .glb -&gt; serve as *.glb.wasm (byte-exact; GLTFLoader detects GLB by magic)&quot;, godot: &quot;4.7.2: --headless --path . --import, then --script check.gd lists tris + PBR maps&quot;}
+style_set: {method: &quot;one style block + one subject line per prop, same seed, Krea 2 (6-11 s); Pixal3D + 20k/5k tail 99-528 s per prop&quot;, result: &quot;8 props read as one game&quot;,
+  palette_rule: &quot;a palette list in the shared block repaints every material (rainbow stump) -&gt; &#x27;natural materials keep natural colours; accents in teal / honey / coral only&#x27;&quot;}
+tilt_fix: {problem: &quot;Pixal3D builds in the concept camera frame: &#x27;3/4 view from slightly above&#x27; concepts -&gt; mesh tilted 15-37 deg about X (G11 tiles 28-34, G3 props 15-36, turret 30)&quot;,
+  tool: &quot;claude-tools/tools/ga_level.py (Blender): search tilt about X in +-50 deg, keep the one with most vertices in the bottom 2 % of height -&gt; &lt;name&gt;_up.glb&quot;,
+  skip: &quot;front-view (gnome) and multi-view (mushroom) meshes are upright; the search gives nonsense there&quot;, check: &quot;side render before any scene or sprite use&quot;}
+sprites: {turntable: &quot;tools/g4_turntable.py: ortho camera at 35 deg, light fixed, 32 frames x 256 px in 13 s&quot;, atlas: &quot;tools/ga_atlas.py &lt;frames&gt; &lt;prefix&gt; 8 --pixel 72 --colors 24 [--sat 1.35 --contrast 1.12]&quot;,
+  pixel_steps: &quot;BOX downscale -&gt; saturation/contrast lift (contrast pivot = mean grey of opaque pixels) -&gt; ONE palette from opaque pixels of all frames -&gt; binary alpha -&gt; 1 px dark outline&quot;,
+  game_scale: &quot;for a game render every sprite at one px-per-metre (demo: 28) instead of filling each frame; one shared palette for all sprites (demo: 22 sprites, 32 colours)&quot;,
+  sizes: &quot;48 px enough for barrel/chest/well, lantern ~64, gnome readable at 48 but stiff without a walk cycle&quot;,
+  blender_pitfalls: [&quot;read_factory_settings loses relative output paths -&gt; abspath all args&quot;, &quot;re-parent to a pivot only after view_layer.update(), else children shift by the pivot location&quot;]}
+hex_tiles: {a_whole_ai_tiles: &quot;Krea &#x27;one thick hexagon slab&#x27; x6 terrains -&gt; Pixal3D -&gt; level -&gt; fit flat-top hexagon (best rotation+scale on the top-view outline): mean radial error 2.2-4.6 % (circle 3.4-5.9 %); rounded corners leave gaps; slab thickness varies&quot;,
+  b_exact_kit: &quot;Blender 6-gon prism (first vertex on +Y: rotate 30 deg for flat-top, no bevel) + AI top texture + earth sides + Pixal3D props: seamless but flatter; props bring their own grass base&quot;,
+  rules: [&quot;turn copies by k*60 deg&quot;, &quot;measure each cell&#x27;s floor by downward rays (ring at 0.72 R + centre, median)&quot;], tool: &quot;tools/g11_board.py&quot;}
+browser_demo: {page: &quot;demo-gnome.html (book page, three@0.160.0 from jsdelivr via importmap + GLTFLoader)&quot;, modes: &quot;3D meadow (28 props, 30 draw calls, 120k tris, 120 fps) / 61-tile hex board (67 calls, 305k tris) / 2D canvas pixel mode&quot;,
+  assets: &quot;tools/g14_assets.py (normalise height, centre, base at 0, hex fit) -&gt; tools/g14_web.sh (gltf-transform resize 512 + webp, output must end in .glb then rename to .glb.wasm) -&gt; ~0.3 MB per 5k model, 6.7 MB total&quot;,
+  pixel: &quot;tools/g14_sprites.py (fixed ppm renders) -&gt; tools/g14_pixel.py (shared palette atlas + ground tiles: texture brightness mapped to a 4-colour ramp)&quot;,
+  colliders: &quot;circle per prop, radius = 80th percentile of footprint distance&quot;, sound: &quot;WebAudio synthesis only (noise bursts per surface, chirps, square-wave chiptune in pixel mode); start after a click&quot;}
 ```
 - Raw AI meshes are split at UV seams in glTF; weld by distance before counting holes/parts. [MEASURED]
 - Sources&#x27; &quot;TRELLIS.2 needs &gt;= 24 GB&quot; refers to the 2025 release; the int8 ComfyUI build fits 16 GB. [MEASURED]

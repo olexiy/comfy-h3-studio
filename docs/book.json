@@ -1,7 +1,7 @@
 {
  "title": "Студия ComfyUI",
  "language": "ru",
- "version": "2026-10-26d",
+ "version": "2026-10-26e",
  "site": "https://olexiy.github.io/comfy-h3-studio/",
  "agent_guide": "agent-guide.md",
  "evidence_tags": {
@@ -620,13 +620,17 @@
    "title": "ИИ для 3D-ассетов",
    "part": "Часть VIII · 3D для игр",
    "status": "live",
-   "en": "AI 3D game assets on a 16 GB GPU: Krea 2 concept → Pixal3D (MIT, native ComfyUI) mesh with PBR in 99–190 s (TRELLIS.2 re-interprets, slower); 4-view input helps only with exact consistent views (template 'left' slot = camera at the object's left); native Decimate+UnwrapMesh+bake hits 20k/5k/1.5k budgets in one run (2.4–11.7 MB GLB, 0.4–2.5 MB with WebP); live <model-viewer> examples.",
+   "en": "AI game assets on a 16 GB GPU: Krea 2 concept → Pixal3D (MIT, native ComfyUI) mesh with PBR in 99–190 s; native Decimate+UnwrapMesh+bake → 20k/5k/1.5k in one run; one style block → 8-prop set that reads as one game (give palette as accents only); Pixal3D meshes from 3/4-view concepts are tilted 15–37° about X → level them (ga_level.py); 32-direction sprite atlases and pixel art from Blender turntables (one shared palette, one px-per-metre scale); hex tiles: whole AI tiles fit a hexagon within 2–5 %, exact prism kit is flatter; browser demo (Three.js + 2D canvas): 3D meadow 30 draw calls / 120k tris, 61-tile hex board, pixel mode, WebAudio sounds.",
    "html": "ch-3d.html",
    "md": "md/ch-3d.md",
    "sections": [
     {
      "id": "g3d-shelf",
      "title": "Витрина: три модели из одной картинки каждая"
+    },
+    {
+     "id": "demo",
+     "title": "Играть: гном на поляне ЗАМЕР"
     },
     {
      "id": "g3d-asset",
@@ -647,6 +651,22 @@
     {
      "id": "g3d-g2",
      "title": "До игрового бюджета за один прогон ЗАМЕР"
+    },
+    {
+     "id": "g3d-g3",
+     "title": "Восемь предметов в одном стиле ЗАМЕР"
+    },
+    {
+     "id": "g3d-tilt",
+     "title": "Модель стоит криво: выровняйте её ЗАМЕР"
+    },
+    {
+     "id": "g3d-sprites",
+     "title": "Спрайты на 32 направления и пиксель-арт ЗАМЕР"
+    },
+    {
+     "id": "g3d-hex",
+     "title": "Гексагональные плитки: целые от ИИ или точный набор ЗАМЕР"
     },
     {
      "id": "g3d-web",
