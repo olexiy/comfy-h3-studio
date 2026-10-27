@@ -1,4 +1,4 @@
-# 10. Скорость и качество
+# 11. Скорость и качество
 
 > EN: H3 speed vs quality: SageAttention (−41 %, same output), rejected 4-step turbo recipe (looks fine on calm 5 s, melts hands on hard 9 s), RAM budget, quality recipe = no turbo, 30 steps, res_multistep, shift 12; SeedVR2 and FILM for post.
 

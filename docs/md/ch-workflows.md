@@ -1,6 +1,6 @@
-# 20. Workflow в ComfyUI
+# 23. Workflow в ComfyUI
 
-> EN: Catalogue of the ready workflows (01 stills, 03 H3 video, 03c chain, 04 post, 09_edit_*, 10_ref_*): what each does, knobs and toggles, measured time; folder convention for agent-built vs human workflows.
+> EN: Catalogue of the ready workflows (01 stills, 03 H3 video, 03c chain, 03R persona video from 3 reference views, 08 talking persona with a locked voice track, 04 post, 09_edit_*, 10_ref_*): what each does, knobs and toggles, measured time; folder convention for agent-built vs human workflows.
 
 Каждый workflow собран одинаково: заметка-инструкция, загрузка картинки, одна нода с ручками и сохранение. Технические детали спрятаны внутри подграфа.
 
@@ -57,6 +57,26 @@ ComfyUI Desktop → Workflows. Папки разделены по владель
 - Те же поля и тогглы, что у 03; результат можно подавать снова
 
 ≈ 233 с за +5 с
+
+03R_video_h3_ref.json
+
+### Видео персонажа по трём видам лица
+
+- H3 FL2VA + стандартная нода референсов, без первого кадра
+
+- Тогглы 2-го и 3-го вида; 30 шагов, shift 12
+
+759 с за 9,4 с
+
+08_video_talking.json
+
+### Персонаж говорит заданным голосом
+
+- 03R + трек в `ref_audios` и якорь звука в кадре 0
+
+- Звук на выходе = поданный трек ([глава «Говорящий персонаж»](ch-talk.html))
+
+≈ 6 мин за 5 с (RTX 5090)
 
 03L_video_ltx25_i2v.json
 
@@ -132,7 +152,7 @@ ComfyUI Desktop → Workflows. Папки разделены по владель
 
 - Лучшее сходство, но копирует позу
 
-5–7 с (PRO 6000)
+9,7 с
 
 10_ref_klein.json
 
@@ -140,7 +160,7 @@ ComfyUI Desktop → Workflows. Папки разделены по владель
 
 - FLUX.3 Klein, <ref_image_0>, тоггл 2nd
 
-6–13 с (PRO 6000)
+10,2 с
 
 10_ref_style_krea.json
 
@@ -148,7 +168,7 @@ ComfyUI Desktop → Workflows. Папки разделены по владель
 
 - Официальная style-LoRA Krea 2, поле силы стиля
 
-17 с (PRO 6000)
+18,9 с
 
 10_ref_product_krea.json
 
@@ -156,6 +176,6 @@ ComfyUI Desktop → Workflows. Папки разделены по владель
 
 - Krea General Edit V2, ref boost 2
 
-11 с (PRO 6000)
+26,8 с
 
 Все workflow в одном стиле: на холсте картинка или видео на входе, одна нода с полями и тогглами, сохранение. Техника спрятана внутри субграфа (двойной клик по заголовку). Убраны как дубли или неудачные: неоптимизированный 01, MOSS (02), первые версии 03 и 05, 03b (длина теперь поле в 03), отдельный 05 (теперь тоггл в 03). Старые версии лежат в архиве.

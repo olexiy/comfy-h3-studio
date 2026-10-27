@@ -1,4 +1,4 @@
-# 11. Сравнение моделей
+# 14. Сравнение моделей
 
 > EN: Model scout on identical prompts: Krea 2, FLUX.3 Klein, Qwen-Image 2.1, Z-Image, MOSS, Anima, SDXL Juggernaut — strengths per task; render at native 2 MP; physics (hands using tools) only by eye; LTX-2.5 as the fast video draft path before H3.
 

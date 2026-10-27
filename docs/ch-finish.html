@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Финиш против ИИ-вида · Студия ComfyUI</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="alternate" type="text/markdown" href="md/ch-finish.md" title="Markdown для ИИ-агентов">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: textbook — one reading column, wide media strips, data tables in mono. Copper accent = the test persona's hair. */
+:root{
+  --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
+  --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Onest", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 80px;display:grid;gap:56px}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(20px,3vw,26px);font-weight:500;margin-bottom:14px}
+h3{font-size:16px;font-weight:500}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.lead{font-size:18px;color:var(--muted);max-width:62ch;margin-top:14px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+section{display:grid;gap:18px;min-width:0}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.step .n{font:500 12px var(--mono);color:var(--accent)}
+.step .t{font:500 26px/1 var(--display)}
+.step .t small{font:400 13px var(--body);color:var(--muted)}
+.total{font:500 14px var(--mono);color:var(--muted)}
+.total b{color:var(--fg)}
+/* media */
+.strip{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+figure{margin:0;display:grid;gap:8px;min-width:0}
+figure img,figure video{width:100%;max-width:100%;height:auto;border-radius:8px;background:#000;display:block}
+figcaption{font-size:13px;color:var(--muted)}
+figcaption b{color:var(--fg);font-weight:600}
+.wide img{border-radius:8px}
+.tag{display:inline-block;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-right:6px;vertical-align:1px}
+.tag.good{color:var(--good)}.tag.warn{color:var(--warn)}.tag.bad{color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);white-space:nowrap}
+tr.win td{background:var(--accent-soft)}
+/* workflows */
+.wf{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .file{font:500 13px var(--mono);color:var(--accent);word-break:break-all}
+.card ul{margin:0;padding-left:18px;font-size:14px}
+.card .time{font:500 13px var(--mono);color:var(--muted)}
+.rules{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.rules li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.rules b{font-weight:600}
+pre{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font:13px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{font:500 13px var(--body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible,video:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.paths td:first-child{white-space:nowrap}
+@media (max-width:760px){.pipe,.strip,.wf{grid-template-columns:minmax(0,1fr)}}
+
+/* book navigation */
+.bookbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between;
+  font:500 13px var(--mono);border-bottom:1px solid var(--line);padding-bottom:12px}
+.bookbar a{text-decoration:none}
+.bookbar .where{color:var(--muted)}
+.pager{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.pager a{display:grid;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--fg)}
+.pager a:hover{border-color:var(--accent)}
+.pager .dir{font:500 12px var(--mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.pager .next{text-align:right;grid-column:2}
+/* contents */
+.toc{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.toc li{border-bottom:1px solid var(--line)}
+.toc a{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;gap:4px 14px;align-items:baseline;padding:14px 4px;text-decoration:none;color:var(--fg)}
+.toc a:hover .ct{color:var(--accent)}
+.toc .cn{font:500 13px var(--mono);color:var(--accent)}
+.toc .ct{font:500 18px/1.25 var(--display)}
+.toc .cd{grid-column:2;color:var(--muted);font-size:14px}
+.toc .st{grid-row:1;grid-column:3}
+.news{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.news li{display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:12px}
+.news time{font:500 13px var(--mono);color:var(--muted)}
+@media (max-width:760px){.toc a{grid-template-columns:2.4em minmax(0,1fr)}.toc .st{grid-row:auto;grid-column:2}
+  .pager{grid-template-columns:minmax(0,1fr)}.pager .next{grid-column:1}.news li{grid-template-columns:minmax(0,1fr);gap:0}}
+/* trend replications (chapter ch-trends + trend-<id>.html pages, built by build_book.py) */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tcard{display:grid;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--fg)}
+.tcard:hover{border-color:var(--accent)}
+.tcard .pair{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.tcard img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.tcard .ci{display:grid;gap:4px;padding:10px 12px}
+.tcard .cm{font:500 12px var(--mono);color:var(--muted)}
+.tr-steps{counter-reset:st;display:grid;gap:28px}
+.tr-steps>section{display:grid;gap:12px}
+.tr-steps>section>h2::before{counter-increment:st;content:counter(st) " · ";color:var(--accent)}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.duo figure{margin:0;display:grid;gap:6px}
+.duo img{width:100%;height:auto;border-radius:8px;display:block}
+.duo figcaption{font-size:13px;color:var(--muted)}
+/* public build: link instead of a creator's original */
+.olink{display:flex;align-items:center;justify-content:center;text-align:center;aspect-ratio:3/4;background:var(--panel,rgba(127,127,127,.08));color:var(--muted);font:500 13px/1.4 var(--mono);text-decoration:none}
+.olink.big{aspect-ratio:auto;min-height:180px;padding:24px;border:1px dashed var(--line);border-radius:10px;color:var(--accent);font-size:15px}
+.olink small{color:var(--muted);font-size:12px}
+/* contents parts + "start here" highlights (cover) */
+.toc li.part{border-bottom:0;padding:26px 4px 6px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hl{display:grid;gap:6px;align-content:start;text-decoration:none;color:var(--fg)}
+.hl img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
+.hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
+@media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+/* textbook navigation (2026-10-26): chapter menu in the bar, «главное за минуту», «на этой странице», reading routes */
+.chmenu{position:relative;font:500 13px var(--mono)}
+.chmenu summary{cursor:pointer;color:var(--accent);list-style:none}
+.chmenu summary::-webkit-details-marker{display:none}
+.chmenu summary::after{content:" ▾"}
+.chmenu[open] summary::after{content:" ▴"}
+.chmenu ol{position:absolute;right:0;top:calc(100% + 8px);z-index:5;width:min(360px,calc(100vw - 32px));max-height:70vh;overflow:auto;
+  margin:0;padding:8px 0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.chmenu li a{display:flex;gap:10px;padding:6px 14px;text-decoration:none;color:var(--fg);font:400 14px/1.35 var(--body)}
+.chmenu li a:hover{background:var(--accent-soft)}
+.chmenu li a[aria-current]{color:var(--accent);font-weight:600}
+.chmenu .cn{font:500 12px var(--mono);color:var(--muted);min-width:1.8em}
+.chmenu li.mp{padding:10px 14px 4px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chintro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}
+.keybox{background:var(--accent-soft);border-radius:10px;padding:14px 18px}
+.keybox b,.onpage b{display:block;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.keybox ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.onpage{border:1px solid var(--line);border-radius:10px;padding:14px 18px;background:var(--panel)}
+.onpage ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.onpage a{text-decoration:none}.onpage a:hover{text-decoration:underline}
+.mdlink{font:500 12px var(--mono);color:var(--muted);margin:0}
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.route{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;align-items:start}
+.route img{width:120px;aspect-ratio:4/5;object-fit:cover;border-radius:8px}
+.route .rt{display:grid;gap:4px}
+.route .rt b{font:500 17px/1.2 var(--display)}
+.route .rt span{color:var(--muted);font-size:14px;line-height:1.4}
+.route ol{margin:6px 0 0;padding-left:20px;font-size:14px;display:grid;gap:2px}
+.agentbox{border:1px dashed var(--accent);border-radius:10px;padding:14px 18px;max-width:80ch}
+/* theory: diagrams, callouts, glossary, evidence tags */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:560px}
+.diagram svg text{font-family:var(--body);fill:var(--fg)}
+.diagram svg .muted{fill:var(--muted)}
+.diagram svg .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.diagram svg .hot{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.diagram svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+.diagram svg .ahead{fill:var(--muted)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;padding:12px 16px;max-width:72ch}
+.callout b:first-child{color:var(--accent)}
+.ev{display:inline-block;font:600 10px/1 var(--mono);letter-spacing:.04em;padding:3px 6px;border-radius:4px;vertical-align:2px;border:1px solid currentColor}
+.ev.m{color:var(--good)}.ev.s{color:var(--warn)}.ev.r{color:var(--accent)}
+.gloss{display:grid;gap:0;margin:0;border-top:1px solid var(--line);max-width:80ch}
+.gloss>div{display:grid;grid-template-columns:minmax(150px,13em) minmax(0,1fr);gap:4px 18px;padding:12px 4px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+.gloss>div:target{background:var(--accent-soft)}
+.gloss dt{font:600 15px var(--body)}
+.gloss dt small{display:block;font:400 12px var(--mono);color:var(--muted)}
+.gloss dd{margin:0;font-size:15px}
+.letters{display:flex;flex-wrap:wrap;gap:6px;font:500 13px var(--mono)}
+.letters a{padding:3px 8px;border:1px solid var(--line);border-radius:6px;text-decoration:none}
+@media (max-width:760px){.chintro,.routes{grid-template-columns:minmax(0,1fr)}.route{grid-template-columns:84px minmax(0,1fr)}.route img{width:84px}
+  .gloss>div{grid-template-columns:minmax(0,1fr)}.chmenu ol{position:fixed;left:16px;right:16px;top:56px;width:auto}}
+.cover-video{max-width:760px}
+/* live 3D viewer (ch-3d, <model-viewer>) */
+.m3d{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.m3d model-viewer{display:block;width:100%;height:auto;aspect-ratio:1/1;max-width:100%;background:var(--bg);border-radius:10px;--poster-color:transparent}
+.m3d-side{display:grid;gap:12px;align-content:start;min-width:0}
+.m3d-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.m3d-pick button{display:grid;gap:6px;justify-items:center;padding:6px;font-size:13px}
+.m3d-pick img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;background:var(--bg)}
+.m3d-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.m3d-l{font:500 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:4px}
+.m3d button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.m3d-stat{font:500 13px/1.4 var(--mono);font-variant-numeric:tabular-nums;margin:0}
+.m3d-note{margin:0;font-size:14px;color:var(--muted)}
+@media (max-width:760px){.m3d{grid-template-columns:minmax(0,1fr)}}
+/* ch-3d demo card: poster + Play link; the game page loads nothing until opened */
+.democard{display:grid;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit}
+.democard img{width:100%;height:auto;display:block}
+.democard .dc{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;padding:14px 16px}
+.democard .dc span{color:var(--muted);font-size:14px;max-width:62ch}
+.democard .playbtn{font:600 16px var(--body);background:var(--accent);color:#fff;border-radius:999px;padding:10px 26px;white-space:nowrap}
+.democard:hover .playbtn,.democard:focus-visible .playbtn{filter:brightness(1.08)}
+.pxspin{image-rendering:pixelated;max-width:288px;width:100%;border-radius:8px}
+.pxduo{display:grid;gap:14px;grid-template-columns:minmax(0,2fr) minmax(0,1fr);align-items:start}
+@media (max-width:700px){.pxduo{grid-template-columns:1fr}}
+</style>
+<style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть II · Кадр · глава 8 из 27</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-finish.html" aria-current="page"><span class="cn">08</span>Финиш против ИИ-вида</a></li><li><a href="ch-ref.html"><span class="cn">09</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">10</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html"><span class="cn">11</span>Скорость и качество</a></li><li><a href="ch-motion.html"><span class="cn">12</span>Движение, POV и сцена</a></li><li><a href="ch-talk.html"><span class="cn">13</span>Говорящий персонаж</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">14</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">15</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">16</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">17</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">18</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">19</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">20</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · 3D для игр</li><li><a href="ch-3d.html"><span class="cn">21</span>ИИ для 3D-ассетов</a></li><li class="mp">Часть IX · Справочник</li><li><a href="ch-eval.html"><span class="cn">22</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">23</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">24</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">25</span>Словарь</a></li><li><a href="ch-lab.html"><span class="cn">26</span>Серии экспериментов</a></li><li><a href="ch-agent.html"><span class="cn">27</span>Для вашего агента</a></li></ol></details></nav>
+<header>
+  <div class="eyebrow">Глава 8 · серия 4 · 27.10.2026</div>
+  <h1>Финиш против ИИ-вида</h1>
+  <p class="lead">Как сделать сгенерированный кадр и ролик похожими на снятые камерой — и не потерять при этом лицо персонажа.</p>
+</header>
+<div class="chintro"><aside class="keybox" aria-label="Главное за минуту"><b>Главное за минуту</b><ul><li>Генеративный проход поверх кадра стирает родинки и шрамы, а FaceDetailer молодит лицо — на кадрах персонажа его не делают.</li><li>Слепой A/B: фото — <code>subtle</code> (или <code>phone</code> для селфи), видео — <code>subtle_light</code>; без обработки кадр проиграл везде.</li><li>Deflicker — только на «пульсирующих» клипах: на говорящих он съедает мимику.</li><li>Скачок резкости в первые 0,5 с клипа H3 убирает пауза в раскадровке + нода Video Slice.</li></ul></aside><nav class="onpage" aria-label="На этой странице"><b>На этой странице</b><ol><li><a href="#fn-why">Откуда «ИИ-вид» и где его лечить</a></li><li><a href="#fn-gen">Генеративный финиш стирает приметы ЗАМЕР</a></li><li><a href="#fn-pixel">Пиксельный финиш для фото: выбор вслепую</a></li><li><a href="#fn-video">Финиш для видео: зерно да, deflicker — только по делу ЗАМЕР</a></li><li><a href="#fn-leadin">Первые полсекунды: «скачок» в начале клипа</a></li><li><a href="#fn-rules">Итог серии 4</a></li></ol></nav></div>
+
+<section aria-labelledby="fn-why">
+  <h2 id="fn-why">Откуда «ИИ-вид» и где его лечить</h2>
+  <p class="prose">У сгенерированного кадра слишком гладкая кожа, слишком чистый цвет и ни одного случайного пикселя. Настоящая камера всегда добавляет шум матрицы, лёгкое смещение цветов по краям и свою цветокоррекцию. В серии 4 мы проверили два способа «состарить» готовый кадр. <b>Генеративный финиш</b> — ещё один слабый проход модели поверх кадра. <b>Пиксельный финиш</b> — зерно, цветокоррекция и хроматическая аберрация обычной обработкой, без нейросети. Проверяли на кадрах вымышленного персонажа Марен: у неё есть родинка под глазом и шрам у брови, и по ним сразу видно, сохранилась ли личность.</p>
+  <div class="pipe">
+    <div class="step"><span class="n">генеративный</span><span class="t">img2img <small>0,12–0,3</small></span><span>Krea 2 поверх всего кадра или FaceDetailer только по лицу</span></div>
+    <div class="step"><span class="n">пиксельный</span><span class="t">скрипт <small>numpy / ffmpeg</small></span><span>зерно, цвет, аберрация; для видео — зерно, меняющееся по кадрам</span></div>
+    <div class="step"><span class="n">судья</span><span class="t">слепой A/B</span><span>человек выбирает, не зная, где какой вариант</span></div>
+  </div>
+</section>
+
+<section aria-labelledby="fn-gen">
+  <h2 id="fn-gen">Генеративный финиш стирает приметы <span class="ev m">ЗАМЕР</span></h2>
+  <p class="prose">Три кадра Марен из Qwen-Edit (кафе, окно с дождём, крыша) прошли через проход Krea 2 по всему кадру (denoise 0,12 / 0,2 / 0,3) и FaceDetailer (0,3 / 0,45). Промпт — общие слова про кожу. Один проход — около 6 с.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Проход</th><th>ArcFace к эталону (кафе / окно / крыша)</th><th>На глаз</th></tr></thead>
+    <tbody>
+      <tr><td>без прохода</td><td class="num">0,55 / 0,56 / 0,59</td><td>кожа слегка пластиковая</td></tr>
+      <tr><td>кожа 0,12</td><td class="num">0,50 / 0,49 / 0,60</td><td>фактура живее, но родинка тонет в веснушках, шрам бледнеет</td></tr>
+      <tr><td>кожа 0,3</td><td class="num">0,40 / 0,32 / 0,54</td><td>самый «фотографичный» — и уже другое лицо, примет нет</td></tr>
+      <tr><td>FaceDetailer 0,3</td><td class="num">0,39 / 0,35 / 0,55</td><td><b>лицо перерисовано моложе, почти подростком</b>; приметы пропали</td></tr>
+      <tr><td>то же с описанием персонажа вместо слов про кожу, без LoRA реализма</td><td class="num">0,50 / 0,50 · 0,45 / 0,37</td><td>возраст снова около 30, но приметы всё равно пропали</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="rules prose">
+    <li><b>На кадрах персонажа генеративного финиша нет</b> ни при каких настройках: мелкие приметы слишком малы для перерисовки в 8 шагов. <span class="ev r">ПРАВИЛО</span></li>
+    <li><b>Реализм должен дать сам генератор</b> (Krea 2 Identity Edit, <a href="ch-persona.html">глава «Персонаж»</a>). Проход кожи 0,12 остаётся для кадров без постоянного персонажа.</li>
+    <li>Причина та же, что у эталонного лица: LoRA реализма и слова «freckles, peach fuzz» молодят лица Krea.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="fn-pixel">
+  <h2 id="fn-pixel">Пиксельный финиш для фото: выбор вслепую</h2>
+  <p class="prose">Скрипт <code>finish.py</code> делает готовые «виды»: <code>subtle</code> (лёгкий цвет, аберрация 0,6 px, зерно 0,025), <code>phone</code> (резкость и шум телефона), <code>film</code> (плёночное зерно 0,03), <code>soft</code> и <code>none</code>. На 2-мегапиксельных кадрах Krea фактура кожи уже есть, и зерно мало что добавляет. Сильнее всего оно меняет 1-мегапиксельные кадры Qwen-Edit и кадры из видео H3.</p>
+  <figure><img src="media/s4-blind-ab.jpg" alt="Шесть лиц по пять вариантов, буквы перемешаны" loading="lazy"><figcaption><b>Слепой лист:</b> шесть крупных планов по пять вариантов, буквы в каждой строке перемешаны, ключ хранится отдельно. Судья выбрал <b>subtle</b> в трёх строках, <b>phone</b> в двух, <b>film</b> в одной. Ни разу не выбраны вариант без обработки и <code>soft</code>.</figcaption></figure>
+  <ul class="rules prose">
+    <li><b>Фото по умолчанию — <code>subtle</code></b>; для селфи и бытовых кадров — <code>phone</code>. <span class="ev r">ПРАВИЛО</span></li>
+    <li><b>Необработанный кадр проиграл во всех строках.</b> Лёгкий пиксельный финиш того стоит, даже если на глаз разница маленькая.</li>
+    <li>Судья заметил «много шума» в одной строке — зерно можно снизить до ≈ 0,018.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="fn-video">
+  <h2 id="fn-video">Финиш для видео: зерно да, deflicker — только по делу <span class="ev m">ЗАМЕР</span></h2>
+  <p class="prose">Советы 2026 года для ИИ-видео дают тот же порядок, что и у нас: выровнять, покрасить, добавить зерно 2–3 %, чуть смягчить. Мы прогнали пять видов на двух клипах H3: 9,4 с в баре и говорящий план. Мерцание — среднее изменение яркости лица от кадра к кадру. Зерно — энергия высоких частот.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Вид</th><th>Мерцание: бар / речь</th><th>Зерно: бар / речь</th></tr></thead>
+    <tbody>
+      <tr><td>none</td><td class="num">0,55 / 0,27</td><td class="num">6,0 / 5,4</td></tr>
+      <tr><td>subtle</td><td class="num">0,53 / 0,26</td><td class="num">9,0 / 8,6</td></tr>
+      <tr class="win"><td><b>subtle_light</b> (зерно слабее)</td><td class="num">0,53 / 0,27</td><td class="num">7,4 / 7,0</td></tr>
+      <tr><td>deflicker + subtle_light</td><td class="num"><b>0,48</b> / 0,36 (хуже)</td><td class="num">7,4 / 7,0</td></tr>
+      <tr><td>film</td><td class="num">0,49 / 0,24</td><td class="num">9,9 / 9,6</td></tr>
+    </tbody>
+  </table></div>
+  <figure class="wide"><img src="media/s4-video-looks.jpg" alt="Говорящее лицо в пяти видах" loading="lazy"><figcaption><b>Один кадр говорящего клипа в пяти видах</b>, лицо увеличено вдвое. Разница видна в первую очередь на щеках и фоне; в движении зерно «живёт» и не выглядит наклейкой.</figcaption></figure>
+  <ul class="rules prose">
+    <li><b>Клипы H3 почти не мерцают:</b> изменения яркости в них — настоящий свет и движение.</li>
+    <li><b>Фильтр <code>deflicker</code> из ffmpeg — не по умолчанию.</b> Бару он помог, а говорящему клипу навредил: выровнял настоящую мимику и игру света. Только для клипов, которые заметно «пульсируют».</li>
+    <li><b>Видео по умолчанию — <code>subtle_light</code></b>: тот же <code>subtle</code>, но зерно слабее. <span class="ev r">ПРАВИЛО</span></li>
+    <li><b>Финиш остаётся скриптом</b> на готовых файлах. Временного зерна (меняющегося по кадрам) нет ни в стандартных, ни в установленных нодах ComfyUI; для этого понадобился бы пакет RES4LYF.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="fn-leadin">
+  <h2 id="fn-leadin">Первые полсекунды: «скачок» в начале клипа</h2>
+  <p class="prose">У H3 первые кадры резче остальных: модель ещё «держит» исходную картинку, потом переходит в своё видео. Резкость лица (по Лапласиану) падает с 135 до 56 и со 165 до 95 между кадрами 0–2 и 9–11 — ещё до начала движения. Лечение — в раскадровке написать паузу <code>0s-0.5s: she holds completely still, settling</code> и потом отрезать эти полсекунды стандартной нодой <b>Video Slice</b>: она режет и кадры, и звук по времени.</p>
+  <ul class="rules prose">
+    <li><b>Отрезать можно после рендера:</b> повторный запуск с новым значением занял 3,3 с — ComfyUI берёт всё остальное из кэша.</li>
+    <li><b>Скачок зависит от клипа:</b> в одном падение 111 → 104, почти незаметно. Поэтому в <code>03</code> есть поле <b>cut lead-in (s)</b> со значением 0 по умолчанию; ставьте 0,5, когда начало видимо «прыгает».</li>
+    <li>H3 растягивает паузу примерно до 1,5 с и иногда приоткрывает губы «на вдохе» — пауза в раскадровке не бесплатна.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="fn-rules">
+  <h2 id="fn-rules">Итог серии 4</h2>
+  <ul class="rules prose">
+    <li><b>Реализм — от генератора, финиш — пиксельный.</b> Генеративные проходы стирают приметы персонажа.</li>
+    <li><b>Фото: <code>subtle</code></b> (или <code>phone</code> для селфи). <b>Видео: <code>subtle_light</code></b>. Без обработки не оставлять.</li>
+    <li><b>Deflicker — только на «пульсирующих» клипах.</b> На говорящих он съедает мимику.</li>
+    <li><b>Скачок в начале клипа</b> — пауза в раскадровке + Video Slice 0,5 с, когда он виден.</li>
+    <li>Родинку, которая «ездит» в видео, финиш не лечит. Это решает H3 Reference-to-Video по трём видам лица (<a href="ch-ref.html#rf-video">глава «Референс»</a>).</li>
+  </ul>
+</section>
+
+<p class="mdlink">Для ИИ-агентов: <a href="md/ch-finish.md">эта глава в Markdown</a> · <a href="llms.txt">llms.txt</a></p>
+<nav class="pager" aria-label="Главы"><a href="ch-fix.html" rel="prev"><span class="dir">← назад</span>Правка кадра</a><a class="next" href="ch-ref.html" rel="next"><span class="dir">дальше →</span>Перенос по референсу</a></nav>
+</div>
+
+<script>
+document.querySelectorAll('button[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.copy), txt=el.textContent;
+    var done=function(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Копировать'},1500)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
+    try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
+  });
+});
+// ←/→ = previous/next chapter (not while typing or selecting text); the chapter menu closes on an outside click or Esc
+document.addEventListener('keydown',function(e){
+  var t=e.target, m=document.querySelector('details.chmenu');
+  if(e.key==='Escape'&&m){m.open=false;return}
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||/INPUT|TEXTAREA|SELECT|VIDEO/.test(t.tagName)||t.isContentEditable)return;
+  if(String(getSelection())!=='')return;
+  var a=document.querySelector('.pager a[rel="'+(e.key==='ArrowLeft'?'prev':e.key==='ArrowRight'?'next':'')+'"]');
+  if(a)location.href=a.getAttribute('href');
+});
+document.addEventListener('click',function(e){
+  var m=document.querySelector('details.chmenu');
+  if(m&&m.open&&!m.contains(e.target))m.open=false;
+});
+</script>
+</body>
+</html>

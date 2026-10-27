@@ -1,4 +1,4 @@
-# 17. Монтаж с ИИ
+# 20. Монтаж с ИИ
 
 > EN: Editing with HyperFrames (HTML → MP4): 9:16 social cut on a music bar grid with ducking, seamless OBS loop + countdown, a data-driven explainer, ACE-Step music, loudness and grading measured; rules for an agent editor.
 
