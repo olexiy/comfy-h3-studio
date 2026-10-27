@@ -3,7 +3,7 @@
 ```yaml
 doc: agent-guide
 audience: autonomous coding/ops agents driving ComfyUI and cloud GPUs (not humans)
-version: 2026-10-26e
+version: 2026-10-27a
 companion: "Russian textbook for humans: llms.txt (map), book.json (chapter index), md/<slug>.md (each chapter), llms-full.txt (all chapters)"
 evidence_tags: {MEASURED: "run by us, numbers from our logs", SOURCE: "official template / docs / community, not re-measured", RULE: "derived decision rule"}
 baseline_box: {gpu: "RTX 5070 Ti 16 GB (Blackwell)", ram: "62 GB", os: "Windows 11", comfyui: "0.42.x", torch: "2.12+cu130", python: "3.13"}
@@ -15,7 +15,7 @@ content_policy: "all examples SFW, depicted adults stated 25+"
 - Sections are independent; each bullet = one fact or rule. Prefer MEASURED over SOURCE when they conflict.
 - File names below are exact (copy them). Node names are ComfyUI class_type names.
 - Numbers are for the baseline box unless a section says `cloud_box`.
-- Section map: 1 API · 2 model recipes · 3 prompting · 3b prompt grammar (measured) · 4 first frame for video · 5 persona + LoRA · 5b editing · 5c reference transfer · 6 evaluation · 7 RunPod · 7b Civitai replication · 8 Windows pitfalls · 9 editing video with HyperFrames · 10 RU↔EN terms · 11 open questions.
+- Section map: 1 API · 2 model recipes · 3 prompting · 3b prompt grammar (measured) · 4 first frame for video · 4b motion control, POV, long clips · 4c talking persona · 5 persona + LoRA · 5b editing · 5c reference transfer · 5d finishing · 5e batch pipeline · 6 evaluation · 7 RunPod · 7b Civitai replication · 8 Windows pitfalls · 9 editing video with HyperFrames · 10 RU↔EN terms · 11 open questions.
 - Human chapters with figures and full tables (Russian) are linked from `llms.txt`; cite them by `md/<slug>.md#` heading when you answer a human.
 
 ## 1. Driving ComfyUI headless (API)
@@ -115,6 +115,45 @@ prompt_lab: {stills: "3 subjects x 8-10 phrasings x Krea 2 Turbo + Qwen-Image 2.
 - Start "pop": face sharpness falls 135 → 56 in the first 0.5 s before any motion. Remedy: shot-list beat `0s-0.5s: holds completely still, settling` + core `Video Slice(start_time 0.5)` (cuts frames and audio). [MEASURED]
 - Light drift (darker/warmer over 3 s): KJNodes `ColorMatch(mkl)` of every frame to the scaled first frame; turn OFF when a big new object enters (bus) — it greys skin. [MEASURED]
 
+## 4b. Motion control, POV and long clips (series 9 + 12, 2026-10-27)
+```yaml
+recipe: {persona: "3 canonical views via MiniMaxH3ReferenceToVideo (no first frame)", steps: 30, shift: 12, sage: off}
+identity_checkpoint_same_prompt_refs_seed: {box: cloud_box, ref2va: {arcface_mean_min: [0.72, 0.68], time_s: 230}, fl2va: {arcface_mean_min: [0.46, 0.33], time_s: 206}}
+controlnet: {model: "Fun ControlNet-Union 2.0 for H3", pose_extractor: SDPose, detector: RT-DETR, clip: "club dance 1024x576 5 s",
+  runs: {none: {arcface: [0.52, 0.20], time_s: 146}, pose_0_6: {arcface: [0.55, 0.03], time_s: 178}, pose_1_0: {arcface: [0.40, 0.14], time_s: 276}, canny_0_8_own_clip_restyle: {arcface: [0.59, 0.30], time_s: 304}}}
+pov_text_only_5s: {selfie_walk: [0.59, 0.19], friend_view_cafe: [0.51, 0.42], mirror_selfie: "failed: phone in hand, no mirror/reflection"}
+mini_scene: {shots: "3 x 8 s FL2VA + refs, 788/682/687 s on RTX 5090", arcface: {shot1: 0.63, shot2_profiles: 0.42, shot3: 0.72}, edit: "0.4 s cross-fades, subtle_light grain, -16 LUFS, 23 s"}
+long_clips_one_pass: {box: cloud_box, 10s: {frames: 243, time_s: 558, vram_gb: 9.7}, 15s: {frames: 362, time_s: 1072, vram_gb: 10.2}, 20s: {frames: 481, time_s: 1760, vram_gb: 10.0}}
+```
+- Persona video: Ref2VA beats FL2VA by 0.26 ArcFace on the same scene → Ref2VA for hero clips (19.5 GB `ref2va_pruned_int8`, cloud or after the human OKs the download), local FL2VA + refs (`03R`) for the rest. [MEASURED]
+- Pose ControlNet strength 0.6; 1.0 copies the moves but costs ≈ 0.15 ArcFace. Canny 0.8 from your own clip = relight/restyle while keeping blocking. Pick pose sources with the full body visible (a dress hid the legs → partial skeletons). [MEASURED]
+- POV from text: arm's-length selfie and friend's view work; a mirror selfie needs an explicit beat ("we see her reflection in the mirror, the phone covers part of her face") or a first frame. [MEASURED]
+- Multi-shot continuity: hard cuts + one outfit lock line in every prompt + the same refs + one frozen voice track per shot (section 4c). Keep ≤ 2 actions per 5 s (section 3b). [RULE]
+- H3 does 20 s in one pass at ≈ 10 GB VRAM; the local 12 s cap is system RAM (62 GB), not VRAM. Time grows ≈ 3.2× from 10 to 20 s. Low ArcFace minima in long clips were look-down / turned-away frames, not drift. [MEASURED]
+- ControlNet graph not yet built as a house-style workflow (`06_video_h3_controlnet` pending). Two-pass 2× latent upscale (Tr1dae upscaler) result was lost (pod deleted by a cleanup script) → open. [MEASURED]
+
+## 4c. Talking persona: chosen voice into H3 (series 11 + 11b, 2026-10-26)
+```yaml
+setup: {recipe: 03R, clip: "5 s 768x960, 30 steps, shift 12", box: "RTX 5090 32 GB cloud, ~6 min/clip", line: "Honestly, this is the best beer in Berlin. Cheers to that!",
+  tts: ["ElevenLabs eleven_multilingual_v2 (cloud)", "Kokoro af_heart (local CPU)"], track_pad_s: 0.5}
+metrics: {WER: "whisper small.en on the clip audio", sync_r: "corr(mouth motion, voice RMS) within +-0.3 s = community H3LipSyncScore method (own voice 0.27-0.35, other voice 0.00)", out_eq_in: "corr of clip audio envelope vs input track"}
+results:
+  h3_speaks_itself: {wer: 0, sync_r: 0.23, arcface: 0.55, voice: "random, changes per clip"}
+  ref_audios_only: {wer: 0, sync_r: [0.46, 0.48], arcface: [0.62, 0.63], out_eq_in: "0.93-0.95, shifted 120-240 ms = re-voiced"}
+  ref_audios_plus_addguide_audio_frame0: {wer: 0, sync_r: [0.42, 0.46], arcface: [0.61, 0.63], out_eq_in: "0.99-1.00, 10 ms = bit-exact"}
+  german_real_track: {chain: "ElevenLabs stability 0.3 style 0.55 -> highpass 120 / lowpass 9k -> compressor 3:1 -> two short echoes -> bar ambience SFX at -11 dB", sync_r: 0.54, arcface: 0.61}
+lipsync_post_pass_11b: {box: "RTX 4090 cloud ($0.89/h; both repos pin torch 2.5.1 / 2.0.1 with no Blackwell kernels)",
+  latentsync_1_6: {time_s_per_5s: "57-70 (20 steps + DeepCache), 162 (40 steps)", on_h3_clip: {sync_r: "0.48-0.52", mouth_motion: "6.2-6.8"}, vram_peak_gb: 17.3},
+  musetalk_1_5: {time_s_per_5s: 22, on_h3_clip: {sync_r: 0.44, mouth_motion: 4.5, arcface_delta: -0.06}},
+  h3_plain: {sync_r: 0.54, mouth_motion: 7.6}, h3_picture_delayed_0_22s: {sync_r: 0.60}}
+```
+- Chosen voice → put the track in `ref_audios` AND in `MiniMaxH3AddGuide` (audio, frame 0). Output audio = input bit-exact, lip sync ≈ 2× H3's own voice, identity unchanged or better. Workflow `08_video_talking`. Source: community pack comfyui-h3-audio-drive-auto. [MEASURED]
+- `ref_audios` alone re-voices the line and shifts it 0.1–0.25 s → unusable for dubbing. [MEASURED]
+- Clean TTS reads as studio-fake to viewers → band-limit, compress, add room echo and place ambience before locking. A "relaxed, subtle, mouth opens only slightly" prompt did not move the metric (0.53). [MEASURED]
+- With a locked track the mouth leads the voice by 0.21–0.25 s. The sync metric prefers delaying the picture 0.22 s, but a human judge kept the plain H3 clip over the shift, MuseTalk and still-frame LatentSync → ship plain H3, no post-pass, no offset. [MEASURED]
+- LatentSync 1.6 uses the source frame as reference and copies H3's over-articulated mouth; MuseTalk 1.5 replaces the mouth (motion −40 %) but pastes a 256 px face region (softer lower face). Untested next step: a calm second H3 render of the same shot (closed lips) as the LatentSync source. [MEASURED]
+- H3 is not a phoneme-level lip-sync model; long dialogue = chained 5–8 s windows, each with its own frozen slice of the track. [SOURCE: community]
+
 ## 5. Persona pipeline (one fictional face → LoRA)
 1. Hero still: Krea 2 Turbo 2 MP + realism LoRAs + identity layer, frontal butterfly light. Reverse-image check that it is not a real person (human step).
 2. Restage 50-80 SFW scenes: **Krea Identity Edit V2 aligned b2** for frontal / 3/4 / medium; Qwen-Edit for strong expressions, profiles, high angles; full-body = Qwen full-body scene + Identity Edit person-into-scene (Krea aligned alone never gives full body — layout is pinned to the reference). [MEASURED]
@@ -189,11 +228,46 @@ h3_ref2v_persona: {node: MiniMaxH3ReferenceToVideo, model: minimax_h3_ref2va_pru
 - A persona first frame from a LoRA plus Ref2V identity refs = two identities; the face re-forms mid-clip (ArcFace min 0.12). Make the first frame from the same refs or skip it. [MEASURED]
 - Gated HF repos on rented GPUs: user stores a read token as a platform secret (RunPod `{{ RUNPOD_SECRET_hf_token }}` → `HF_TOKEN`); never move 10+ GB over a home uplink, it also starves result downloads. [MEASURED]
 
+- **Series 6b + local timing:** the FL2VA checkpoint (already on the baseline box) also reads identity references through the stock `MiniMaxH3ReferenceToVideo` node. FL2VA, 2 scenes, 2 seeds, ArcFace mean: text only 0.26, RefMod 0.58, stock ref node 0.56 (Ref2VA native refs 0.68). RefMods (Luisacaotica MiniMaxH3Mod) = the same latents saved to a 1–5 MB file: packaging only, no quality or speed gain. First frame + refs collapses on FL2VA too (min 0.10). [MEASURED]
+- Workflow `03R_video_h3_ref` (FL2VA + stock ref node, 3 canonical views, 30 steps, shift 12): 9.4 s clip on the baseline box in **759 s**, peak VRAM 15.5 GB, RAM 55 GB, ArcFace 0.58 / min 0.42 (same clip on a cloud RTX 5090 without Sage: 910 s, 0.585 / 0.43 on the same scorer) → no pod needed for persona video. [MEASURED]
+- `10_ref_*` on the baseline box incl. model load: qwen21 9.7 s · klein 10.2 s · style_krea 18.9 s · product_krea 26.8 s, peak VRAM ≤ 15.2 GB → all local. [MEASURED]
+
+## 5d. Finishing against the "AI look" (series 4, 2026-10-27)
+```yaml
+generative_finish_on_persona_shots: {passes: ["Krea 2 img2img denoise 0.12/0.2/0.3 whole frame", "FaceDetailer 0.3/0.45"], time_s: 6,
+  arcface_vs_hero: {none: [0.55, 0.56, 0.59], skin_0_12: [0.50, 0.49, 0.60], skin_0_3: [0.40, 0.32, 0.54], facedetailer_0_3: [0.39, 0.35, 0.55]},
+  by_eye: "mole/scar wiped at every setting; FaceDetailer re-renders the face teen-looking"}
+pixel_looks_stills: {tool: "finish.py (numpy/PIL)", presets: {subtle: "grade + 0.6 px chromatic aberration + grain 0.025", phone: "phone sharpening/noise", film: "grain 0.03", soft: "", none: ""},
+  blind_ab: "6 face crops x 5 looks, shuffled letters: subtle 3 rows, phone 2, film 1; none and soft never picked"}
+video_looks: {tool: "ffmpeg chain with temporal luma grain", metric_flicker: "mean |delta face-crop luma| per frame", metric_grain: "high-pass energy",
+  bar_clip: {none: [0.55, 6.0], subtle: [0.53, 9.0], subtle_light: [0.53, 7.4], deflicker5_subtle_light: [0.48, 7.4], film: [0.49, 9.9]},
+  talking_clip: {none: [0.27, 5.4], subtle: [0.26, 8.6], subtle_light: [0.27, 7.0], deflicker5_subtle_light: [0.36, 7.0], film: [0.24, 9.6]}}
+```
+- No generative finishing on persona shots; realism must come from the generator (Krea 2 Identity Edit). Skin pass 0.12 stays an option for non-persona stills. [MEASURED]
+- Defaults: stills `subtle` (grain ≈ 0.018–0.025), selfies `phone`, video `subtle_light` (subtle with weaker grain). Never ship unprocessed: it lost every blind row. [RULE]
+- ffmpeg `deflicker` is not a default: it helped one clip and hurt the talking clip (flattens real expression/light). H3 clips barely flicker. [MEASURED]
+- Temporal grain has no core/installed ComfyUI node → finishing stays a script on finished files (a RES4LYF grain node would need a node install). [MEASURED]
+
+## 5e. Batch "content factory" (series 14, 2026-10-27)
+```yaml
+tool: "batch.py JOBS.yaml [--dry]  (drives local ComfyUI over HTTP)"
+job_file: {defaults: [lora, strength, trigger, seeds, keep, size], still_job: prompt, video_job: "video_from: <still job> + H3 shot list (workflow 03 on every kept still)"}
+stills: "01b recipe: Krea 2 Turbo int8, 8 steps euler/beta + persona LoRA 0.8, ~7 s/image"
+score: "0.7 * aligned ArcFace vs persona_refs + 0.3 * face sharpness -> top `keep` per job -> kept/"
+outputs: [contact.jpg, report.md, results.json]
+dry_run: {jobs: "4 scenes x 4 seeds + 2 H3 5 s videos", scores: {studio: "0.80-0.85", market: "0.72-0.76", cafe: "0.68-0.73", bike_full_body: "0.42-0.54"}, h3_5s_local_s: 300, total_gpu_min: 12}
+guards: ["free disk >= 100 GB", "GPU lock per render, released between renders (waits up to 2 h)", "resume: skip renders already in results.json"]
+```
+- ComfyUI's cache returns the previous output for an identical graph → put a run stamp into the save prefix. When server and script share an output folder, read local paths directly instead of fetching through `/view` (a fetch truncated the file it was reading). [MEASURED]
+- ArcFace selection only makes sense for persona jobs (small faces in full-body scenes always score lower); for non-persona jobs use an aesthetic score, and keep a human pass on the contact sheet. [RULE]
+
 ## 6. Evaluation harness (what metrics mean)
 - Identity: insightface buffalo_l ArcFace cosine of the largest face vs the reference. ≥ 0.6 ≈ same person; 0.5-0.6 usable; < 0.3 different. Blind to profiles (≈ 0) and fooled by animal faces (picked a dog). Faces < 100 px are unreliable. [MEASURED]
 - Taste: LAION aesthetic v2 reproduced a human's per-image ranking; sharpness (Laplacian) and CLIP prompt-adherence did not. Physics/hand-object interaction is invisible to all metrics → eye check. [MEASURED]
 - Video: per-frame Laplacian of the face box for start pops / mid-clip blur; corner diff for background repaint; luma mean for colour drift. [MEASURED]
 - Show humans: stacked full-res crop sheets (same regions, same moments per variant) + side-by-side mp4; blind A/B with a shuffled-letter key for subjective choices. [RULE]
+- Speech: WER (whisper) for words; sync r (mouth motion vs voice RMS, ±0.3 s, H3LipSyncScore method) for lips — SyncNet LSE correlates poorly with people. A human rejected the variant sync r liked best (section 4c): metrics filter, eyes decide. [MEASURED]
+- Video flicker: mean |Δ face-crop luma| per frame; real light and expression changes count as flicker too, so a lower value is not automatically better. [MEASURED]
 - Judge speed tricks on a HARD scene (≥ 9 s, fast hands, held object, passing vehicle): a broken turbo recipe ranked first on a calm 5 s clip by metrics. [MEASURED]
 
 ## 7. RunPod procedure (runpodctl 2.x)
@@ -216,6 +290,9 @@ runpodctl pod list ; runpodctl pod delete <pod_id> ; runpodctl me   # verify not
 - Background jobs over ssh: `setsid nohup cmd < /dev/null > log 2>&1 &` (plain `nohup … &` keeps the ssh session open). A Windows-made tar extracts with "Cannot change ownership" (exit 1) → `--no-same-owner`, don't chain with `&&`. [MEASURED]
 - Cost reference: LoRA run (setup + 2500 steps + eval) ≈ 1.7 h ≈ $4.2 on PRO 6000 SECURE. [MEASURED]
 - Decision rule: if a local job takes hours and the cloud does it for a few dollars, use the cloud — especially for daytime experiments a human is waiting on; overnight batches can stay local. "Local hardware can't do better" may only be claimed after the same input was rendered on full-precision weights in the cloud. [RULE]
+
+- Pod-script pitfalls: `pkill -f` inside `ssh '…'` kills its own shell (use the `[m]ain.py` bracket pattern); a "done" check on a log must ignore earlier rejected rows (a cleanup script deleted a pod mid-render that way); stopping a script mid-`pod create` still creates the pod → `pod list` by name before re-creating; tag pod names with the session so parallel agents never delete each other's pods. [MEASURED]
+- Repos pinned to old torch (LatentSync 1.6 → 2.5.1, MuseTalk 1.5 → 2.0.1) have no Blackwell kernels → rent an Ada/Ampere card (RTX 4090 SECURE ≈ $0.89/h). Check HF download speed right after SSH (`curl -w %{speed_download}`): one US host gave 0 B/s twice. [MEASURED]
 
 ## 7b. Replicating a Civitai post (trend loop)
 - Metadata without login: `GET https://civitai.com/api/v1/images?imageId=<id>&withMeta=true&nsfw=X` → `meta` (may be nested once more as `meta.meta`): prompt, negativePrompt, sampler, scheduler, steps, cfgScale, seed, `civitaiResources` [{modelVersionId, weight, type}], sometimes the full ComfyUI API graph as a JSON string in `meta.comfy`. Resolve each version: `GET /api/v1/model-versions/<id>` → trainedWords (triggers), files[].downloadUrl, sizeKB, baseModel. [MEASURED]
@@ -300,9 +377,10 @@ browser_demo: {page: "demo-gnome.html (book page, three@0.160.0 from jsdelivr vi
 - Sources' "TRELLIS.2 needs >= 24 GB" refers to the 2025 release; the int8 ComfyUI build fits 16 GB. [MEASURED]
 
 ## 10. Russian ↔ English terms (to read the human chapters)
-кадр = still / frame · первый кадр = first frame (I2V) · ролик = clip · раскадровка = timed shot list · правка = edit · перенос по референсу = reference transfer · персонаж = persona / character · эталонное лицо = hero still · приметы = permanent marks (mole, scar) · утечка = leak / bleeding · сид = seed · шаги = steps · сила LoRA = LoRA strength · подпись = caption · датасет = dataset · замок (appearance/background lock) = lock line · дрейф = drift · кроп-лист = crop sheet · бок о бок = side-by-side · слепой A/B = blind A/B · локально = on the baseline box · в облаке / аренда = cloud_box (RunPod) · серия N = experiment series N · готово / пополняется / в работе = done / growing / in progress · ЗАМЕР / ИСТОЧНИК / ПРАВИЛО = MEASURED / SOURCE / RULE.
+кадр = still / frame · первый кадр = first frame (I2V) · ролик = clip · раскадровка = timed shot list · правка = edit · перенос по референсу = reference transfer · персонаж = persona / character · эталонное лицо = hero still · приметы = permanent marks (mole, scar) · утечка = leak / bleeding · сид = seed · шаги = steps · сила LoRA = LoRA strength · подпись = caption · датасет = dataset · замок (appearance/background lock) = lock line · дрейф = drift · кроп-лист = crop sheet · бок о бок = side-by-side · слепой A/B = blind A/B · локально = on the baseline box · в облаке / аренда = cloud_box (RunPod) · серия N = experiment series N · готово / пополняется / в работе = done / growing / in progress · ЗАМЕР / ИСТОЧНИК / ПРАВИЛО = MEASURED / SOURCE / RULE · финиш = finishing · зерно = grain · мерцание = flicker · скачок в начале = start pop · говорящий персонаж = talking persona · голос вморожен / якорь звука = locked track (AddGuide audio frame 0) · липсинк = lip-sync · съёмка от первого лица = POV · мини-сцена = multi-shot scene · пакетный конвейер = batch pipeline · лист-контакт = contact sheet.
 
 ## 11. Open questions (not yet measured)
 - Resolved 2026-10-25: the leak — regularisation sets halve the subject's steps in ai-toolkit; DOP + name-like trigger + 4000 steps fixed both leak and marks (section 5, result v3).
-- 9:16 vs 4:5 first frames; H3 Ref2V on the 16 GB baseline box (tested only on cloud_box, section 5c); H3 LoRA from still images; H3 15-30 s clips on a 96 GB card; prompt lab follow-ups: 9 s clips, CLIP-encoder models.
+- Resolved 2026-10-27: persona video on the baseline box → FL2VA + stock ref node (`03R`, 759 s per 9.4 s, section 5c); H3 20 s in one pass on cloud_box (section 4b).
+- Open: 9:16 vs 4:5 first frames; Ref2VA on the baseline box (19.5 GB download, needs the human's OK); H3 LoRA from still images; two-pass 2× latent upscale; calm second H3 render → LatentSync (11c); ControlNet house-style workflow; prompt lab follow-ups: 9 s clips, CLIP-encoder models.
 - Resolved 2026-10-25: H3 full precision vs quantised → no visible gap (section 2, minimax_h3.precision_test).

@@ -1,6 +1,6 @@
-# 21. Грабли
+# 24. Грабли
 
-> EN: Pitfalls table: symptom → cause → fix (MOSS noise, sizes not multiple of 32, missing detector model, see-through fabric, two ComfyUI instances, background repaint after cropping, colour drift, finger melt).
+> EN: Pitfalls table: symptom → cause → fix (MOSS noise, sizes not multiple of 32, missing detector model, see-through fabric, two ComfyUI instances, background repaint after cropping, colour drift, finger melt, old-torch lip-sync repos on Blackwell, a cleanup script deleting a pod mid-render, ComfyUI cache returning stale batch outputs).
 
 Ошибки, которые стоили времени. Каждая с причиной и решением.
 
@@ -21,4 +21,8 @@
 | Фигура «спортивная», хотя просил пышную | мягкие слова о теле, Krea Turbo при cfg 1 их не слышит | сильные теги (секция «Фигура») |
 | Через ~1 с полностью меняется фон | первый кадр обрезан под 4:5 (у картинки 5:8) + в background lock перечислены предметы, которых нет на кадре | масштаб без обрезки (`05`); в lock: «the room exactly as in <Picture 1>, nothing added» |
 | Кадр за 3 с темнеет и желтеет | дрейф H3 / Eros Max (до −31 %), «warm» в промпте, даже в строке музыки | тоггл «свет как на первом кадре» (ColorMatch); без слов настроения в промпте |
+| LatentSync / MuseTalk не запускаются на RTX 5090 | оба закреплены на старом PyTorch без ядер для Blackwell | под на RTX 4090 (Ada); или новый torch и пересборка |
+| Агент сам удалил под посреди рендера | скрипт уборки проверял «готово» по журналу и нашёл старые строки отклонённых попыток | проверять только строки текущего запуска; удалять под по имени и после проверки результата |
+| Остановка скрипта всё равно создала под | команда `pod create` уже ушла на сервер | перед повторным созданием — `pod list` по имени |
+| Пакетный прогон вернул старую картинку для того же графа | кэш ComfyUI отдаёт прежний результат одинакового графа | метка запуска в префиксе файла сохранения |
 | Пальцы плывут в конце ролика | касание рук в последней секунде | касание в середину, в конце удержание |

@@ -1,4 +1,4 @@
-# 12. Какие модели существуют
+# 15. Какие модели существуют
 
 > EN: Landscape of open image/video models (Oct 2026): MiniMax H3, LTX-2.5, Wan 2.2, Krea 2, FLUX.3 Klein, Qwen-Image 2.1, Z-Image — rankings, licences (H3 excludes the EU), why to test each.
 

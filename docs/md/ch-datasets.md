@@ -1,4 +1,4 @@
-# 14. Датасеты для LoRA
+# 17. Датасеты для LoRA
 
 > EN: LoRA datasets: what 44 Civitai creators report (own generations, real photos, video frames, big curated sets, face-less crops), shared rules (diversity except the target, 1/3 close-medium-full, caption = future prompt, trigger first), our persona recipe, free datasets with licences, tools (img2dataset, JoyCaption, Qwen3-VL, Florence-2, imagededup, ArcFace).
 

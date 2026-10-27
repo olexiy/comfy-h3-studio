@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Движение, POV и сцена · Студия ComfyUI</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="alternate" type="text/markdown" href="md/ch-motion.md" title="Markdown для ИИ-агентов">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: textbook — one reading column, wide media strips, data tables in mono. Copper accent = the test persona's hair. */
+:root{
+  --bg:#f3f2ef; --panel:#ffffff; --fg:#1d2126; --muted:#5d6670; --line:#d9d6cf;
+  --accent:#b4572a; --accent-soft:#f3e3d8; --good:#2f7a4f; --warn:#a8641a; --bad:#a63a3a;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Onest", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15181c; --panel:#1d2227; --fg:#e7e4de; --muted:#9aa3ad; --line:#2f363d;
+  --accent:#e08a5a; --accent-soft:#3a2a21; --good:#6cc08f; --warn:#e0a35a; --bad:#e07a7a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 80px;display:grid;gap:56px}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(20px,3vw,26px);font-weight:500;margin-bottom:14px}
+h3{font-size:16px;font-weight:500}
+p{margin:0 0 12px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.lead{font-size:18px;color:var(--muted);max-width:62ch;margin-top:14px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+section{display:grid;gap:18px;min-width:0}
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.step .n{font:500 12px var(--mono);color:var(--accent)}
+.step .t{font:500 26px/1 var(--display)}
+.step .t small{font:400 13px var(--body);color:var(--muted)}
+.total{font:500 14px var(--mono);color:var(--muted)}
+.total b{color:var(--fg)}
+/* media */
+.strip{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+figure{margin:0;display:grid;gap:8px;min-width:0}
+figure img,figure video{width:100%;max-width:100%;height:auto;border-radius:8px;background:#000;display:block}
+figcaption{font-size:13px;color:var(--muted)}
+figcaption b{color:var(--fg);font-weight:600}
+.wide img{border-radius:8px}
+.tag{display:inline-block;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:999px;border:1px solid currentColor;margin-right:6px;vertical-align:1px}
+.tag.good{color:var(--good)}.tag.warn{color:var(--warn)}.tag.bad{color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);white-space:nowrap}
+tr.win td{background:var(--accent-soft)}
+/* workflows */
+.wf{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .file{font:500 13px var(--mono);color:var(--accent);word-break:break-all}
+.card ul{margin:0;padding-left:18px;font-size:14px}
+.card .time{font:500 13px var(--mono);color:var(--muted)}
+.rules{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.rules li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.rules b{font-weight:600}
+pre{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font:13px/1.55 var(--mono);white-space:pre-wrap;word-break:break-word}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{font:500 13px var(--body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible,video:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.paths td:first-child{white-space:nowrap}
+@media (max-width:760px){.pipe,.strip,.wf{grid-template-columns:minmax(0,1fr)}}
+
+/* book navigation */
+.bookbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between;
+  font:500 13px var(--mono);border-bottom:1px solid var(--line);padding-bottom:12px}
+.bookbar a{text-decoration:none}
+.bookbar .where{color:var(--muted)}
+.pager{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.pager a{display:grid;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--fg)}
+.pager a:hover{border-color:var(--accent)}
+.pager .dir{font:500 12px var(--mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.pager .next{text-align:right;grid-column:2}
+/* contents */
+.toc{display:grid;gap:0;margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.toc li{border-bottom:1px solid var(--line)}
+.toc a{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;gap:4px 14px;align-items:baseline;padding:14px 4px;text-decoration:none;color:var(--fg)}
+.toc a:hover .ct{color:var(--accent)}
+.toc .cn{font:500 13px var(--mono);color:var(--accent)}
+.toc .ct{font:500 18px/1.25 var(--display)}
+.toc .cd{grid-column:2;color:var(--muted);font-size:14px}
+.toc .st{grid-row:1;grid-column:3}
+.news{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.news li{display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:12px}
+.news time{font:500 13px var(--mono);color:var(--muted)}
+@media (max-width:760px){.toc a{grid-template-columns:2.4em minmax(0,1fr)}.toc .st{grid-row:auto;grid-column:2}
+  .pager{grid-template-columns:minmax(0,1fr)}.pager .next{grid-column:1}.news li{grid-template-columns:minmax(0,1fr);gap:0}}
+/* trend replications (chapter ch-trends + trend-<id>.html pages, built by build_book.py) */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tcard{display:grid;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--fg)}
+.tcard:hover{border-color:var(--accent)}
+.tcard .pair{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.tcard img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.tcard .ci{display:grid;gap:4px;padding:10px 12px}
+.tcard .cm{font:500 12px var(--mono);color:var(--muted)}
+.tr-steps{counter-reset:st;display:grid;gap:28px}
+.tr-steps>section{display:grid;gap:12px}
+.tr-steps>section>h2::before{counter-increment:st;content:counter(st) " · ";color:var(--accent)}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.duo figure{margin:0;display:grid;gap:6px}
+.duo img{width:100%;height:auto;border-radius:8px;display:block}
+.duo figcaption{font-size:13px;color:var(--muted)}
+/* public build: link instead of a creator's original */
+.olink{display:flex;align-items:center;justify-content:center;text-align:center;aspect-ratio:3/4;background:var(--panel,rgba(127,127,127,.08));color:var(--muted);font:500 13px/1.4 var(--mono);text-decoration:none}
+.olink.big{aspect-ratio:auto;min-height:180px;padding:24px;border:1px dashed var(--line);border-radius:10px;color:var(--accent);font-size:15px}
+.olink small{color:var(--muted);font-size:12px}
+/* contents parts + "start here" highlights (cover) */
+.toc li.part{border-bottom:0;padding:26px 4px 6px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hl{display:grid;gap:6px;align-content:start;text-decoration:none;color:var(--fg)}
+.hl img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.hl .ht{font:500 17px/1.2 var(--display)}.hl:hover .ht{color:var(--accent)}
+.hl .hd{color:var(--muted);font-size:14px;line-height:1.4}
+@media (max-width:760px){.hls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hls .hl:nth-child(3){display:none}.hl .ht{font-size:15px}.hl .hd{font-size:13px}}
+/* textbook navigation (2026-10-26): chapter menu in the bar, «главное за минуту», «на этой странице», reading routes */
+.chmenu{position:relative;font:500 13px var(--mono)}
+.chmenu summary{cursor:pointer;color:var(--accent);list-style:none}
+.chmenu summary::-webkit-details-marker{display:none}
+.chmenu summary::after{content:" ▾"}
+.chmenu[open] summary::after{content:" ▴"}
+.chmenu ol{position:absolute;right:0;top:calc(100% + 8px);z-index:5;width:min(360px,calc(100vw - 32px));max-height:70vh;overflow:auto;
+  margin:0;padding:8px 0;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.chmenu li a{display:flex;gap:10px;padding:6px 14px;text-decoration:none;color:var(--fg);font:400 14px/1.35 var(--body)}
+.chmenu li a:hover{background:var(--accent-soft)}
+.chmenu li a[aria-current]{color:var(--accent);font-weight:600}
+.chmenu .cn{font:500 12px var(--mono);color:var(--muted);min-width:1.8em}
+.chmenu li.mp{padding:10px 14px 4px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chintro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}
+.keybox{background:var(--accent-soft);border-radius:10px;padding:14px 18px}
+.keybox b,.onpage b{display:block;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.keybox ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.onpage{border:1px solid var(--line);border-radius:10px;padding:14px 18px;background:var(--panel)}
+.onpage ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.onpage a{text-decoration:none}.onpage a:hover{text-decoration:underline}
+.mdlink{font:500 12px var(--mono);color:var(--muted);margin:0}
+.routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.route{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;align-items:start}
+.route img{width:120px;aspect-ratio:4/5;object-fit:cover;border-radius:8px}
+.route .rt{display:grid;gap:4px}
+.route .rt b{font:500 17px/1.2 var(--display)}
+.route .rt span{color:var(--muted);font-size:14px;line-height:1.4}
+.route ol{margin:6px 0 0;padding-left:20px;font-size:14px;display:grid;gap:2px}
+.agentbox{border:1px dashed var(--accent);border-radius:10px;padding:14px 18px;max-width:80ch}
+/* theory: diagrams, callouts, glossary, evidence tags */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:560px}
+.diagram svg text{font-family:var(--body);fill:var(--fg)}
+.diagram svg .muted{fill:var(--muted)}
+.diagram svg .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.diagram svg .hot{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.diagram svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+.diagram svg .ahead{fill:var(--muted)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;padding:12px 16px;max-width:72ch}
+.callout b:first-child{color:var(--accent)}
+.ev{display:inline-block;font:600 10px/1 var(--mono);letter-spacing:.04em;padding:3px 6px;border-radius:4px;vertical-align:2px;border:1px solid currentColor}
+.ev.m{color:var(--good)}.ev.s{color:var(--warn)}.ev.r{color:var(--accent)}
+.gloss{display:grid;gap:0;margin:0;border-top:1px solid var(--line);max-width:80ch}
+.gloss>div{display:grid;grid-template-columns:minmax(150px,13em) minmax(0,1fr);gap:4px 18px;padding:12px 4px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+.gloss>div:target{background:var(--accent-soft)}
+.gloss dt{font:600 15px var(--body)}
+.gloss dt small{display:block;font:400 12px var(--mono);color:var(--muted)}
+.gloss dd{margin:0;font-size:15px}
+.letters{display:flex;flex-wrap:wrap;gap:6px;font:500 13px var(--mono)}
+.letters a{padding:3px 8px;border:1px solid var(--line);border-radius:6px;text-decoration:none}
+@media (max-width:760px){.chintro,.routes{grid-template-columns:minmax(0,1fr)}.route{grid-template-columns:84px minmax(0,1fr)}.route img{width:84px}
+  .gloss>div{grid-template-columns:minmax(0,1fr)}.chmenu ol{position:fixed;left:16px;right:16px;top:56px;width:auto}}
+.cover-video{max-width:760px}
+/* live 3D viewer (ch-3d, <model-viewer>) */
+.m3d{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.m3d model-viewer{display:block;width:100%;height:auto;aspect-ratio:1/1;max-width:100%;background:var(--bg);border-radius:10px;--poster-color:transparent}
+.m3d-side{display:grid;gap:12px;align-content:start;min-width:0}
+.m3d-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.m3d-pick button{display:grid;gap:6px;justify-items:center;padding:6px;font-size:13px}
+.m3d-pick img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;background:var(--bg)}
+.m3d-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.m3d-l{font:500 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:4px}
+.m3d button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.m3d-stat{font:500 13px/1.4 var(--mono);font-variant-numeric:tabular-nums;margin:0}
+.m3d-note{margin:0;font-size:14px;color:var(--muted)}
+@media (max-width:760px){.m3d{grid-template-columns:minmax(0,1fr)}}
+/* ch-3d demo card: poster + Play link; the game page loads nothing until opened */
+.democard{display:grid;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit}
+.democard img{width:100%;height:auto;display:block}
+.democard .dc{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;padding:14px 16px}
+.democard .dc span{color:var(--muted);font-size:14px;max-width:62ch}
+.democard .playbtn{font:600 16px var(--body);background:var(--accent);color:#fff;border-radius:999px;padding:10px 26px;white-space:nowrap}
+.democard:hover .playbtn,.democard:focus-visible .playbtn{filter:brightness(1.08)}
+.pxspin{image-rendering:pixelated;max-width:288px;width:100%;border-radius:8px}
+.pxduo{display:grid;gap:14px;grid-template-columns:minmax(0,2fr) minmax(0,1fr);align-items:start}
+@media (max-width:700px){.pxduo{grid-template-columns:1fr}}
+</style>
+<style>body{margin:0}:root{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="bookbar" aria-label="Учебник"><a href="index.html">← Студия ComfyUI · оглавление</a><span class="where">Часть III · Видео · глава 12 из 27</span><details class="chmenu"><summary>Все главы</summary><ol><li class="mp">Часть I · Введение</li><li><a href="ch-intro.html"><span class="cn">01</span>Как устроен учебник</a></li><li><a href="ch-theory.html"><span class="cn">02</span>Как работают генеративные модели</a></li><li><a href="ch-comfy.html"><span class="cn">03</span>ComfyUI: граф, ноды, workflow</a></li><li><a href="ch-studio.html"><span class="cn">04</span>Железо, файлы и облако</a></li><li class="mp">Часть II · Кадр</li><li><a href="ch-stills.html"><span class="cn">05</span>Кадр: фото на Krea 2</a></li><li><a href="ch-prompts.html"><span class="cn">06</span>Промпты</a></li><li><a href="ch-fix.html"><span class="cn">07</span>Правка кадра</a></li><li><a href="ch-finish.html"><span class="cn">08</span>Финиш против ИИ-вида</a></li><li><a href="ch-ref.html"><span class="cn">09</span>Перенос по референсу</a></li><li class="mp">Часть III · Видео</li><li><a href="ch-video.html"><span class="cn">10</span>Видео на MiniMax H3</a></li><li><a href="ch-speed.html"><span class="cn">11</span>Скорость и качество</a></li><li><a href="ch-motion.html" aria-current="page"><span class="cn">12</span>Движение, POV и сцена</a></li><li><a href="ch-talk.html"><span class="cn">13</span>Говорящий персонаж</a></li><li class="mp">Часть IV · Модели</li><li><a href="ch-scout.html"><span class="cn">14</span>Сравнение моделей</a></li><li><a href="ch-models.html"><span class="cn">15</span>Какие модели существуют</a></li><li class="mp">Часть V · Персонаж и LoRA</li><li><a href="ch-persona.html"><span class="cn">16</span>Свой персонаж и LoRA</a></li><li><a href="ch-datasets.html"><span class="cn">17</span>Датасеты для LoRA</a></li><li class="mp">Часть VI · Чужие рецепты</li><li><a href="ch-creators.html"><span class="cn">18</span>Разбор креаторов</a></li><li><a href="ch-trends.html"><span class="cn">19</span>Повтор трендов</a></li><li class="mp">Часть VII · Монтаж</li><li><a href="ch-editing.html"><span class="cn">20</span>Монтаж с ИИ</a></li><li class="mp">Часть VIII · 3D для игр</li><li><a href="ch-3d.html"><span class="cn">21</span>ИИ для 3D-ассетов</a></li><li class="mp">Часть IX · Справочник</li><li><a href="ch-eval.html"><span class="cn">22</span>Как мы оцениваем результат</a></li><li><a href="ch-workflows.html"><span class="cn">23</span>Workflow в ComfyUI</a></li><li><a href="ch-pitfalls.html"><span class="cn">24</span>Грабли</a></li><li><a href="ch-glossary.html"><span class="cn">25</span>Словарь</a></li><li><a href="ch-lab.html"><span class="cn">26</span>Серии экспериментов</a></li><li><a href="ch-agent.html"><span class="cn">27</span>Для вашего агента</a></li></ol></details></nav>
+<header>
+  <div class="eyebrow">Глава 12 · серия 9 · 27.10.2026</div>
+  <h1>Движение, POV и сцена</h1>
+  <p class="lead">Как точнее управлять движением в H3: чужая поза, своя композиция в новом свете, POV и сцена из нескольких планов с одним персонажем.</p>
+</header>
+<div class="chintro"><aside class="keybox" aria-label="Главное за минуту"><b>Главное за минуту</b><ul><li>Лицо персонажа: Ref2VA 0,72 против FL2VA 0,46 на одной сцене — Ref2VA для главных клипов.</li><li>ControlNet позы — сила 0,6; при 1,0 движения точнее, но лицо теряет ≈ 0,15 ArcFace.</li><li>Canny по своему клипу меняет свет и вид, сохраняя мизансцену.</li><li>Селфи и «взгляд друга» получаются из текста; зеркалу нужен явный бит про отражение.</li></ul></aside><nav class="onpage" aria-label="На этой странице"><b>На этой странице</b><ol><li><a href="#mo-why">Что значит «управлять движением»</a></li><li><a href="#mo-ref">Ref2VA держит лицо лучше FL2VA ЗАМЕР</a></li><li><a href="#mo-cn">ControlNet: повторить позу или сменить вид</a></li><li><a href="#mo-pov">Съёмка «от первого лица»</a></li><li><a href="#mo-scene">Мини-сцена из трёх планов</a></li><li><a href="#mo-rules">Итог серии 9</a></li></ol></nav></div>
+
+<section aria-labelledby="mo-why">
+  <h2 id="mo-why">Что значит «управлять движением»</h2>
+  <p class="prose">Раскадровка по секундам говорит модели, <i>что</i> делать. Но иногда нужно точнее: повторить движения танцора, сохранить композицию готового клипа и поменять только свет, снять «от первого лица» или собрать сцену из нескольких планов с одним и тем же человеком. В серии 9 мы проверили четыре инструмента на H3 и одном персонаже, вымышленной Марен:</p>
+  <div class="pipe">
+    <div class="step"><span class="n">референсы личности</span><span class="t">FL2VA или Ref2VA</span><span>три канонических вида лица вместо первого кадра</span></div>
+    <div class="step"><span class="n">ControlNet</span><span class="t">Fun Union 2.0</span><span>скелет позы или контуры (canny) из чужого клипа</span></div>
+    <div class="step"><span class="n">POV</span><span class="t">только текст</span><span>селфи на вытянутой руке, взгляд друга, зеркало</span></div>
+    <div class="step"><span class="n">мини-сцена</span><span class="t">3 плана × 8 с</span><span>склейка встык, один наряд, один голос</span></div>
+  </div>
+  <p class="prose">Считали на двух арендованных картах одновременно: RTX 5090 (POV и сцена) и RTX PRO 6000 (ControlNet и Ref2VA). Рецепт везде один: 30 шагов, shift 12, без SageAttention. ArcFace — сходство с эталонным фото Марен, среднее и минимум по 6 кадрам клипа.</p>
+</section>
+
+<section aria-labelledby="mo-ref">
+  <h2 id="mo-ref">Ref2VA держит лицо лучше FL2VA <span class="ev m">ЗАМЕР</span></h2>
+  <p class="prose">У H3 два чекпойнта, которые читают референсы личности. <b>FL2VA</b> (первый и последний кадр + звук) у нас стоит локально, <b>Ref2VA</b> (Reference-to-Video + звук, 19,5 ГБ) — специализированный. Один и тот же промпт «бар, она пьёт пиво», те же три вида лица, тот же сид:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Чекпойнт</th><th>Время (PRO 6000)</th><th>ArcFace среднее / минимум</th><th>На глаз</th></tr></thead>
+    <tbody>
+      <tr class="win"><td><b>Ref2VA</b></td><td class="num">230 с</td><td class="num"><b>0,72 / 0,68</b></td><td>самое устойчивое лицо за всю ночь</td></tr>
+      <tr><td>FL2VA</td><td class="num">206 с</td><td class="num">0,46 / 0,33</td><td>та же сцена, сходство слабее</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="rules prose">
+    <li><b>Для клипов, где лицо главное, — Ref2VA.</b> Для повседневных — локальный FL2VA со стандартной нодой референсов (<a href="ch-ref.html#rf-video">глава «Референс»</a>): дешевле и без лишних 19,5 ГБ. <span class="ev r">ПРАВИЛО</span></li>
+    <li>Разница в 0,26 — больше, чем в серии 6b (≈ 0,10), где FL2VA выполнял поворот головы, а Ref2VA его пропускал. Сравнивайте чекпойнты на одной сцене и смотрите, выполнены ли действия.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="mo-cn">
+  <h2 id="mo-cn">ControlNet: повторить позу или сменить вид</h2>
+  <p class="prose"><b>Fun ControlNet-Union 2.0</b> для H3 принимает скелет позы (мы извлекали его SDPose) или контуры кадра (canny). Сила управления — главная ручка: чем она выше, тем точнее движение и тем меньше модели остаётся на лицо.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Вариант</th><th>Время</th><th>ArcFace среднее / мин</th><th>На глаз</th></tr></thead>
+    <tbody>
+      <tr><td>без ControlNet, танец в клубе 1024×576</td><td class="num">146 с</td><td class="num">0,52 / 0,20</td><td>свободный танец</td></tr>
+      <tr class="win"><td><b>поза, сила 0,6</b></td><td class="num">178 с</td><td class="num"><b>0,55</b> / 0,03</td><td>частично повторяет движения рук, лицо держится</td></tr>
+      <tr><td>поза, сила 1,0</td><td class="num">276 с</td><td class="num">0,40 / 0,14</td><td>точно повторяет руки (кулаки вверх), сходство падает</td></tr>
+      <tr class="win"><td><b>canny 0,8</b> из нашего клипа в баре → синий неон</td><td class="num">304 с</td><td class="num">0,59 / 0,30</td><td>композиция и движения те же, свет и вид новые</td></tr>
+    </tbody>
+  </table></div>
+  <figure class="wide"><img src="media/s9-controlnet.jpg" alt="Кадры клипов: без ControlNet, поза 0,6 и 1,0, canny, Ref2VA и FL2VA" loading="lazy"><figcaption><b>Сверху вниз:</b> танец без ControlNet, поза 0,6, поза 1,0, canny-перекраска клипа из бара, Ref2VA и FL2VA на одной сцене, взгляд друга за столиком кафе. Над каждой строкой — длина клипа и ArcFace.</figcaption></figure>
+  <ul class="rules prose">
+    <li><b>Поза — сила 0,6.</b> 1,0 копирует движения, но стоит ≈ 0,15 ArcFace. <span class="ev r">ПРАВИЛО</span></li>
+    <li><b>Canny по своему клипу — способ перекрасить или пересветить сцену</b>, сохранив мизансцену: кто где стоит и куда движется.</li>
+    <li><b>Источник позы важен.</b> У танцовщицы из шаблона платье закрывает ноги, и SDPose нарисовал неполные скелеты. Берите клип, где тело видно целиком.</li>
+    <li>Минимумы ArcFace около нуля — это кадры с волосами на лице или со спины, а не другая личность. Проверяйте глазами.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="mo-pov">
+  <h2 id="mo-pov">Съёмка «от первого лица»</h2>
+  <p class="prose">POV-кадры делали без управления, одним текстом и референсами личности. По 5 с, ≈ 6 минут на RTX 5090.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Кадр</th><th>ArcFace среднее / мин</th><th>Результат</th></tr></thead>
+    <tbody>
+      <tr class="win"><td>селфи на вытянутой руке на прогулке</td><td class="num">0,59 / 0,19</td><td>убедительно, с взглядом через плечо</td></tr>
+      <tr class="win"><td>взгляд друга за столиком кафе</td><td class="num">0,51 / 0,42</td><td>хорошо; рука друга не появилась, только чашка</td></tr>
+      <tr><td>селфи в зеркале</td><td class="num">0,54 / 0,43</td><td><b>не вышло:</b> телефон в руке, но ни зеркала, ни отражения</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="rules prose">
+    <li><b>Селфи и «взгляд друга» работают из текста.</b> <span class="ev m">ЗАМЕР</span></li>
+    <li><b>Зеркальному селфи нужен явный бит:</b> «we see her reflection in the mirror, the phone covers part of her face» — или первый кадр с зеркалом.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="mo-scene">
+  <h2 id="mo-scene">Мини-сцена из трёх планов</h2>
+  <p class="prose">Влог «мой любимый бар в Кройцберге»: прогулка с разговором, заказ у стойки, тост. Три плана по 8 с на FL2VA с тремя видами лица. У каждого плана своя немецкая реплика: голос ElevenLabs, обработанный «под улицу и бар», вморожен в латент по рецепту из <a href="ch-talk.html">главы «Говорящий персонаж»</a>. Монтаж — переходы 0,4 с, зерно <code>subtle_light</code> (<a href="ch-finish.html">глава «Финиш»</a>), громкость −16 LUFS.</p>
+  <figure><video src="media/s9-mini-scene.mp4" poster="media/s9-mini-scene-poster.jpg" controls playsinline preload="none"></video><figcaption><b>Мини-сцена, 23 с.</b> «Hallo ihr Lieben! Ich bin gerade in Kreuzberg…» → «Zwei Helle, bitte!» → «Ehrlich, das ist das beste Bier in ganz Berlin. Prost!»</figcaption></figure>
+  <figure class="wide"><img src="media/s9-scenes.jpg" alt="Кадры трёх планов сцены и POV" loading="lazy"><figcaption><b>Три плана и POV по кадрам.</b> План 1 (788 с): 0,63 / 0,59, в конце она показывает на бар. План 2 (682 с): 0,42 / 0,10 — профиль у стойки занижает метрику, лицо то же. План 3 (687 с): <b>0,72</b> / 0,65, чокается с бокалом друга у края кадра. Ниже — селфи на прогулке и неудавшееся зеркало.</figcaption></figure>
+  <ul class="rules prose">
+    <li><b>Непрерывность держат три вещи:</b> склейка встык, одна строка наряда во всех промптах и одни и те же референсы. <span class="ev r">ПРАВИЛО</span></li>
+    <li><b>Голос на каждый план — свой трек, вмороженный в латент:</b> реплики чистые, губы попадают.</li>
+    <li>Не больше двух действий на 5 с (<a href="ch-prompts.html#pr-video">серия 7</a>): в 8-секундном плане — три-четыре бита.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="mo-rules">
+  <h2 id="mo-rules">Итог серии 9</h2>
+  <ul class="rules prose">
+    <li><b>Лицо персонажа:</b> Ref2VA 0,72 против FL2VA 0,46 на одной сцене. Ref2VA — для главных клипов, локальный FL2VA с референсами — для остальных.</li>
+    <li><b>ControlNet позы — 0,6;</b> canny по своему клипу — для пересвета и перекраски.</li>
+    <li><b>POV:</b> селфи и взгляд друга — текстом; зеркало — только с явным битом про отражение.</li>
+    <li><b>Сцена из планов:</b> склейка встык, один наряд, одни референсы, голос на каждый план.</li>
+    <li>Стоимость ночи вместе с серией 12 — около $5 за две карты (≈ 3 часа аренды).</li>
+    <li>Workflow с ControlNet ещё не собран в общий стиль: граф есть только в скрипте серии.</li>
+  </ul>
+</section>
+
+<p class="mdlink">Для ИИ-агентов: <a href="md/ch-motion.md">эта глава в Markdown</a> · <a href="llms.txt">llms.txt</a></p>
+<nav class="pager" aria-label="Главы"><a href="ch-speed.html" rel="prev"><span class="dir">← назад</span>Скорость и качество</a><a class="next" href="ch-talk.html" rel="next"><span class="dir">дальше →</span>Говорящий персонаж</a></nav>
+</div>
+
+<script>
+document.querySelectorAll('button[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.copy), txt=el.textContent;
+    var done=function(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Копировать'},1500)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено, нажми Ctrl+C'};
+    try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
+  });
+});
+// ←/→ = previous/next chapter (not while typing or selecting text); the chapter menu closes on an outside click or Esc
+document.addEventListener('keydown',function(e){
+  var t=e.target, m=document.querySelector('details.chmenu');
+  if(e.key==='Escape'&&m){m.open=false;return}
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||/INPUT|TEXTAREA|SELECT|VIDEO/.test(t.tagName)||t.isContentEditable)return;
+  if(String(getSelection())!=='')return;
+  var a=document.querySelector('.pager a[rel="'+(e.key==='ArrowLeft'?'prev':e.key==='ArrowRight'?'next':'')+'"]');
+  if(a)location.href=a.getAttribute('href');
+});
+document.addEventListener('click',function(e){
+  var m=document.querySelector('details.chmenu');
+  if(m&&m.open&&!m.contains(e.target))m.open=false;
+});
+</script>
+</body>
+</html>

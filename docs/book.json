@@ -1,7 +1,7 @@
 {
  "title": "Студия ComfyUI",
  "language": "ru",
- "version": "2026-10-26e",
+ "version": "2026-10-27a",
  "site": "https://olexiy.github.io/comfy-h3-studio/",
  "agent_guide": "agent-guide.md",
  "evidence_tags": {
@@ -296,11 +296,47 @@
   },
   {
    "n": 8,
+   "slug": "ch-finish",
+   "title": "Финиш против ИИ-вида",
+   "part": "Часть II · Кадр",
+   "status": "done",
+   "en": "Anti-AI finishing (series 4): generative passes (Krea img2img 0.12–0.3, FaceDetailer) wipe a persona's small marks and FaceDetailer makes faces look teen → none on persona shots; pixel finish wins blind A/B (stills 'subtle', selfies 'phone', video 'subtle_light'); ffmpeg deflicker hurts talking clips; H3 start pop fixed with a settle beat + core Video Slice 0.5 s.",
+   "html": "ch-finish.html",
+   "md": "md/ch-finish.md",
+   "sections": [
+    {
+     "id": "fn-why",
+     "title": "Откуда «ИИ-вид» и где его лечить"
+    },
+    {
+     "id": "fn-gen",
+     "title": "Генеративный финиш стирает приметы ЗАМЕР"
+    },
+    {
+     "id": "fn-pixel",
+     "title": "Пиксельный финиш для фото: выбор вслепую"
+    },
+    {
+     "id": "fn-video",
+     "title": "Финиш для видео: зерно да, deflicker — только по делу ЗАМЕР"
+    },
+    {
+     "id": "fn-leadin",
+     "title": "Первые полсекунды: «скачок» в начале клипа"
+    },
+    {
+     "id": "fn-rules",
+     "title": "Итог серии 4"
+    }
+   ]
+  },
+  {
+   "n": 9,
    "slug": "ch-ref",
    "title": "Перенос по референсу",
    "part": "Часть II · Кадр",
    "status": "done",
-   "en": "Reference transfer on 14 references: Qwen-Image 2.1 + one photo gives the best likeness (ArcFace 0.81, beats a 4000-step LoRA) but copies pose; FLUX.3 Klein for new poses/viewpoints; Krea style-reference LoRA is the only palette/light transfer; H3 Reference-to-Video with three canonical views keeps a persona's mole in place.",
+   "en": "Reference transfer on 14 references: Qwen-Image 2.1 + one photo gives the best likeness (ArcFace 0.81, beats a 4000-step LoRA) but copies pose; FLUX.3 Klein for new poses/viewpoints; Krea style-reference LoRA is the only palette/light transfer; H3 Reference-to-Video with three canonical views keeps a persona's mole in place. Series 6b: the local FL2VA checkpoint also reads identity references via the stock MiniMaxH3ReferenceToVideo node (ArcFace 0.56 vs 0.26 text-only; RefMods add only packaging) → workflow 03R, 9.4 s in 759 s on a 16 GB RTX 5070 Ti (15.5 GB VRAM, 55 GB RAM). All four 10_ref_* workflows run locally in 10–27 s.",
    "html": "ch-ref.html",
    "md": "md/ch-ref.md",
    "sections": [
@@ -325,6 +361,10 @@
      "title": "Видео: родинка больше не «плывёт»"
     },
     {
+     "id": "rf-local",
+     "title": "Без лишних 19,5 ГБ: локальный чекпойнт тоже читает референсы ЗАМЕР"
+    },
+    {
      "id": "rf-wf",
      "title": "Новые workflow"
     },
@@ -335,12 +375,12 @@
    ]
   },
   {
-   "n": 9,
+   "n": 10,
    "slug": "ch-video",
    "title": "Видео на MiniMax H3",
    "part": "Часть III · Видео",
    "status": "live",
-   "en": "MiniMax H3 image-to-video with audio: still → video → 48 fps pipeline, settings sweep (resolution beats steps, shift), length limits (≈ 12 s locally, frames 17k+5), chaining 5 s hops with guide frames, community finetune Eros Max vs official.",
+   "en": "MiniMax H3 image-to-video with audio: still → video → 48 fps pipeline, settings sweep (resolution beats steps, shift), length limits (≈ 12 s locally, frames 17k+5), chaining 5 s hops with guide frames, community finetune Eros Max vs official. Series 12: 10/15/20 s in one pass on a 96 GB cloud card (558/1072/1760 s, ≈ 10 GB VRAM) → the local 12 s cap is system RAM.",
    "html": "ch-video.html",
    "md": "md/ch-video.md",
    "sections": [
@@ -361,13 +401,17 @@
      "title": "Длина видео и склейка клипов"
     },
     {
+     "id": "long",
+     "title": "Длиннее 12 секунд одним проходом: облако ЗАМЕР"
+    },
+    {
      "id": "eros",
      "title": "H3 Eros Max против официальной H3"
     }
    ]
   },
   {
-   "n": 10,
+   "n": 11,
    "slug": "ch-speed",
    "title": "Скорость и качество",
    "part": "Часть III · Видео",
@@ -419,7 +463,75 @@
    ]
   },
   {
-   "n": 11,
+   "n": 12,
+   "slug": "ch-motion",
+   "title": "Движение, POV и сцена",
+   "part": "Часть III · Видео",
+   "status": "done",
+   "en": "Motion control on H3 (series 9): Ref2VA keeps a persona's face far better than FL2VA on the same prompt/refs (ArcFace 0.72 vs 0.46); Fun ControlNet-Union 2.0 pose at 0.6 (1.0 copies moves but costs ~0.15 ArcFace), canny 0.8 restyles your own clip; arm's-length selfie and friend's-view POV work from text, mirror selfie needs an explicit reflection beat; 3×8 s mini-scene with hard cuts, one outfit lock, same refs and a frozen voice per shot.",
+   "html": "ch-motion.html",
+   "md": "md/ch-motion.md",
+   "sections": [
+    {
+     "id": "mo-why",
+     "title": "Что значит «управлять движением»"
+    },
+    {
+     "id": "mo-ref",
+     "title": "Ref2VA держит лицо лучше FL2VA ЗАМЕР"
+    },
+    {
+     "id": "mo-cn",
+     "title": "ControlNet: повторить позу или сменить вид"
+    },
+    {
+     "id": "mo-pov",
+     "title": "Съёмка «от первого лица»"
+    },
+    {
+     "id": "mo-scene",
+     "title": "Мини-сцена из трёх планов"
+    },
+    {
+     "id": "mo-rules",
+     "title": "Итог серии 9"
+    }
+   ]
+  },
+  {
+   "n": 13,
+   "slug": "ch-talk",
+   "title": "Говорящий персонаж",
+   "part": "Часть III · Видео",
+   "status": "done",
+   "en": "Talking persona (series 11/11b): TTS track fed to H3 via ref_audios plus MiniMaxH3AddGuide audio at frame 0 comes out bit-exact (r 0.99–1.00) with lip sync ~2x H3's own voice; ref_audios alone re-voices and shifts 0.1–0.25 s; clean TTS sounds fake → band-limit, compress, echo, ambience; post-hoc LatentSync 1.6 copies the source mouth, MuseTalk 1.5 calms it but softens the face; the viewer kept plain H3 although the sync metric preferred a 0.22 s shift.",
+   "html": "ch-talk.html",
+   "md": "md/ch-talk.md",
+   "sections": [
+    {
+     "id": "tk-why",
+     "title": "H3 умеет говорить сам. Зачем ещё что-то"
+    },
+    {
+     "id": "tk-lock",
+     "title": "Три способа подать голос ЗАМЕР"
+    },
+    {
+     "id": "tk-real",
+     "title": "Чистый TTS звучит как студия — добавьте комнату"
+    },
+    {
+     "id": "tk-lipsync",
+     "title": "Серия 11b: поправить рот моделью липсинка"
+    },
+    {
+     "id": "tk-wf",
+     "title": "Workflow и стоимость"
+    }
+   ]
+  },
+  {
+   "n": 14,
    "slug": "ch-scout",
    "title": "Сравнение моделей",
    "part": "Часть IV · Модели",
@@ -455,7 +567,7 @@
    ]
   },
   {
-   "n": 12,
+   "n": 15,
    "slug": "ch-models",
    "title": "Какие модели существуют",
    "part": "Часть IV · Модели",
@@ -471,12 +583,12 @@
    ]
   },
   {
-   "n": 13,
+   "n": 16,
    "slug": "ch-persona",
    "title": "Свой персонаж и LoRA",
    "part": "Часть V · Персонаж и LoRA",
    "status": "live",
-   "en": "Fictional persona pipeline: hero face (age anchored by facial structure), turnaround with Qwen-Edit 2511, restaging into scenes, first-frame rules for H3, LoRA v1→v3 on RunPod (leak of marks to every woman, regularisation halves the steps in ai-toolkit, DOP + name-like trigger + 4000 steps fixes it: ArcFace 0.65, leak 0.15).",
+   "en": "Fictional persona pipeline: hero face (age anchored by facial structure), turnaround with Qwen-Edit 2511, restaging into scenes, first-frame rules for H3, LoRA v1→v3 on RunPod (leak of marks to every woman, regularisation halves the steps in ai-toolkit, DOP + name-like trigger + 4000 steps fixes it: ArcFace 0.65, leak 0.15). Series 14: batch.py job files (Krea 2 Turbo + persona LoRA → score 0.7·ArcFace + 0.3·sharpness → top-k → H3 from kept stills), resume via results.json, disk guard, per-render GPU lock.",
    "html": "ch-persona.html",
    "md": "md/ch-persona.md",
    "sections": [
@@ -507,11 +619,15 @@
     {
      "id": "lora",
      "title": "Рецепт целиком: от лица до LoRA"
+    },
+    {
+     "id": "ps-batch",
+     "title": "Конвейер на ночь: пакет кадров и роликов с автоотбором"
     }
    ]
   },
   {
-   "n": 14,
+   "n": 17,
    "slug": "ch-datasets",
    "title": "Датасеты для LoRA",
    "part": "Часть V · Персонаж и LoRA",
@@ -543,7 +659,7 @@
    ]
   },
   {
-   "n": 15,
+   "n": 18,
    "slug": "ch-creators",
    "title": "Разбор креаторов",
    "part": "Часть VI · Чужие рецепты",
@@ -563,7 +679,7 @@
    ]
   },
   {
-   "n": 16,
+   "n": 19,
    "slug": "ch-trends",
    "title": "Повтор трендов",
    "part": "Часть VI · Чужие рецепты",
@@ -579,7 +695,7 @@
    ]
   },
   {
-   "n": 17,
+   "n": 20,
    "slug": "ch-editing",
    "title": "Монтаж с ИИ",
    "part": "Часть VII · Монтаж",
@@ -615,7 +731,7 @@
    ]
   },
   {
-   "n": 18,
+   "n": 21,
    "slug": "ch-3d",
    "title": "ИИ для 3D-ассетов",
    "part": "Часть VIII · 3D для игр",
@@ -691,12 +807,12 @@
    ]
   },
   {
-   "n": 19,
+   "n": 22,
    "slug": "ch-eval",
    "title": "Как мы оцениваем результат",
    "part": "Часть IX · Справочник",
    "status": "done",
-   "en": "Evaluation methods used in the book: Laplacian sharpness, ArcFace identity (thresholds 0.6 / 0.5 / 0.3), LAION aesthetic (matched a human ranking), CLIP (did not), OWLv2 + DINOv2 object match, centre PSNR, luma drift, corner diff, LUFS; crop sheets, blind A/B, hard test scenes.",
+   "en": "Evaluation methods used in the book: Laplacian sharpness, ArcFace identity (thresholds 0.6 / 0.5 / 0.3), LAION aesthetic (matched a human ranking), CLIP (did not), OWLv2 + DINOv2 object match, centre PSNR, luma drift, corner diff, LUFS, WER, lip-sync correlation (rejected by a human), flicker; crop sheets, blind A/B, hard test scenes.",
    "html": "ch-eval.html",
    "md": "md/ch-eval.md",
    "sections": [
@@ -723,12 +839,12 @@
    ]
   },
   {
-   "n": 20,
+   "n": 23,
    "slug": "ch-workflows",
    "title": "Workflow в ComfyUI",
    "part": "Часть IX · Справочник",
    "status": "live",
-   "en": "Catalogue of the ready workflows (01 stills, 03 H3 video, 03c chain, 04 post, 09_edit_*, 10_ref_*): what each does, knobs and toggles, measured time; folder convention for agent-built vs human workflows.",
+   "en": "Catalogue of the ready workflows (01 stills, 03 H3 video, 03c chain, 03R persona video from 3 reference views, 08 talking persona with a locked voice track, 04 post, 09_edit_*, 10_ref_*): what each does, knobs and toggles, measured time; folder convention for agent-built vs human workflows.",
    "html": "ch-workflows.html",
    "md": "md/ch-workflows.md",
    "sections": [
@@ -739,12 +855,12 @@
    ]
   },
   {
-   "n": 21,
+   "n": 24,
    "slug": "ch-pitfalls",
    "title": "Грабли",
    "part": "Часть IX · Справочник",
    "status": "live",
-   "en": "Pitfalls table: symptom → cause → fix (MOSS noise, sizes not multiple of 32, missing detector model, see-through fabric, two ComfyUI instances, background repaint after cropping, colour drift, finger melt).",
+   "en": "Pitfalls table: symptom → cause → fix (MOSS noise, sizes not multiple of 32, missing detector model, see-through fabric, two ComfyUI instances, background repaint after cropping, colour drift, finger melt, old-torch lip-sync repos on Blackwell, a cleanup script deleting a pod mid-render, ComfyUI cache returning stale batch outputs).",
    "html": "ch-pitfalls.html",
    "md": "md/ch-pitfalls.md",
    "sections": [
@@ -755,12 +871,12 @@
    ]
   },
   {
-   "n": 22,
+   "n": 25,
    "slug": "ch-glossary",
    "title": "Словарь",
    "part": "Часть IX · Справочник",
    "status": "live",
-   "en": "Glossary RU/EN: ~60 terms (attention, CFG, DiT, DOP, flow matching, LoRA, latent, quantisation, sampler, scheduler, shift, VAE…) with anchors and links to chapters.",
+   "en": "Glossary RU/EN: ~65 terms (attention, CFG, DiT, DOP, flow matching, LoRA, latent, quantisation, sampler, scheduler, shift, VAE…) with anchors and links to chapters.",
    "html": "ch-glossary.html",
    "md": "md/ch-glossary.md",
    "sections": [
@@ -771,12 +887,12 @@
    ]
   },
   {
-   "n": 23,
+   "n": 26,
    "slug": "ch-lab",
    "title": "Серии экспериментов",
    "part": "Часть IX · Справочник",
    "status": "live",
-   "en": "Research programme: 18 experiment series (0–17 + 13B), run by an AI agent with a fixed protocol; status of each, where it runs (local, RunPod, API).",
+   "en": "Research programme: about 20 experiment series (0–17 plus 6b, 9B, 11b, 13B), run by an AI agent with a fixed protocol; status of each, where it runs (local, RunPod, API).",
    "html": "ch-lab.html",
    "md": "md/ch-lab.md",
    "sections": [
@@ -787,7 +903,7 @@
    ]
   },
   {
-   "n": 24,
+   "n": 27,
    "slug": "ch-agent",
    "title": "Для вашего агента",
    "part": "Часть IX · Справочник",

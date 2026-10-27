@@ -1,4 +1,4 @@
-# 18. ИИ для 3D-ассетов
+# 21. ИИ для 3D-ассетов
 
 > EN: AI game assets on a 16 GB GPU: Krea 2 concept → Pixal3D (MIT, native ComfyUI) mesh with PBR in 99–190 s; native Decimate+UnwrapMesh+bake → 20k/5k/1.5k in one run; one style block → 8-prop set that reads as one game (give palette as accents only); Pixal3D meshes from 3/4-view concepts are tilted 15–37° about X → level them (ga_level.py); 32-direction sprite atlases and pixel art from Blender turntables (one shared palette, one px-per-metre scale); hex tiles: whole AI tiles fit a hexagon within 2–5 %, exact prism kit is flatter; Godot 4.7 bench (2500 props): triangles decide, not draw calls (auto-instancing); our 20k/5k/1.5k VisibilityRange chain 0.86 ms vs 9.79 ms plain 20k and 1.94 ms Godot auto-LOD; MultiMesh slower (no per-instance culling); browser demo (Three.js + 2D canvas): 3D meadow 30 draw calls / 120k tris, 61-tile hex board, pixel mode, WebAudio sounds.
 

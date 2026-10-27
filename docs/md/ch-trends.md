@@ -1,4 +1,4 @@
-# 16. Повтор трендов
+# 19. Повтор трендов
 
 > EN: Trend replication loop, one page per Civitai post: metadata via the public API, missing files, rebuilt graph, closest copy + two own-subject renders in the same aesthetic; what replicates on the first render and what needs the creator's LoRA.
 

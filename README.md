@@ -7,7 +7,7 @@ A local ComfyUI pipeline for photoreal image-to-video on a single 16 GB consumer
 Ready-to-drop ComfyUI workflows, the Python tooling used to generate and benchmark them, and the measured
 results.
 
-- **Textbook (Russian, 23 chapters, for people and AI agents):** https://olexiy.github.io/comfy-h3-studio/ — theory (how diffusion / flow-matching models, VAE, text encoders, CFG, LoRA and quantisation work), ComfyUI basics, hardware and cloud, Krea 2 stills, image editing, reference transfer, MiniMax H3 video, speed vs quality, model comparison, a fictional persona + LoRA trained on RunPod, LoRA datasets, Civitai creator breakdowns and trend replications, editing video with HyperFrames, evaluation methods, glossary. Two short explainer videos. **For agents:** [`docs/llms.txt`](docs/llms.txt) (map), [`docs/agent-guide.md`](docs/agent-guide.md) (English, exact files and settings with [MEASURED]/[SOURCE]/[RULE] tags), [`docs/book.json`](docs/book.json), [`docs/llms-full.txt`](docs/llms-full.txt), every chapter as Markdown in [`docs/md/`](docs/md/).
+- **Textbook (Russian, 27 chapters, for people and AI agents):** https://olexiy.github.io/comfy-h3-studio/ — theory (how diffusion / flow-matching models, VAE, text encoders, CFG, LoRA and quantisation work), ComfyUI basics, hardware and cloud, Krea 2 stills, image editing, reference transfer, anti-AI finishing, MiniMax H3 video (incl. 20 s in one pass on a cloud card), motion control (ControlNet, POV, a multi-shot scene), a talking persona with a chosen TTS voice, speed vs quality, model comparison, a fictional persona + LoRA trained on RunPod and a batch pipeline, LoRA datasets, Civitai creator breakdowns and trend replications, editing video with HyperFrames, evaluation methods, glossary. Two short explainer videos. **For agents:** [`docs/llms.txt`](docs/llms.txt) (map), [`docs/agent-guide.md`](docs/agent-guide.md) (English, exact files and settings with [MEASURED]/[SOURCE]/[RULE] tags), [`docs/book.json`](docs/book.json), [`docs/llms-full.txt`](docs/llms-full.txt), every chapter as Markdown in [`docs/md/`](docs/md/).
 - **Workflows:** [`workflows/`](workflows/) · **Tools:** [`tools/`](tools/) · **Shot-list prompts:** [`prompts/`](prompts/)
 
 > **Model licence first.** This repo ships no weights. MiniMax H3's open-weights licence
@@ -38,15 +38,17 @@ switched-off branch never runs.
 | `03c_video_h3_chain` | Continue a clip: last 22 frames + audio of the previous clip as anchor (`MiniMaxH3AddGuide`), +5 s, joined into one mp4; size taken from the clip | same as 03 | **233 s** per +5 s |
 | `04_post_upscale_rife` | lanczos ×2 → 1536×1920, RIFE 4.7 → 48 fps, audio passed through | RIFE multiplier, fps (= 24 × multiplier) · **upscale ×2**, **RIFE** | **27 s** (×3 / 72 fps: 39 s, RAM 61 GB) |
 | `01e_edit_qwen2511_persona` | Qwen-Image-Edit 2511, 40 steps cfg 4: restage a persona (expressions, profiles, angles) for a LoRA dataset | instruction, seed, size | ≈ 110 s |
+| `03R_video_h3_ref` | MiniMax H3 persona video from 3 identity reference views (front, 3/4, profile) through the stock `MiniMaxH3ReferenceToVideo` node on the FL2VA checkpoint — no first frame; quality recipe 30 steps, shift 12 | prompt, size, frames, seed · **2nd**, **3rd reference** | 9.4 s clip: **759 s** (peak VRAM 15.5 GB, RAM 55 GB) |
+| `08_video_talking` | `03R` + a chosen voice: the TTS track goes to `ref_audios` **and** to `MiniMaxH3AddGuide` (audio, frame 0), so the clip's audio is the input track bit-exact | prompt (restrained mouth wording), voice track, seed | ≈ 6 min per 5 s on an RTX 5090 |
 | `03L_video_ltx25_i2v` | LTX-2.5 distilled i2v — fast draft path with the same first frame and shot-list as `03` | prompt, size, frames, seed | ≈ 60 s per 9 s at 768×960 |
 | `09_edit_qwen21` | **Default editor**: Qwen-Image 2.1 Turbo, 8 steps — remove, recolour, background, outfit, sign text, hand fix | instruction, seed · **2nd reference**, **new canvas size** (outpaint 16:9 / 9:16) | ≈ 11 s |
 | `09_edit_krea_general` | Krea 2 General Edit V2 LoRA on Krea 2 Turbo — relight and soft recolour that keep the photo texture | instruction, seed, MP, ref boost, grounding | ≈ 30 s |
 | `09_edit_headswap_bfs` | BFS head swap on Qwen-Image 2.1 Turbo — last resort, fictional characters only | body image, head image, seed, BFS strength | ≈ 13 s |
 | `09_edit_upscale_4k` | SeedVR2 7B sharp, ×2.4, colour correction lab | — | ≈ 12 s |
-| `10_ref_qwen21` | 1–3 reference images → new scene (best likeness; copies pose/camera) | prompt naming image 1/2/3, canvas size · **2nd**, **3rd reference** | 5–7 s on a 96 GB card |
-| `10_ref_klein` | FLUX.3 Klein with `<ref_image_N>` — new poses and viewpoints | prompt, seed · **2nd reference** | 6–13 s on a 96 GB card |
-| `10_ref_style_krea` | official Krea 2 style-reference LoRA — palette, light and style only | prompt (content only), style strength | 17 s on a 96 GB card |
-| `10_ref_product_krea` | Krea 2 General Edit V2 — product shot into a new 4:5 scene | prompt, ref boost (2 = new scene) | 11 s on a 96 GB card |
+| `10_ref_qwen21` | 1–3 reference images → new scene (best likeness; copies pose/camera) | prompt naming image 1/2/3, canvas size · **2nd**, **3rd reference** | 9.7 s |
+| `10_ref_klein` | FLUX.3 Klein with `<ref_image_N>` — new poses and viewpoints | prompt, seed · **2nd reference** | 10.2 s |
+| `10_ref_style_krea` | official Krea 2 style-reference LoRA — palette, light and style only | prompt (content only), style strength | 18.9 s |
+| `10_ref_product_krea` | Krea 2 General Edit V2 — product shot into a new 4:5 scene | prompt, ref boost (2 = new scene) | 26.8 s |
 
 Toggles in the video workflows:
 - **Eros Max** — off = official H3 + turbo LoRA (sharper); on = community finetune Eros Max beta5 + VBVR LoRA 0.25

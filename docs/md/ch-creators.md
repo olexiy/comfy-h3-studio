@@ -1,4 +1,4 @@
-# 15. Разбор креаторов
+# 18. Разбор креаторов
 
 > EN: Creator breakdowns from Civitai generation metadata: Sleeps_In_Sunbeams — one-line prompts plus a stack of 3–6 style LoRAs on Krea 2 Turbo, 8–15 steps, cfg 1; file list with triggers; how to rebuild the stack.
 
